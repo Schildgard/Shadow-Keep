@@ -101,6 +101,11 @@ void AEternalGrace_ProtoCharacter::TriggerCurrentInteractable()
 	Interact_Implementation();
 }
 
+void AEternalGrace_ProtoCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AEternalGrace_ProtoCharacter::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
@@ -129,8 +134,8 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Look);
-
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Interact_Implementation);
+		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::ShowInventory);
 
 
 	}
@@ -168,6 +173,19 @@ UInventoryComponent* AEternalGrace_ProtoCharacter::GetInventory()
 void AEternalGrace_ProtoCharacter::ObtainArmor(FName ArmorName, EObjectType ItemCategory)
 {
 	PlayerInventory->TryToObtainItem(ArmorName, ItemCategory);
+}
+
+void AEternalGrace_ProtoCharacter::SetPlayerIndex(int AssignedPlayerIndex)
+{
+	PlayerIndex = AssignedPlayerIndex;
+	if(PlayerIndex == 1)
+	{
+		ObjectID = "PlayerTwo";
+	}
+	else
+	{
+		ObjectID = "PlayerOne";
+	}
 }
 
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)
@@ -301,7 +319,7 @@ void AEternalGrace_ProtoCharacter::ShowInteractUI_Implementation(AActor* ActorTo
 {
 	UE_LOG(LogTemp, Display, TEXT("Player shows Interact Interface"));
 	//Get player Controller
-	APlayerController* PossessingController = UGameplayStatics::GetPlayerController(GetWorld(), PlayerIndex);
+	APlayerController* PossessingController = UGameplayStatics::GetPlayerController(GetWorld(), PlayerIndex); //<< Fehler hier
 	AEG_PlayerController* EGController = Cast<AEG_PlayerController>(PossessingController);
 	if (EGController)
 	{
@@ -310,6 +328,10 @@ void AEternalGrace_ProtoCharacter::ShowInteractUI_Implementation(AActor* ActorTo
 		EGController->ShowInteractInfoWidget();
 		//Set Current Interactable
 		CurrentInteractable = ActorToInteractWith;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to Cast PlayerController in Interact Implementation (ProtoCharacter Class)"));
 	}
 }
 

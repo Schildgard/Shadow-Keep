@@ -11,6 +11,7 @@
  *
  */
 class UEternalGrace_SaveGame;
+class AEternalGrace_ProtoCharacter;
 UCLASS()
 class ETERNALGRACE_PROTO_API UEternalGrace_GameInstance : public UGameInstance
 {
@@ -41,6 +42,15 @@ protected:
 	bool bIsMultiplayerActivated;
 	UPROPERTY()
 	bool bHasMultiplayerBeenSet;
+
+	//ClassSelection
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players", meta = (AllowPrivateAccess))
+	TSubclassOf<AEternalGrace_ProtoCharacter> CharacterClass0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players", meta = (AllowPrivateAccess))
+	TSubclassOf<AEternalGrace_ProtoCharacter> CharacterClass1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess)) //temporary
+	TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> PlayerMap;
 public:
 	UFUNCTION()
 	bool GetTwoPlayerMode();
@@ -82,4 +92,9 @@ public:
 
 	UFUNCTION()
 	void SetMultiplayer(bool bShouldMultiplayerBeActive);
+
+	UFUNCTION()
+	void SetPlayerClass(int PlayerIndex, int ClassIndex);
+	UFUNCTION()
+	TSubclassOf<AEternalGrace_ProtoCharacter> GetPlayerClass(int PlayerIndex);
 };

@@ -53,6 +53,11 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MenuAction;
+
+
+
 public:
 	AEternalGrace_ProtoCharacter();
 	
@@ -96,7 +101,7 @@ protected:
 
 
 protected:
-
+	virtual void BeginPlay()override;
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -122,5 +127,9 @@ public:
 
 	UFUNCTION()
 	void ObtainArmor(FName ArmorName, EObjectType ItemCategory);
+
+	//While Object ID is an Identifier for the Save Game, the PlayerIndex holds track to wether its Player 1 or 2
+	UFUNCTION()
+	void SetPlayerIndex(int AssigendPlayerIndex);
 };
 

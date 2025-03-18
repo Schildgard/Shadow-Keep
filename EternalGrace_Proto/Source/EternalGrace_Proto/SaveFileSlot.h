@@ -11,6 +11,7 @@
  */
 class UButton;
 class UTextBlock;
+class UTitleScreenOptions;
 UCLASS()
 class ETERNALGRACE_PROTO_API USaveFileSlot : public UUserWidget
 {
@@ -27,6 +28,9 @@ protected:
 	UTextBlock* ButtonText;
 	UPROPERTY()
 	FName SlotID;
+
+	UPROPERTY()
+	UTitleScreenOptions* Instigator;
 public:
 
 	UFUNCTION()
@@ -37,5 +41,7 @@ public:
 	void LoadGame();
 	UFUNCTION()
 	void DeleteFile();
+	UFUNCTION()
+	void SetInstigator(UTitleScreenOptions* InstigatingMenu);
 	
 };

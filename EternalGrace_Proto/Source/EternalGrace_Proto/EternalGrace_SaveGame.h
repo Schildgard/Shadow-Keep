@@ -11,6 +11,7 @@
 /**
  * 
  */
+class AEternalGrace_ProtoCharacter;
 UCLASS()
 class ETERNALGRACE_PROTO_API UEternalGrace_SaveGame : public USaveGame
 {
@@ -25,8 +26,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Groups", meta = (AllowPrivateAccess))
 	TMap<FName, FTreasureChestSaveData> TreasureChestSaveDataMap;
 
+
+	//General Game Settings Data
 	UPROPERTY()
 	bool bIsTwoPlayerModeActivated;
+	UPROPERTY()
+	TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> PlayerClassMap;
 
 
 public:
@@ -51,11 +56,11 @@ public:
 	UFUNCTION()
 	bool CheckTreasureSaveDataMap(FName ObjectID, FTreasureChestSaveData TreasureData);
 
-	//UFUNCTION()
-	//TMap<FName, FTreasureChestSaveData>& GetTreasureChestSaveDataMap();
-	//
-	//UFUNCTION()
-	//TMap<FName, FPlayerSaveData>& GetPlayerSaveDataMap();
+	UFUNCTION()
+	void SetPlayerMap(TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> PlayerMap);
+	UFUNCTION()
+	TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> GetPlayerMap();
+
 
 	UFUNCTION()
 	void SavePlayerData(FName ObjectID, FPlayerSaveData NewSaveData);

@@ -205,7 +205,20 @@ void UEternalGrace_GameInstance::DeleteFile(FName SlotID)
 
 void UEternalGrace_GameInstance::StartGame()
 {
+	int SlotNumber = GetAllSaveGames().Num() + 1;
+	FName NewSlotName;
+	if (bIsMultiplayerActivated)
+	{
+		NewSlotName = FName(TEXT("Multiplayer Session 0"), SlotNumber);
+	}
+	else
+	{
+		NewSlotName = FName(TEXT("Singleplayer Session 0"), SlotNumber);
+	}
+	SetActiveSaveGameSlot(NewSlotName);
+
 	CurrentSaveGame->SetTwoPlayerModeInfo(bIsMultiplayerActivated);
+	CurrentSaveGame->SetPlayerMap(PlayerMap);
 	//Load The Game
 	UGameplayStatics::OpenLevel(GetWorld(), FName("EmptyLevel"));
 }
@@ -213,18 +226,52 @@ void UEternalGrace_GameInstance::StartGame()
 void UEternalGrace_GameInstance::ResumeGame()
 {
 	SetMultiplayer(CurrentSaveGame->GetTwoPlayerModeInfo());
+	PlayerMap = CurrentSaveGame->GetPlayerMap();
 	UGameplayStatics::OpenLevel(GetWorld(), FName("EmptyLevel"));
 }
 
 void UEternalGrace_GameInstance::SetMultiplayer(bool bShouldMultiplayerBeActive)
 {
-	if(bHasMultiplayerBeenSet)
+	if (bHasMultiplayerBeenSet)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Multiplayer can only be set before starting a Game in the Main Menu."))
 			return;
 	}
 	bIsMultiplayerActivated = bShouldMultiplayerBeActive;
 	bHasMultiplayerBeenSet = true;
+}
+
+void UEternalGrace_GameInstance::SetPlayerClass(int PlayerIndex, int ClassIndex)
+{
+
+	if(PlayerIndex > 1)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid PlayerIndex (GameInstance)"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("Set Player %i Default Class to %i (GameInstance)"), PlayerIndex, ClassIndex);
+		switch (ClassIndex)
+		{
+		case 0:
+			PlayerMap.Add(PlayerIndex, CharacterClass0);
+			break;
+		case 1:
+			PlayerMap.Add(PlayerIndex, CharacterClass1);
+			break;
+		default:
+			PlayerMap.Add(PlayerIndex, CharacterClass0);
+			break;
+		}
+		UE_LOG(LogTemp, Display, TEXT("PlayerMap Contains %i PlayerData now (GameInstance)"), PlayerMap.Num());
+
+		//Test! Remove this!
+		StartGame();
+}
+
+TSubclassOf<AEternalGrace_ProtoCharacter> UEternalGrace_GameInstance::GetPlayerClass(int PlayerIndex)
+{
+	return *PlayerMap.Find(PlayerIndex);
 }
 
 

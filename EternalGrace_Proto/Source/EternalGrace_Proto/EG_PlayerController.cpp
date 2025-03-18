@@ -32,6 +32,7 @@ void AEG_PlayerController::BeginPlay()
 	}
 }
 
+
 void AEG_PlayerController::ShowInventory()
 {
 	//Check if Inventory Class is assigned
@@ -42,6 +43,10 @@ void AEG_PlayerController::ShowInventory()
 		{
 			CurrentInventorySlot.Empty();
 			CurrentInventory->RemoveFromParent();
+			FInputModeGameOnly GameOnlyInputMode;
+			SetInputMode(GameOnlyInputMode);
+			bShowMouseCursor = false;
+			
 			return;
 		}
 		CurrentInventory = CreateWidget<UInventory>(this, InventoryClass);
@@ -102,6 +107,13 @@ void AEG_PlayerController::ShowInventory()
 						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Pants->PantsName.ToString())
 					}
 				}
+				if(CurrentInventorySlot.Num() >=1)
+				{
+					CurrentInventorySlot[0]->SetFocus();
+				}
+
+				FInputModeGameAndUI InputMode;
+				SetInputMode(InputMode);
 			}
 		}
 	}

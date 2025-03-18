@@ -73,6 +73,17 @@ bool UEternalGrace_SaveGame::CheckTreasureSaveDataMap(FName ObjectID, FTreasureC
 	return true;
 }
 
+void UEternalGrace_SaveGame::SetPlayerMap(TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> IncomingPlayerMap)
+{
+	PlayerClassMap = IncomingPlayerMap;
+	SaveTheGame();
+}
+
+TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> UEternalGrace_SaveGame::GetPlayerMap()
+{
+	return PlayerClassMap;
+}
+
 //LoadData functions are calles by Saveable Objects which load their SaveData Info from this Data Map!
 FPlayerSaveData* UEternalGrace_SaveGame::LoadPlayerData(FName ObjectID)
 {

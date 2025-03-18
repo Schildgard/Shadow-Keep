@@ -10,6 +10,7 @@
  * 
  */
 class UButton;
+class UButtonWidget;
 class UVerticalBox;
 class USaveFileSlot;
 class UEternalGrace_GameInstance;
@@ -21,16 +22,24 @@ class ETERNALGRACE_PROTO_API UTitleScreenOptions : public UUserWidget
 protected:
 	void NativeConstruct()override;
 
-	UPROPERTY(meta =(BindWidget), Transient)
-	UButton* StartNewGameButton;
+	UPROPERTY(meta =(BindWidget))
+	UButtonWidget* StartNewGameButton;
 	UPROPERTY(meta = (BindWidget), Transient)
-	UButton* GoBackButton;
+	UButtonWidget* GoBackButton;
 	UPROPERTY(meta = (BindWidget), Transient)
-	UButton* LoadGameButton;
+	UButtonWidget* LoadGameButton;
 	UPROPERTY(meta = (BindWidget), Transient)
-	UButton* SinglePlayerModeSelectionButton;
+	UButtonWidget* SinglePlayerModeSelectionButton;
 	UPROPERTY(meta = (BindWidget), Transient)
-	UButton* MultiPlayerModeSelectionButton;
+	UButtonWidget* MultiPlayerModeSelectionButton;
+	UPROPERTY(meta = (BindWidget), Transient)
+	UButtonWidget* CloseSaveFileButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class Selection", meta= (AllowPrivateAccess))
+	TSubclassOf<UUserWidget> ClassSelectionWidgetClass;
+	UPROPERTY()
+	UUserWidget* ClassSelectionWidget;
+
 
 	UPROPERTY(Transient)
 	bool bAreLoadButtonsVisible;
@@ -55,4 +64,17 @@ protected:
 	void ShowPlayerModeOptions();
 	UFUNCTION()
 	void ReturnToSaveGameSelection();
+
+	UFUNCTION()
+	void PlayOnSelectedSound();
+
+	UFUNCTION()
+	void ShowClassSelection();
+
+	UFUNCTION()
+	void SetPlayerStartingClass();
+
+public:
+	UFUNCTION()
+	UButtonWidget* GetCloseSaveFileButton();
 };
