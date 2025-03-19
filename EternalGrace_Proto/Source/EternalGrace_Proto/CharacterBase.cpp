@@ -6,16 +6,23 @@
 #include "Kismet/GameplayStatics.h"
 #include "EternalGrace_GameInstance.h"
 
-// Sets default values
 ACharacterBase::ACharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	SaveGameObject = nullptr;
 
+	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FaceComp");
+	HeadMesh->SetupAttachment(GetMesh());
+	HairComponent = CreateDefaultSubobject<UGroomComponent>("HairComp");
+	HairComponent->SetupAttachment(HeadMesh);
+	BeardComponent = CreateDefaultSubobject<UGroomComponent>("BeardComp");
+	BeardComponent->SetupAttachment(HeadMesh);
+	MustacheComponent = CreateDefaultSubobject<UGroomComponent>("MustacheComp");
+	MustacheComponent->SetupAttachment(HeadMesh);
+	
+
 }
 
-// Called when the game starts or when spawned
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

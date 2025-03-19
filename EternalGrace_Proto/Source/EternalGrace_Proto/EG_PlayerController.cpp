@@ -107,6 +107,30 @@ void AEG_PlayerController::ShowInventory()
 						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Pants->PantsName.ToString())
 					}
 				}
+
+				//iterate through Pants Data Table
+				TArray<FHelmet*> HelmetTable;
+				static const FString HelmetContext(TEXT("HelmetContext"));
+				OwningCharacter->GetInventory()->GetHelmetInventory()->GetAllRows<FHelmet>(HelmetContext, HelmetTable);
+				int u = j;
+				for (FHelmet* Helmet : HelmetTable)
+				{
+					//create an Inventory Slot for each row of the Inventory and assign Data to Slot
+					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
+					if (CurrentInventorySlot[u])
+					{
+						CurrentInventorySlot[u]->AddToPlayerScreen();
+						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[u]);
+						CurrentInventorySlot[u]->SetImage(Helmet->ThumpNailImage.LoadSynchronous());
+						CurrentInventorySlot[u]->SetItemName(Helmet->HelmetName);
+						CurrentInventorySlot[u]->SetObjectType(Helmet->ObjectType);
+						CurrentInventorySlot[u]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[u], &UInventorySlot::UseInventorySlot);
+						u++;
+						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Helmet->HelmetName.ToString())
+					}
+				}
+
+
 				if(CurrentInventorySlot.Num() >=1)
 				{
 					CurrentInventorySlot[0]->SetFocus();

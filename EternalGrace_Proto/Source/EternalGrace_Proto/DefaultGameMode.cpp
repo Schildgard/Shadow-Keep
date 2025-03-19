@@ -9,7 +9,7 @@
 
 ADefaultGameMode::ADefaultGameMode()
 	: Player1Character(nullptr),
-		Player2Character(nullptr)
+	Player2Character(nullptr)
 {
 	SecondPlayerController = nullptr;
 }
@@ -20,7 +20,7 @@ void ADefaultGameMode::BeginPlay()
 	bool bIsTwoPlayerModeActivated;
 	UGameInstance* GameInstanceReference = GetGameInstance();
 	UEternalGrace_GameInstance* CurrentGameInstance = Cast<UEternalGrace_GameInstance>(GameInstanceReference);
-	if(CurrentGameInstance)
+	if (CurrentGameInstance)
 	{
 		bIsTwoPlayerModeActivated = CurrentGameInstance->GetTwoPlayerMode();
 	}
@@ -36,8 +36,12 @@ void ADefaultGameMode::BeginPlay()
 		FVector Player1SpawnLocation = FVector(0);
 		FRotator Player1SpawnRotation = FRotator(0);
 		AEternalGrace_ProtoCharacter* Player1 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player1Character, Player1SpawnLocation, Player1SpawnRotation);
-		Player1->SetPlayerIndex(0);
-		GetWorld()->GetFirstPlayerController()->Possess(Player1);
+		if (Player1)
+		{
+			Player1->SetPlayerIndex(0);
+			GetWorld()->GetFirstPlayerController()->Possess(Player1);
+		}
+		else UE_LOG(LogTemp, Error, TEXT("Player1 Could not be spawned! (DefaultGameMode)"));
 	}
 	else
 	{
@@ -57,12 +61,18 @@ void ADefaultGameMode::BeginPlay()
 			if (SecondPlayerController)
 			{
 				AEternalGrace_ProtoCharacter* Player2 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player2Character, Player2SpawnLocation, Player2SpawnRotation);
+				if (!Player2)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Player2 Could not be spawned! (DefaultGameMode)"));
+					return;
+				}
+
 				Player2->SetPlayerIndex(1);
 				SecondPlayerController->Possess(Player2);
 				SecondPlayerController->SetOwningCharacterVariable(Player2);
-				if(SecondPlayerController->GetOwningCharacter())
+				if (SecondPlayerController->GetOwningCharacter())
 				{
-				UE_LOG(LogTemp, Warning, TEXT("Second Player Controller Owner has been set to %s"), *Player2->GetFName().ToString());
+					UE_LOG(LogTemp, Warning, TEXT("Second Player Controller Owner has been set to %s"), *Player2->GetFName().ToString());
 				}
 				else
 				{

@@ -6,6 +6,7 @@
 #include "GameFramework/SaveGame.h"
 #include "Saveable.h"
 #include "GameFramework/Character.h"
+#include "GroomComponent.h"
 #include "CharacterBase.generated.h"
 
 class UEternalGrace_SaveGame;
@@ -20,6 +21,15 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
+	USkeletalMeshComponent* HeadMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UGroomComponent* HairComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UGroomComponent* BeardComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UGroomComponent* MustacheComponent;
 
 	UFUNCTION(CallInEditor, Category = "SaveGame")
 	virtual void SaveData_Implementation()override;

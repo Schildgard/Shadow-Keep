@@ -98,7 +98,7 @@ void UArmorComponent::EquipHelmet(FName HelmetName)
 	FHelmet* HelmetData = HelmetTable->FindRow<FHelmet>(CurrentHelmetsName, ContextString);
 	if (HelmetData)
 	{
-		Helmet->SetSkeletalMesh(HelmetData->HelmetMesh.LoadSynchronous());
+		Helmet->SetSkeletalMesh(HelmetData->HelmetMesh.LoadSynchronous());		
 	}
 	else
 	{

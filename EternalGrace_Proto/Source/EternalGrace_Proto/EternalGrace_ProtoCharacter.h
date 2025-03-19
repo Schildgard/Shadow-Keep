@@ -116,8 +116,8 @@ public:
 	void ChangeUpperArmor();
 	UFUNCTION(CallInEditor, Category = "Equipment Test")
 	void ChangePants();
-	UFUNCTION(CallInEditor, Category = "Equipment Test")
-	void ChangeHelmet();
+	UFUNCTION()
+	void ChangeHelmet(FName HelmetID);
 
 	UFUNCTION()
 	UArmorComponent* GetArmorComponent();

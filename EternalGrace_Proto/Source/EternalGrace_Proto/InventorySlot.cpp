@@ -36,7 +36,8 @@ void UInventorySlot::UseInventorySlot()
 		OwningCharacter->GetArmorComponent()->EquipBreastPlate(ItemName);
 		break;
 	case EObjectType::HeadEquipment:
-		OwningCharacter->GetArmorComponent()->EquipHelmet(ItemName);
+		//OwningCharacter->GetArmorComponent()->EquipHelmet(ItemName);
+		OwningCharacter->ChangeHelmet(ItemName);
 		break;
 	case EObjectType::LegEquipment:
 		UE_LOG(LogTemp, Warning, TEXT("Call Equip Pants"))

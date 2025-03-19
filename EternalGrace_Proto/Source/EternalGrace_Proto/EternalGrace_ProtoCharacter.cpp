@@ -155,9 +155,19 @@ void AEternalGrace_ProtoCharacter::ChangePants()
 	UpperArmor->EquipPants("StandardPants");
 }
 
-void AEternalGrace_ProtoCharacter::ChangeHelmet()
+void AEternalGrace_ProtoCharacter::ChangeHelmet(FName HelmetID)
 {
-	UpperArmor->EquipHelmet("StandardHelmet");
+	UpperArmor->EquipHelmet(HelmetID);
+	if (UpperArmor->GetHelmetsName() != "NoHelmet")
+	{
+		HairComponent->SetVisibility(false);
+		BeardComponent->SetVisibility(false);
+	}
+	else
+	{
+		HairComponent->SetVisibility(true);
+		BeardComponent->SetVisibility(true);
+	}
 }
 
 UArmorComponent* AEternalGrace_ProtoCharacter::GetArmorComponent()
@@ -178,7 +188,7 @@ void AEternalGrace_ProtoCharacter::ObtainArmor(FName ArmorName, EObjectType Item
 void AEternalGrace_ProtoCharacter::SetPlayerIndex(int AssignedPlayerIndex)
 {
 	PlayerIndex = AssignedPlayerIndex;
-	if(PlayerIndex == 1)
+	if (PlayerIndex == 1)
 	{
 		ObjectID = "PlayerTwo";
 	}
@@ -260,10 +270,10 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 			SaveDataInfo = *SaveData;
 
 			UE_LOG(LogTemp, Display, TEXT("LOADING SUCESSFULL SaveDataMap Contained Object ID %s"), *ObjectID.ToString())
-			SetActorTransform(SaveDataInfo.PlayerTransform);
+				SetActorTransform(SaveDataInfo.PlayerTransform);
 			UpperArmor->EquipBreastPlate(SaveDataInfo.CurrentBreastArmorName);
 			UpperArmor->EquipPants(SaveDataInfo.CurrentPantsName);
-			//UpperArmor->EquipHelmet(SaveDataInfo.CurrentHelmetsName);
+			UpperArmor->EquipHelmet(SaveDataInfo.CurrentHelmetsName);
 			//Load Inventory
 			for (FArmor Armor : SaveDataInfo.SavedArmorData)
 			{
