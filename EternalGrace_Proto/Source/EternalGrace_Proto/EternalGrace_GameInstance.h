@@ -97,4 +97,7 @@ public:
 	void SetPlayerClass(int PlayerIndex, int ClassIndex);
 	UFUNCTION()
 	TSubclassOf<AEternalGrace_ProtoCharacter> GetPlayerClass(int PlayerIndex);
+
+	UFUNCTION()
+	void TestLoadLevel(UWorld* CurrentWorld);
 };

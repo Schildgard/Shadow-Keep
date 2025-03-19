@@ -37,10 +37,13 @@ void ATreasureChest::GetAllTreasure()
 	{
 		Interactor->ObtainArmor(HelmetName, EObjectType::HeadEquipment);
 	}
+
 	ContainedHelmets.Empty();
 	bCanbeActivated = false;
-	Interactor = nullptr;
 	Execute_SaveData(this);
+	Execute_SaveData(Interactor);
+
+	Interactor = nullptr;
 }
 
 void ATreasureChest::GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)

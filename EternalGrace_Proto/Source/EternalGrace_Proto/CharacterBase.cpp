@@ -14,7 +14,7 @@ ACharacterBase::ACharacterBase()
 	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FaceComp");
 	HeadMesh->SetupAttachment(GetMesh());
 	HairComponent = CreateDefaultSubobject<UGroomComponent>("HairComp");
-	HairComponent->SetupAttachment(HeadMesh);
+	HairComponent->SetupAttachment(HeadMesh, "head");
 	BeardComponent = CreateDefaultSubobject<UGroomComponent>("BeardComp");
 	BeardComponent->SetupAttachment(HeadMesh);
 	MustacheComponent = CreateDefaultSubobject<UGroomComponent>("MustacheComp");

@@ -228,6 +228,7 @@ void UEternalGrace_GameInstance::ResumeGame()
 	SetMultiplayer(CurrentSaveGame->GetTwoPlayerModeInfo());
 	PlayerMap = CurrentSaveGame->GetPlayerMap();
 	UGameplayStatics::OpenLevel(GetWorld(), FName("EmptyLevel"));
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEternalGrace_GameInstance::TestLoadLevel);
 }
 
 void UEternalGrace_GameInstance::SetMultiplayer(bool bShouldMultiplayerBeActive)
@@ -272,6 +273,11 @@ void UEternalGrace_GameInstance::SetPlayerClass(int PlayerIndex, int ClassIndex)
 TSubclassOf<AEternalGrace_ProtoCharacter> UEternalGrace_GameInstance::GetPlayerClass(int PlayerIndex)
 {
 	return *PlayerMap.Find(PlayerIndex);
+}
+
+void UEternalGrace_GameInstance::TestLoadLevel(UWorld* CurrentWorld)
+{
+	RequestLoad();
 }
 
 

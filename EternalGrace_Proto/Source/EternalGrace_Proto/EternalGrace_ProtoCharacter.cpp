@@ -73,8 +73,8 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 	UpperArmor->GetPantsMesh()->SetupAttachment(GetMesh());
 	UpperArmor->GetPantsMesh()->SetLeaderPoseComponent(GetMesh());
 
-	UpperArmor->GetHelmetMesh()->SetupAttachment(GetMesh());
-	UpperArmor->GetHelmetMesh()->SetLeaderPoseComponent(GetMesh());
+	UpperArmor->GetHelmetMesh()->SetupAttachment(HeadMesh);
+	UpperArmor->GetHelmetMesh()->SetLeaderPoseComponent(HeadMesh);
 
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>("Inventory");
 
@@ -273,7 +273,8 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 				SetActorTransform(SaveDataInfo.PlayerTransform);
 			UpperArmor->EquipBreastPlate(SaveDataInfo.CurrentBreastArmorName);
 			UpperArmor->EquipPants(SaveDataInfo.CurrentPantsName);
-			UpperArmor->EquipHelmet(SaveDataInfo.CurrentHelmetsName);
+			ChangeHelmet(SaveDataInfo.CurrentHelmetsName);
+			//UpperArmor->EquipHelmet(SaveDataInfo.CurrentHelmetsName);
 			//Load Inventory
 			for (FArmor Armor : SaveDataInfo.SavedArmorData)
 			{
