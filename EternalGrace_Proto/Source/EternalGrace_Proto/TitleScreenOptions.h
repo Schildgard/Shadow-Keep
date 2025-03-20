@@ -12,6 +12,7 @@
 class UButton;
 class UButtonWidget;
 class UVerticalBox;
+class UScrollBox;
 class USaveFileSlot;
 class UEternalGrace_GameInstance;
 UCLASS()
@@ -46,6 +47,8 @@ protected:
 
 	UPROPERTY(meta = (BindWidget), Transient)
 	UVerticalBox* ButtonAllignmentBox;
+	UPROPERTY(meta = (BindWidget), Transient)
+	UScrollBox* LoadBUttonScrollBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Transient, meta = (AllowPrivateAccess))
 	TSubclassOf<USaveFileSlot> SaveFileSlotWidgetClass;

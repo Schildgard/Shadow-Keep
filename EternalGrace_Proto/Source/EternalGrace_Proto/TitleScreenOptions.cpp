@@ -5,6 +5,7 @@
 #include "EternalGrace_GameInstance.h"
 #include "Components/Button.h"
 #include "Components/VerticalBox.h"
+#include "Components/ScrollBox.h"
 #include "SaveFileSlot.h"
 #include "ButtonWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -25,7 +26,6 @@ void UTitleScreenOptions::NativeConstruct()
 	SinglePlayerModeSelectionButton->GetWidgetButton()->OnClicked.AddDynamic(this, &UTitleScreenOptions::ShowClassSelection); //that was previously on StartNewGame
 	MultiPlayerModeSelectionButton->GetWidgetButton()->OnClicked.AddDynamic(this, &UTitleScreenOptions::SetMultiPlayerMode);
 	CloseSaveFileButton->GetWidgetButton()->OnClicked.AddDynamic(this, &UTitleScreenOptions::ShowAviableSaveGames); //If Savegame list is already open, it closes
-	//ClassSelectionWidget->GetWidgetButton()->OnClicked.AddDynamic(this, &UTitleScreenOptions::SetPlayerStartingClass);
 
 }
 
@@ -51,8 +51,10 @@ void UTitleScreenOptions::ShowAviableSaveGames()
 {
 	if (bAreLoadButtonsVisible)
 	{
-		ButtonAllignmentBox->ClearChildren();
+		//ButtonAllignmentBox->ClearChildren();
+		LoadBUttonScrollBox->ClearChildren();
 		bAreLoadButtonsVisible = false;
+		ReturnToSaveGameSelection();
 		StartNewGameButton->SetFocus();
 		return;
 	}
@@ -66,7 +68,8 @@ void UTitleScreenOptions::ShowAviableSaveGames()
 			SaveFile = CreateWidget<USaveFileSlot>(this, SaveFileSlotWidgetClass);
 			if (SaveFile)
 			{
-				ButtonAllignmentBox->AddChildToVerticalBox(SaveFile);
+				//ButtonAllignmentBox->AddChildToVerticalBox(SaveFile);
+				LoadBUttonScrollBox->AddChild(SaveFile);
 				SaveFile->SetSlotID(SaveGameID);
 				SaveFile->SetInstigator(this);
 				if (i == 0)
@@ -78,10 +81,14 @@ void UTitleScreenOptions::ShowAviableSaveGames()
 		}
 		if (SaveGameList.Num() >= 1)
 		{
-			ButtonAllignmentBox->AddChildToVerticalBox(CloseSaveFileButton);
+			//ButtonAllignmentBox->AddChildToVerticalBox(CloseSaveFileButton);
+			LoadBUttonScrollBox->AddChild(CloseSaveFileButton);
 			CloseSaveFileButton->SetVisibility(ESlateVisibility::Visible);
 			bAreLoadButtonsVisible = true;
 		}
+
+		StartNewGameButton->SetVisibility(ESlateVisibility::Collapsed);
+		LoadGameButton->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	else
 	{
@@ -115,7 +122,6 @@ void UTitleScreenOptions::SetMultiPlayerMode()
 	SinglePlayerModeSelectionButton->SetVisibility(ESlateVisibility::Collapsed);
 	MultiPlayerModeSelectionButton->SetVisibility(ESlateVisibility::Collapsed);
 	GoBackButton->SetVisibility(ESlateVisibility::Collapsed);
-	//StartNewGame();
 }
 
 void UTitleScreenOptions::ShowPlayerModeOptions()
@@ -154,6 +160,7 @@ void UTitleScreenOptions::ShowClassSelection()
 		{
 			ClassSelect->AddToPlayerScreen();
 			UE_LOG(LogTemp, Warning, TEXT("ClassSelect added to viewport. Owned by Controller: %s"), *GetOwningPlayer()->GetFName().ToString());
+			//ClassSelect->SetFocus();
 		}
 	}
 //	if (ClassSelectionWidget->GetVisibility() != ESlateVisibility::Visible)
