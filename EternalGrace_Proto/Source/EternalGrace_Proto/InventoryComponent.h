@@ -22,6 +22,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GlobalData", meta = (AllowPrivateAccess))
 	UDataTable* GlobalArmorInventory;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GlobalData", meta = (AllowPrivateAccess))
@@ -38,6 +39,14 @@ protected:
 	UDataTable* HelmetInventory;
 
 public:	
+	//Attempt to replace Datatables
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta =(AllowPrivateAccess))
+	TMap<FName, int> ArmorInventoryMap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
+	TMap<FName, int> PantsInventoryMap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
+	TMap<FName, int> HelmetInventoryMap;
+
 
 	UFUNCTION()
 	UDataTable* GetArmorInventory();

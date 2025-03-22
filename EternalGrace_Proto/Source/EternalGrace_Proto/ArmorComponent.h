@@ -18,19 +18,21 @@ public:
 
 protected:
 
+	void BeginPlay()override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	UDataTable* BreastPlateArmorTable;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	FName CurrentBreastplateName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	UDataTable* PantsTable;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	FName CurrentPantsName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	UDataTable* HelmetTable;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	FName CurrentHelmetsName;
 
 	//Breastplate
@@ -50,13 +52,13 @@ protected:
 
 public:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void EquipBreastPlate(FName ArmorName);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void EquipPants(FName PantsName);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void EquipHelmet(FName HelmetName);
 
 	UFUNCTION()

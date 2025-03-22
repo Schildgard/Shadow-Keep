@@ -145,14 +145,14 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 	}
 }
 
-void AEternalGrace_ProtoCharacter::ChangeUpperArmor()
+void AEternalGrace_ProtoCharacter::ChangeUpperArmor(FName ArmorID)
 {
-	UpperArmor->EquipBreastPlate("StandardArmor");
+	UpperArmor->EquipBreastPlate(ArmorID);
 }
 
-void AEternalGrace_ProtoCharacter::ChangePants()
+void AEternalGrace_ProtoCharacter::ChangePants(FName PantsID)
 {
-	UpperArmor->EquipPants("StandardPants");
+	UpperArmor->EquipPants(PantsID);
 }
 
 void AEternalGrace_ProtoCharacter::ChangeHelmet(FName HelmetID)
@@ -243,7 +243,8 @@ void AEternalGrace_ProtoCharacter::SaveData_Implementation()
 	if (SaveGameObject)
 	{
 		//Update localSaveData Struct
-		SaveDataInfo.SetPlayerTransform(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), PlayerInventory->GetArmorInventory(), PlayerInventory->GetPantsInventory(), PlayerInventory->GetHelmetInventory());
+	//	SaveDataInfo.SetPlayerTransform(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), PlayerInventory->GetArmorInventory(), PlayerInventory->GetPantsInventory(), PlayerInventory->GetHelmetInventory());
+		SaveDataInfo.UpdatePlayerData(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), &PlayerInventory->ArmorInventoryMap, &PlayerInventory->PantsInventoryMap, &PlayerInventory->HelmetInventoryMap);
 		//Actually Save Data from Struct To SaveGame
 		SaveGameObject->SavePlayerData(ObjectID, SaveDataInfo);
 		UE_LOG(LogTemp, Warning, TEXT("%s called SavePlayerData on SaveGameID %s"), *ObjectID.ToString(), *SaveGameObject->SlotID);
@@ -271,26 +272,32 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 
 			UE_LOG(LogTemp, Display, TEXT("LOADING SUCESSFULL SaveDataMap Contained Object ID %s"), *ObjectID.ToString())
 				SetActorTransform(SaveDataInfo.PlayerTransform);
-			UpperArmor->EquipBreastPlate(SaveDataInfo.CurrentBreastArmorName);
-			UpperArmor->EquipPants(SaveDataInfo.CurrentPantsName);
+			ChangeUpperArmor(SaveDataInfo.CurrentBreastArmorName);
+			ChangePants(SaveDataInfo.CurrentPantsName);
 			ChangeHelmet(SaveDataInfo.CurrentHelmetsName);
-			//UpperArmor->EquipHelmet(SaveDataInfo.CurrentHelmetsName);
 			//Load Inventory
-			for (FArmor Armor : SaveDataInfo.SavedArmorData)
-			{
-				PlayerInventory->AddArmorToInventory(Armor);
-				UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Armor.ArmorName.ToString())
-			}
-			for (FPants Pants : SaveDataInfo.SavedPantsData)
-			{
-				PlayerInventory->AddPantsToInventory(Pants);
-				UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Pants.PantsName.ToString())
-			}
-			for (FHelmet Helmet : SaveDataInfo.SavedHelmetData)
-			{
-				PlayerInventory->AddHelmetToInventory(Helmet);
-				UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Helmet.HelmetName.ToString());
-			}
+		//	for (FArmor Armor : SaveDataInfo.SavedArmorData)
+		//	{
+		//		PlayerInventory->AddArmorToInventory(Armor);
+		//		UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Armor.ArmorName.ToString())
+		//	}
+		//	for (FPants Pants : SaveDataInfo.SavedPantsData)
+		//	{
+		//		PlayerInventory->AddPantsToInventory(Pants);
+		//		UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Pants.PantsName.ToString())
+		//	}
+		//	for (FHelmet Helmet : SaveDataInfo.SavedHelmetData)
+		//	{
+		//		PlayerInventory->AddHelmetToInventory(Helmet);
+		//		UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Helmet.HelmetName.ToString());
+		//	}
+			PlayerInventory->ArmorInventoryMap.Empty();
+			PlayerInventory->ArmorInventoryMap.Append(SaveDataInfo.SavedArmorDataMap);
+			PlayerInventory->PantsInventoryMap.Empty();
+			PlayerInventory->PantsInventoryMap.Append(SaveDataInfo.SavedPantsDataMap);
+			PlayerInventory->HelmetInventoryMap.Empty();
+			PlayerInventory->HelmetInventoryMap.Append(SaveDataInfo.SavedHelmetDataMap);
+
 
 		}
 		else

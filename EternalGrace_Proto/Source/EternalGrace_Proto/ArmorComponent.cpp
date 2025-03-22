@@ -30,19 +30,28 @@ UArmorComponent::UArmorComponent()
 
 }
 
+void UArmorComponent::BeginPlay()
+{
+	//EquipBreastPlate(CurrentBreastplateName);
+	//EquipPants(CurrentPantsName);
+	//EquipHelmet(CurrentHelmetsName);
+}
+
 void UArmorComponent::EquipBreastPlate(FName ArmorName)
 {
 	//Check if Player already wears this Armor. If so, Unequip
-	if (ArmorName != CurrentBreastplateName)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current ArmorName to %s"), *ArmorName.ToString())
-		CurrentBreastplateName = ArmorName;
-	}
-	else
-	{
-		CurrentBreastplateName = "NoArmor";
-		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current ArmorName from %s to NoArmor, since the Character already wears this armor!"), *ArmorName.ToString())
-	}
+//	if (ArmorName != CurrentBreastplateName)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current ArmorName to %s"), *ArmorName.ToString())
+//		CurrentBreastplateName = ArmorName;
+//	}
+//	else
+//	{
+//		CurrentBreastplateName = "NoArmor";
+//		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current ArmorName from %s to NoArmor, since the Character already wears this armor!"), *ArmorName.ToString())
+//	}
+
+	CurrentBreastplateName = ArmorName;
 	//Search general DataTable for ArmorData and Set Data
 	static const FString ContextString(TEXT("NewArmorContext"));
 	FArmor* ArmorData = BreastPlateArmorTable->FindRow<FArmor>(CurrentBreastplateName, ContextString);
@@ -60,16 +69,17 @@ void UArmorComponent::EquipBreastPlate(FName ArmorName)
 
 void UArmorComponent::EquipPants(FName PantsName)
 {
-	if (PantsName != CurrentPantsName)
-	{
-		CurrentPantsName = PantsName;
-		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current PantsName to %s"), *PantsName.ToString())
-	}
-	else
-	{
-		CurrentPantsName = "NoPants";
-		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current PantsName from %s to NoPants, since the Character already wears this pants!"), *PantsName.ToString())
-	}
+//	if (PantsName != CurrentPantsName)
+//	{
+//		CurrentPantsName = PantsName;
+//		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current PantsName to %s"), *PantsName.ToString())
+//	}
+//	else
+//	{
+//		CurrentPantsName = "NoPants";
+//		UE_LOG(LogTemp, Warning, TEXT("ArmorComponent Changes Current PantsName from %s to NoPants, since the Character already wears this pants!"), *PantsName.ToString())
+//	}
+	CurrentPantsName = PantsName;
 	//Search general DataTable for ArmorData and Set Data
 	static const FString ContextString(TEXT("NewPantsContext"));
 	FPants* PantsData = PantsTable->FindRow<FPants>(CurrentPantsName, ContextString);
@@ -86,14 +96,15 @@ void UArmorComponent::EquipPants(FName PantsName)
 void UArmorComponent::EquipHelmet(FName HelmetName)
 {
 
-	if (HelmetName != CurrentHelmetsName)
-	{
-		CurrentHelmetsName = HelmetName;
-	}
-	else
-	{
-		CurrentHelmetsName = "NoHelmet";
-	}
+//	if (HelmetName != CurrentHelmetsName)
+//	{
+//		CurrentHelmetsName = HelmetName;
+//	}
+//	else
+//	{
+//		CurrentHelmetsName = "NoHelmet";
+//	}
+	CurrentHelmetsName = HelmetName;
 	static const FString ContextString(TEXT("NewHelmetContext"));
 	FHelmet* HelmetData = HelmetTable->FindRow<FHelmet>(CurrentHelmetsName, ContextString);
 	if (HelmetData)

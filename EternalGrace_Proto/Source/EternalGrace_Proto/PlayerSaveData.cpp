@@ -47,3 +47,17 @@ void FPlayerSaveData::SetPlayerTransform(FTransform NewTransform, FName Armor, F
 	}
 }
 
+void FPlayerSaveData::UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave)
+{
+	//Save Player Data
+	PlayerTransform = NewTransform;
+	CurrentBreastArmorName = Armor;
+	CurrentPantsName = Pants;
+	CurrentHelmetsName = Helmet;
+
+
+	SavedArmorDataMap = *ArmorDataToSave;
+	SavedPantsDataMap = *PantsDataToSave;
+	SavedHelmetDataMap = *HelmetDataToSave;
+}
+

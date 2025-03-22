@@ -54,7 +54,7 @@ void AEG_PlayerController::ShowInventory()
 			{
 				UWrapBox* InventoryWrapBox = CurrentInventory->GetWrapBox();
 
-				//iterate through Armor Data Table
+		/*		//iterate through Armor Data Table
 				TArray<FArmor*> Table;
 				static const FString Context(TEXT("Context"));
 				OwningCharacter->GetInventory()->GetArmorInventory()->GetAllRows<FArmor>(Context, Table);
@@ -121,12 +121,72 @@ void AEG_PlayerController::ShowInventory()
 						u++;
 						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Helmet->HelmetName.ToString())
 					}
+				} */
+				//TEST: iteriere durch inventory (TMap. Hole für jedes Item die Daten aus dem Data Table.
+
+				int z = 0;
+					static const FString Context2(TEXT("TestContext"));
+				for(TPair<FName,int> ArmorData : OwningCharacter->GetInventory()->ArmorInventoryMap)
+				{
+					FArmor* Armor = OwningCharacter->GetInventory()->GlobalArmorInventory->FindRow<FArmor>(ArmorData.Key, Context2, true);
+
+					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
+					if(CurrentInventorySlot[z])
+					{
+						CurrentInventorySlot[z]->AddToPlayerScreen();
+						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
+						CurrentInventorySlot[z]->SetImage(Armor->ThumpNailImage.LoadSynchronous());
+						CurrentInventorySlot[z]->SetItemName(Armor->ArmorName);
+						CurrentInventorySlot[z]->SetObjectType(Armor->ObjectType);
+						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
+					}
+					z++;
+
 				}
+
+;
+				for (TPair<FName, int> ArmorData : OwningCharacter->GetInventory()->PantsInventoryMap)
+				{
+					FPants* Armor = OwningCharacter->GetInventory()->GlobalPantsInventory->FindRow<FPants>(ArmorData.Key, Context2, true);
+
+					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
+					if (CurrentInventorySlot[z])
+					{
+						CurrentInventorySlot[z]->AddToPlayerScreen();
+						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
+						CurrentInventorySlot[z]->SetImage(Armor->ThumpNailImage.LoadSynchronous());
+						CurrentInventorySlot[z]->SetItemName(Armor->PantsName);
+						CurrentInventorySlot[z]->SetObjectType(Armor->ObjectType);
+						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
+					}
+					z++;
+
+				}
+
+
+				for (TPair<FName, int> ArmorData : OwningCharacter->GetInventory()->HelmetInventoryMap)
+				{
+					FHelmet* Armor = OwningCharacter->GetInventory()->GlobalHelmetInventory->FindRow<FHelmet>(ArmorData.Key, Context2, true);
+
+					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
+					if (CurrentInventorySlot[z])
+					{
+						CurrentInventorySlot[z]->AddToPlayerScreen();
+						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
+						CurrentInventorySlot[z]->SetImage(Armor->ThumpNailImage.LoadSynchronous());
+						CurrentInventorySlot[z]->SetItemName(Armor->HelmetName);
+						CurrentInventorySlot[z]->SetObjectType(Armor->ObjectType);
+						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
+					}
+					z++;
+
+				}
+
 
 
 				if(CurrentInventorySlot.Num() >=1)
 				{
-					CurrentInventorySlot[0]->SetFocus();
+					CurrentInventorySlot[0]->SetKeyboardFocus();
 				}
 
 				FInputModeGameAndUI InputMode;

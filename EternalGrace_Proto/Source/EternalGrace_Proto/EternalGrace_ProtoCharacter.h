@@ -112,11 +112,11 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	UFUNCTION(CallInEditor, Category = "Equipment Test")
-	void ChangeUpperArmor();
-	UFUNCTION(CallInEditor, Category = "Equipment Test")
-	void ChangePants();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
+	void ChangeUpperArmor(FName ArmortID);
+	UFUNCTION(BlueprintCallable)
+	void ChangePants(FName PantsID);
+	UFUNCTION(BlueprintCallable)
 	void ChangeHelmet(FName HelmetID);
 
 	UFUNCTION()

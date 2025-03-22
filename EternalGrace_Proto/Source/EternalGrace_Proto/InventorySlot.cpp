@@ -32,16 +32,14 @@ void UInventorySlot::UseInventorySlot()
 	switch (ItemCategory)
 	{
 	case EObjectType::BodyEquipment:
-		UE_LOG(LogTemp, Warning, TEXT("Call Equip Armor"))
-		OwningCharacter->GetArmorComponent()->EquipBreastPlate(ItemName);
+		OwningCharacter->ChangeUpperArmor(ItemName);
 		break;
 	case EObjectType::HeadEquipment:
 		//OwningCharacter->GetArmorComponent()->EquipHelmet(ItemName);
 		OwningCharacter->ChangeHelmet(ItemName);
 		break;
 	case EObjectType::LegEquipment:
-		UE_LOG(LogTemp, Warning, TEXT("Call Equip Pants"))
-		OwningCharacter->GetArmorComponent()->EquipPants(ItemName);
+		OwningCharacter->ChangePants(ItemName);
 		break;
 	case EObjectType::ArmEquipment:
 		UE_LOG(LogTemp, Warning, TEXT("There is no use Function for Arms Equipment implemented yet. Check InventorySlotClass"))
