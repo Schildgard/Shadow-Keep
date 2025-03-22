@@ -42,6 +42,7 @@ void UCharacterClassSelectWidget::SetClass1()
 			UE_LOG(LogTemp, Error, TEXT("The PlayerController created by CharacterClassSelectionWidget is wether Player 1 nor Player 2"))
 				return;
 		}
+		RemoveFromParent();
 	}
 	else
 	{
@@ -71,6 +72,7 @@ void UCharacterClassSelectWidget::SetClass2()
 			UE_LOG(LogTemp, Error, TEXT("The PlayerController created by CharacterClassSelectionWidget is wether Player 1 nor Player 2"))
 				return;
 		}
+		RemoveFromParent();
 	}
 	else
 	{

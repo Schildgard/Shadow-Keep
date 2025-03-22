@@ -23,13 +23,6 @@ AEG_PlayerController::AEG_PlayerController()
 void AEG_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	//This works only for the first player, since the controller is getted with GetFirstPlayerController Function.
-	//Second Player is set manually with a function called by GameMode
-	OwningCharacter = Cast<AEternalGrace_ProtoCharacter>(GetPawn());
-	if (!OwningCharacter)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Could not Cast Character %s!"), *GetFName().ToString())
-	}
 }
 
 

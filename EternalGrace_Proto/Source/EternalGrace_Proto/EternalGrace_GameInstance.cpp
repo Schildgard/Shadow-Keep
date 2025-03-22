@@ -7,6 +7,7 @@
 #include "Saveable.h"
 #include "HAL/FileManager.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "EternalGrace_ProtoCharacter.h"
 
 UEternalGrace_GameInstance::UEternalGrace_GameInstance()
 {
@@ -209,11 +210,11 @@ void UEternalGrace_GameInstance::StartGame()
 	FName NewSlotName;
 	if (bIsMultiplayerActivated)
 	{
-		NewSlotName = FName(TEXT("Multiplayer Session 0"), SlotNumber);
+		NewSlotName = FName(TEXT("Multiplayer Session "), SlotNumber);
 	}
 	else
 	{
-		NewSlotName = FName(TEXT("Singleplayer Session 0"), SlotNumber);
+		NewSlotName = FName(TEXT("Singleplayer Session "), SlotNumber);
 	}
 	SetActiveSaveGameSlot(NewSlotName);
 
@@ -245,29 +246,41 @@ void UEternalGrace_GameInstance::SetMultiplayer(bool bShouldMultiplayerBeActive)
 void UEternalGrace_GameInstance::SetPlayerClass(int PlayerIndex, int ClassIndex)
 {
 
-	if(PlayerIndex > 1)
+	if (PlayerIndex > 1)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Invalid PlayerIndex (GameInstance)"));
 		return;
 	}
 
 	UE_LOG(LogTemp, Display, TEXT("Set Player %i Default Class to %i (GameInstance)"), PlayerIndex, ClassIndex);
-		switch (ClassIndex)
-		{
-		case 0:
-			PlayerMap.Add(PlayerIndex, CharacterClass0);
-			break;
-		case 1:
-			PlayerMap.Add(PlayerIndex, CharacterClass1);
-			break;
-		default:
-			PlayerMap.Add(PlayerIndex, CharacterClass0);
-			break;
-		}
-		UE_LOG(LogTemp, Display, TEXT("PlayerMap Contains %i PlayerData now (GameInstance)"), PlayerMap.Num());
+	switch (ClassIndex)
+	{
+	case 0:
+		PlayerMap.Add(PlayerIndex, CharacterClass0);
+		break;
+	case 1:
+		PlayerMap.Add(PlayerIndex, CharacterClass1);
+		break;
+	default:
+		PlayerMap.Add(PlayerIndex, CharacterClass0);
+		break;
+	}
+	UE_LOG(LogTemp, Display, TEXT("PlayerMap Contains %i PlayerData now (GameInstance)"), PlayerMap.Num());
 
-		//Test! Remove this!
-		StartGame();
+	if (bIsMultiplayerActivated)
+	{
+		if (!PlayerMap.Contains(0))
+		{
+			UE_LOG(LogTemp, Display, TEXT("Waiting for Player 1"));
+			return;
+		}
+		else if (!PlayerMap.Contains(1))
+		{
+			UE_LOG(LogTemp, Display, TEXT("Waiting for Player 2"));
+			return;
+		}
+	}
+	StartGame();
 }
 
 TSubclassOf<AEternalGrace_ProtoCharacter> UEternalGrace_GameInstance::GetPlayerClass(int PlayerIndex)
@@ -278,6 +291,42 @@ TSubclassOf<AEternalGrace_ProtoCharacter> UEternalGrace_GameInstance::GetPlayerC
 void UEternalGrace_GameInstance::TestLoadLevel(UWorld* CurrentWorld)
 {
 	RequestLoad();
+}
+
+void UEternalGrace_GameInstance::SavePlayerData()
+{
+	APlayerController* FirstPlayer = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (FirstPlayer)
+	{
+		AEternalGrace_ProtoCharacter* FirstPlayerChar = Cast<AEternalGrace_ProtoCharacter>(FirstPlayer->GetCharacter());
+		if(FirstPlayerChar)
+		{
+			FirstPlayerChar->Execute_SaveData(FirstPlayerChar);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to Chast first character in savePlayer Function (GameInstance)"))
+		}
+	}
+
+	if(bIsMultiplayerActivated)
+	{
+		APlayerController* SecondPlayer = UGameplayStatics::GetPlayerController(GetWorld(), 1);
+		if (SecondPlayer)
+		{
+			AEternalGrace_ProtoCharacter* SecondPlayerChar = Cast<AEternalGrace_ProtoCharacter>(SecondPlayer->GetCharacter());
+			if (SecondPlayerChar)
+			{
+				SecondPlayerChar->Execute_SaveData(SecondPlayerChar);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to Chast second character in savePlayer Function (GameInstance)"))
+		}
+
+	}
+
 }
 
 

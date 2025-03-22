@@ -41,7 +41,6 @@ void ATreasureChest::GetAllTreasure()
 	ContainedHelmets.Empty();
 	bCanbeActivated = false;
 	Execute_SaveData(this);
-	Execute_SaveData(Interactor);
 
 	Interactor = nullptr;
 }
@@ -65,6 +64,7 @@ void ATreasureChest::SaveData_Implementation()
 			//Actually SaveData to SaveGame
 			CurrentSavegame->SaveTreasureChestData(ObjectID, SaveDataInfo);
 		}
+		CurrentGameInstance->SavePlayerData();
 	}
 }
 

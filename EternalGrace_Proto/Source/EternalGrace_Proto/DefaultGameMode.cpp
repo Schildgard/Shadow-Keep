@@ -11,12 +11,13 @@ ADefaultGameMode::ADefaultGameMode()
 	: Player1Character(nullptr),
 	Player2Character(nullptr)
 {
-	SecondPlayerController = nullptr;
 }
 
 void ADefaultGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//Check if MultiplayerMode is activated
 	bool bIsTwoPlayerModeActivated;
 	UGameInstance* GameInstanceReference = GetGameInstance();
 	UEternalGrace_GameInstance* CurrentGameInstance = Cast<UEternalGrace_GameInstance>(GameInstanceReference);
@@ -30,24 +31,47 @@ void ADefaultGameMode::BeginPlay()
 		bIsTwoPlayerModeActivated = false;
 	}
 
+
+	// Get Class Type of first player from GameInstance, which is set by the Character Selection Button.
 	Player1Character = CurrentGameInstance->GetPlayerClass(0);
 	if (Player1Character)
 	{
+		// Todo: Change the Spawnpoint to PlayerStart...
 		FVector Player1SpawnLocation = FVector(0);
 		FRotator Player1SpawnRotation = FRotator(0);
+		//Spawn Character and let Controller posses him. 
 		AEternalGrace_ProtoCharacter* Player1 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player1Character, Player1SpawnLocation, Player1SpawnRotation);
-		if (Player1)
+		if (!Player1)
 		{
-			Player1->SetPlayerIndex(0);
-			GetWorld()->GetFirstPlayerController()->Possess(Player1);
+			UE_LOG(LogTemp, Error, TEXT("Player1 Could not be spawned! (DefaultGameMode)"));
+			return;
 		}
-		else UE_LOG(LogTemp, Error, TEXT("Player1 Could not be spawned! (DefaultGameMode)"));
+		APlayerController* PlayerControllerRef = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PlayerControllerRef)
+		{
+			AEG_PlayerController* FirstPlayerController = Cast<AEG_PlayerController>(PlayerControllerRef);
+			if (FirstPlayerController)
+			{
+				Player1->SetPlayerIndex(0);
+				FirstPlayerController->Possess(Player1);
+				FirstPlayerController->SetOwningCharacterVariable(Player1);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("First Player Controller could not be Cast (Game Mode)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("First Player Controller Ref could not be getted"));
+		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("GameMode Could not get Player1 Character Class"))
 	}
 
+	//repeat the some for second player.
 	if (bIsTwoPlayerModeActivated)
 	{
 		Player2Character = CurrentGameInstance->GetPlayerClass(1);
@@ -56,8 +80,13 @@ void ADefaultGameMode::BeginPlay()
 			FVector Player2SpawnLocation = FVector(100);
 			FRotator Player2SpawnRotation = FRotator(0);
 
-			APlayerController* NewPlayerController = UGameplayStatics::CreatePlayer(GetWorld(), -1);
-			SecondPlayerController = Cast<AEG_PlayerController>(NewPlayerController);
+			APlayerController* PlayerControllerRef2 = UGameplayStatics::GetPlayerController(GetWorld(), 1);
+			if(!PlayerControllerRef2)
+			{
+				//If a game is loaded, the second controller does not exist yet (since it is created in class selection usually. So a new one has to be created.
+				PlayerControllerRef2 = UGameplayStatics::CreatePlayer(GetWorld(), 1);
+			}
+			AEG_PlayerController* SecondPlayerController = Cast<AEG_PlayerController>(PlayerControllerRef2);
 			if (SecondPlayerController)
 			{
 				AEternalGrace_ProtoCharacter* Player2 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player2Character, Player2SpawnLocation, Player2SpawnRotation);
@@ -70,14 +99,6 @@ void ADefaultGameMode::BeginPlay()
 				Player2->SetPlayerIndex(1);
 				SecondPlayerController->Possess(Player2);
 				SecondPlayerController->SetOwningCharacterVariable(Player2);
-				if (SecondPlayerController->GetOwningCharacter())
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Second Player Controller Owner has been set to %s"), *Player2->GetFName().ToString());
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("player controller 2 failed to stand its ground"));
-				}
 			}
 			else
 			{

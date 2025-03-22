@@ -49,7 +49,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players", meta = (AllowPrivateAccess))
 	TSubclassOf<AEternalGrace_ProtoCharacter> CharacterClass1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess)) //temporary
+	//Player Map is used in the Class Selection to determine both Players Starting Class. The Gamemode can also use this for assigning the class on spawn,
+	// even though he right now uses CharacterClass0 and 1 which I thing might be obsolete by now..
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
 	TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> PlayerMap;
 public:
 	UFUNCTION()
@@ -100,4 +102,7 @@ public:
 
 	UFUNCTION()
 	void TestLoadLevel(UWorld* CurrentWorld);
+
+	UFUNCTION()
+	void SavePlayerData();
 };

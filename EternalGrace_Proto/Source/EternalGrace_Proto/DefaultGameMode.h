@@ -23,9 +23,6 @@ protected:
 	TSubclassOf<AEternalGrace_ProtoCharacter> Player1Character;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players", meta = (AllowPrivateAccess))
 	TSubclassOf<AEternalGrace_ProtoCharacter> Player2Character;
-
-	UPROPERTY()
-	AEG_PlayerController* SecondPlayerController;
 	
 
 	void BeginPlay()override;

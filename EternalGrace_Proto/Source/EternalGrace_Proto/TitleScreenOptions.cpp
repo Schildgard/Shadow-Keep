@@ -108,12 +108,14 @@ void UTitleScreenOptions::SetMultiPlayerMode()
 		if (ClassSelect)
 		{
 			ClassSelect->AddToPlayerScreen();
+			ClassSelect->SetUserFocus(Player1Controller);
 			UE_LOG(LogTemp, Warning, TEXT("ClassSelect added to viewport. Owned by Controller: %s"), *Player1Controller->GetFName().ToString());
 		}
 		UUserWidget* ClassSelect2 = CreateWidget<UUserWidget>(Player2Controller, ClassSelectionWidgetClass);
 		if (ClassSelect2)
 		{
 			ClassSelect2->AddToPlayerScreen();
+			ClassSelect2->SetUserFocus(Player2Controller);
 			UE_LOG(LogTemp, Warning, TEXT("ClassSelect added to viewport. Owned by Controller: %s"), *Player2Controller->GetFName().ToString());
 		}
 
