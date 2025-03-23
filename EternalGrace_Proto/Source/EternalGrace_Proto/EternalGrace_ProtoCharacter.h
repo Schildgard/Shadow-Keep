@@ -9,6 +9,7 @@
 #include "PlayerSaveData.h"
 #include "Playable.h"
 #include "ObjectType.h"
+#include "WeaponType.h"
 #include "EternalGrace_ProtoCharacter.generated.h"
 
 class USpringArmComponent;
@@ -17,6 +18,9 @@ class UInputMappingContext;
 class UInputAction;
 class UArmorComponent;
 class UInventoryComponent;
+class UWeaponComponent;
+class AWeaponBase;
+class UEG_AnimInstance;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -55,6 +59,12 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MenuAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta =(AllowPrivateAccess))
+	UWeaponComponent* WeaponComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UEG_AnimInstance* EGAnimInstance;
 
 
 
@@ -131,5 +141,8 @@ public:
 	//While Object ID is an Identifier for the Save Game, the PlayerIndex holds track to wether its Player 1 or 2
 	UFUNCTION()
 	void SetPlayerIndex(int AssigendPlayerIndex);
+
+	UFUNCTION()
+	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
 };
 

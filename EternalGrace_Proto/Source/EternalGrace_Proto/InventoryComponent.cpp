@@ -14,10 +14,6 @@ UInventoryComponent::UInventoryComponent()
 	GlobalArmorInventory = nullptr;
 	GlobalPantsInventory = nullptr;
 	GlobalHelmetInventory = nullptr;
-
-	ArmorInventory = nullptr;
-	PantsInventory = nullptr;
-	HelmetInventory = nullptr;
 }
 
 
@@ -25,76 +21,30 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	//TODO: Managing the Inventory in DataTables seems to be a bad idea. The Advantage of DataTables is that they can be consistent outside of the game, so for a general Database its fine.
-	// However I dont want to have a DataTable file for every character per Savegame, so handling a list or dictionary probably is a better idea.
-	ArmorInventory = NewObject<UDataTable>(this);
-	if (ArmorInventory)
-	{
-			ArmorInventory->RowStruct = FArmor::StaticStruct();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to Create ArmorInventory Table at Start of the Game"))
-	}
-
-	PantsInventory = NewObject<UDataTable>(this);
-	if (PantsInventory)
-	{
-			PantsInventory->RowStruct = FPants::StaticStruct();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to Create PantsInventory Table at Start of the Game"))
-	}
-
-	HelmetInventory = NewObject<UDataTable>(this);
-	if (HelmetInventory)
-	{
-			HelmetInventory->RowStruct = FHelmet::StaticStruct();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to Create HelmetInventory Table at Start of the Game"))
-	}
-
-
-
-
-
-
-
 
 }
 
-UDataTable* UInventoryComponent::GetArmorInventory()
+TMap<FName, int>* UInventoryComponent::GetInventoryOfType(EObjectType ItemCategory)
 {
-	return ArmorInventory;
-}
-UDataTable* UInventoryComponent::GetPantsInventory()
-{
-	return PantsInventory;
-}
-UDataTable* UInventoryComponent::GetHelmetInventory()
-{
-	return HelmetInventory;
+	switch (ItemCategory)
+	{
+	case EObjectType::BodyEquipment:
+		return &ArmorInventoryMap;
+	case EObjectType::LegEquipment:
+		return &PantsInventoryMap;
+	case EObjectType::HeadEquipment:
+		return &HelmetInventoryMap;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("No Valid Object Type"))
+		return nullptr;
+	}
 }
 
 void UInventoryComponent::AddArmorToInventory(FArmor ArmorToAdd)
 {
-//	//This Function decides if the player can put the existing Item in his inventory and what happens if he already owns it.
-//	FName ArmorNameToFind = ArmorToAdd.ArmorName;
-//	static const FString ContextString(TEXT("NewArmorContext"));
-//	FArmor* FoundArmor = ArmorInventory->FindRow<FArmor>(ArmorNameToFind, ContextString, false);
-//	if (FoundArmor)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("Character Already owns this Object"))
-//			return;
-//	}
-//	ArmorInventory->AddRow(ArmorNameToFind, ArmorToAdd);
-
 	if(!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
 	{
-		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 0);
+		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 1);
 		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
 	}
 	else
@@ -108,18 +58,6 @@ void UInventoryComponent::AddArmorToInventory(FArmor ArmorToAdd)
 
 void UInventoryComponent::AddPantsToInventory(FPants PantsToAdd)
 {
-//	//This Function decides if the player can put the existing Item in his inventory and what happens if he already owns it.
-//	FName PantsNameToFind = PantsToAdd.PantsName;
-//	static const FString ContextString(TEXT("NewPantsContext"));
-//	FPants* FoundArmor = PantsInventory->FindRow<FPants>(PantsNameToFind, ContextString, false);
-//	if (FoundArmor)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("Character Already owns this Object"))
-//			return;
-//	}
-//	PantsInventory->AddRow(PantsNameToFind, PantsToAdd);
-
-
 	if (!PantsInventoryMap.Contains(PantsToAdd.PantsName))
 	{
 		PantsInventoryMap.Add(PantsToAdd.PantsName, 0);
@@ -134,18 +72,6 @@ void UInventoryComponent::AddPantsToInventory(FPants PantsToAdd)
 
 void UInventoryComponent::AddHelmetToInventory(FHelmet HelmetToAdd)
 {
-//	//This Function decides if the player can put the existing Item in his inventory and what happens if he already owns it.
-//	FName HelmetsNameToFind = HelmetToAdd.HelmetName;
-//	static const FString ContextString(TEXT("NewArmorContext"));
-//	FHelmet* FoundArmor = HelmetInventory->FindRow<FHelmet>(HelmetsNameToFind, ContextString, false);
-//	if (FoundArmor)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("Character Already owns this Object"))
-//			return;
-//	}
-//	HelmetInventory->AddRow(HelmetsNameToFind, HelmetToAdd);
-
-
 	if (!HelmetInventoryMap.Contains(HelmetToAdd.HelmetName))
 	{
 		HelmetInventoryMap.Add(HelmetToAdd.HelmetName, 0);

@@ -54,76 +54,6 @@ void AEG_PlayerController::ShowInventory()
 			{
 				UWrapBox* InventoryWrapBox = CurrentInventory->GetWrapBox();
 
-		/*		//iterate through Armor Data Table
-				TArray<FArmor*> Table;
-				static const FString Context(TEXT("Context"));
-				OwningCharacter->GetInventory()->GetArmorInventory()->GetAllRows<FArmor>(Context, Table);
-
-				int i = 0;
-				for (FArmor* Armor : Table)
-				{
-					//create an Inventory Slot for each row of the Inventory and assign Data to Slot
-					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
-					if (CurrentInventorySlot[i])
-					{
-						//CurrentInventorySlot[i]->AddToPlayerScreen();
-						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[i]);
-						//assign here Object Type and Name to InventorySlot
-						CurrentInventorySlot[i]->SetImage(Armor->ThumpNailImage.LoadSynchronous());
-						CurrentInventorySlot[i]->SetItemName(Armor->ArmorName);
-						CurrentInventorySlot[i]->SetObjectType(Armor->ObjectType);
-						CurrentInventorySlot[i]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[i], &UInventorySlot::UseInventorySlot);
-						i++;
-						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Armor->ArmorName.ToString())
-					}
-
-				}
-
-				//iterate through Pants Data Table
-				TArray<FPants*> PantsTable;
-				static const FString PantsContext(TEXT("PantsContext"));
-				OwningCharacter->GetInventory()->GetPantsInventory()->GetAllRows<FPants>(PantsContext, PantsTable);
-				int j = i;
-				for (FPants* Pants : PantsTable)
-				{
-					//create an Inventory Slot for each row of the Inventory and assign Data to Slot
-					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
-					if (CurrentInventorySlot[j])
-					{
-						CurrentInventorySlot[j]->AddToPlayerScreen();
-						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[j]);
-						CurrentInventorySlot[j]->SetImage(Pants->ThumpNailImage.LoadSynchronous());
-						CurrentInventorySlot[j]->SetItemName(Pants->PantsName);
-						CurrentInventorySlot[j]->SetObjectType(Pants->ObjectType);
-						CurrentInventorySlot[j]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[j], &UInventorySlot::UseInventorySlot);
-						j++;
-						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Pants->PantsName.ToString())
-					}
-				}
-
-				//iterate through Pants Data Table
-				TArray<FHelmet*> HelmetTable;
-				static const FString HelmetContext(TEXT("HelmetContext"));
-				OwningCharacter->GetInventory()->GetHelmetInventory()->GetAllRows<FHelmet>(HelmetContext, HelmetTable);
-				int u = j;
-				for (FHelmet* Helmet : HelmetTable)
-				{
-					//create an Inventory Slot for each row of the Inventory and assign Data to Slot
-					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
-					if (CurrentInventorySlot[u])
-					{
-						CurrentInventorySlot[u]->AddToPlayerScreen();
-						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[u]);
-						CurrentInventorySlot[u]->SetImage(Helmet->ThumpNailImage.LoadSynchronous());
-						CurrentInventorySlot[u]->SetItemName(Helmet->HelmetName);
-						CurrentInventorySlot[u]->SetObjectType(Helmet->ObjectType);
-						CurrentInventorySlot[u]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[u], &UInventorySlot::UseInventorySlot);
-						u++;
-						UE_LOG(LogTemp, Warning, TEXT("Creat Slot for %s"), *Helmet->HelmetName.ToString())
-					}
-				} */
-				//TEST: iteriere durch inventory (TMap. Hole für jedes Item die Daten aus dem Data Table.
-
 				int z = 0;
 					static const FString Context2(TEXT("TestContext"));
 				for(TPair<FName,int> ArmorData : OwningCharacter->GetInventory()->ArmorInventoryMap)
@@ -181,8 +111,6 @@ void AEG_PlayerController::ShowInventory()
 					z++;
 
 				}
-
-
 
 				if(CurrentInventorySlot.Num() >=1)
 				{

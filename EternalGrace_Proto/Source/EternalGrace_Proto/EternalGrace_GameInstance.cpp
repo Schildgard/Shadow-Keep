@@ -221,14 +221,14 @@ void UEternalGrace_GameInstance::StartGame()
 	CurrentSaveGame->SetTwoPlayerModeInfo(bIsMultiplayerActivated);
 	CurrentSaveGame->SetPlayerMap(PlayerMap);
 	//Load The Game
-	UGameplayStatics::OpenLevel(GetWorld(), FName("EmptyLevel"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Map_EntryLevel"));
 }
 
 void UEternalGrace_GameInstance::ResumeGame()
 {
 	SetMultiplayer(CurrentSaveGame->GetTwoPlayerModeInfo());
 	PlayerMap = CurrentSaveGame->GetPlayerMap();
-	UGameplayStatics::OpenLevel(GetWorld(), FName("EmptyLevel"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Map_EntryLevel"));
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEternalGrace_GameInstance::TestLoadLevel);
 }
 

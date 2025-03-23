@@ -30,15 +30,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GlobalData", meta = (AllowPrivateAccess))
 	UDataTable* GlobalHelmetInventory;
 
-
-	UPROPERTY()
-	UDataTable* ArmorInventory;
-	UPROPERTY()
-	UDataTable* PantsInventory;
-	UPROPERTY()
-	UDataTable* HelmetInventory;
-
-public:	
 	//Attempt to replace Datatables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta =(AllowPrivateAccess))
 	TMap<FName, int> ArmorInventoryMap;
@@ -47,13 +38,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
 	TMap<FName, int> HelmetInventoryMap;
 
-
-	UFUNCTION()
-	UDataTable* GetArmorInventory();
-	UFUNCTION()
-	UDataTable* GetPantsInventory();
-	UFUNCTION()
-	UDataTable* GetHelmetInventory();
+	//This function is not used because I am to lazy to also make a setter. And since the component is already only accessible through a Getter, I think having the maps public should be fine.
+	TMap<FName, int>* GetInventoryOfType(EObjectType ItemCategory);
 
 	UFUNCTION()
 	void AddArmorToInventory(FArmor ArmorToAdd);

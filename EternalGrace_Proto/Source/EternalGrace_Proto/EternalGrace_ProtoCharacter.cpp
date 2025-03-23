@@ -19,6 +19,9 @@
 #include "Armor.h"
 #include "Pants.h"
 #include "Interactable.h"
+#include "WeaponComponent.h"
+#include "WeaponBase.h"
+#include "EG_AnimInstance.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,6 +80,8 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 	UpperArmor->GetHelmetMesh()->SetLeaderPoseComponent(HeadMesh);
 
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>("Inventory");
+	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon");
+	WeaponComponent->SetupAttachment(GetMesh(),"s_hand_r");
 
 }
 
@@ -104,6 +109,18 @@ void AEternalGrace_ProtoCharacter::TriggerCurrentInteractable()
 void AEternalGrace_ProtoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EGAnimInstance = Cast<UEG_AnimInstance>(GetMesh()->GetAnimInstance());
+	if(!EGAnimInstance)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to Cast AnimInstance (PlayerCharacter)"))
+			return;
+	}
+	if(WeaponComponent->CurrentWeaponClass)
+	{
+		EquipWeapon(WeaponComponent->CurrentWeaponClass);
+	}
+
 }
 
 void AEternalGrace_ProtoCharacter::NotifyControllerChanged()
@@ -198,6 +215,13 @@ void AEternalGrace_ProtoCharacter::SetPlayerIndex(int AssignedPlayerIndex)
 	}
 }
 
+void AEternalGrace_ProtoCharacter::EquipWeapon(TSubclassOf<AWeaponBase> WeaponSubclass)
+{
+	EWeaponType NewWeaponCategory = WeaponComponent->ChangeWeapon(WeaponSubclass);
+	EGAnimInstance->SetWeaponType(NewWeaponCategory);
+	UE_LOG(LogTemp, Warning, TEXT("Weapon Category is %s"), *UEnum::GetValueAsString(NewWeaponCategory));
+}
+
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -243,7 +267,6 @@ void AEternalGrace_ProtoCharacter::SaveData_Implementation()
 	if (SaveGameObject)
 	{
 		//Update localSaveData Struct
-	//	SaveDataInfo.SetPlayerTransform(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), PlayerInventory->GetArmorInventory(), PlayerInventory->GetPantsInventory(), PlayerInventory->GetHelmetInventory());
 		SaveDataInfo.UpdatePlayerData(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), &PlayerInventory->ArmorInventoryMap, &PlayerInventory->PantsInventoryMap, &PlayerInventory->HelmetInventoryMap);
 		//Actually Save Data from Struct To SaveGame
 		SaveGameObject->SavePlayerData(ObjectID, SaveDataInfo);
@@ -276,27 +299,9 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 			ChangePants(SaveDataInfo.CurrentPantsName);
 			ChangeHelmet(SaveDataInfo.CurrentHelmetsName);
 			//Load Inventory
-		//	for (FArmor Armor : SaveDataInfo.SavedArmorData)
-		//	{
-		//		PlayerInventory->AddArmorToInventory(Armor);
-		//		UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Armor.ArmorName.ToString())
-		//	}
-		//	for (FPants Pants : SaveDataInfo.SavedPantsData)
-		//	{
-		//		PlayerInventory->AddPantsToInventory(Pants);
-		//		UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Pants.PantsName.ToString())
-		//	}
-		//	for (FHelmet Helmet : SaveDataInfo.SavedHelmetData)
-		//	{
-		//		PlayerInventory->AddHelmetToInventory(Helmet);
-		//		UE_LOG(LogTemp, Display, TEXT("Loaded %s into Inventory from Savefile"), *Helmet.HelmetName.ToString());
-		//	}
-			PlayerInventory->ArmorInventoryMap.Empty();
-			PlayerInventory->ArmorInventoryMap.Append(SaveDataInfo.SavedArmorDataMap);
-			PlayerInventory->PantsInventoryMap.Empty();
-			PlayerInventory->PantsInventoryMap.Append(SaveDataInfo.SavedPantsDataMap);
-			PlayerInventory->HelmetInventoryMap.Empty();
-			PlayerInventory->HelmetInventoryMap.Append(SaveDataInfo.SavedHelmetDataMap);
+			PlayerInventory->ArmorInventoryMap = SaveDataInfo.SavedArmorDataMap;
+			PlayerInventory->PantsInventoryMap = SaveDataInfo.SavedPantsDataMap;
+			PlayerInventory->HelmetInventoryMap =SaveDataInfo.SavedHelmetDataMap;
 
 
 		}

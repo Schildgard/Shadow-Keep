@@ -30,8 +30,7 @@ void ADefaultGameMode::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("GameMade could not cast Game Instance. Game locked to Singleplayer"));
 		bIsTwoPlayerModeActivated = false;
 	}
-
-
+	AActor* StartActor = ChoosePlayerStart(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	// Get Class Type of first player from GameInstance, which is set by the Character Selection Button.
 	Player1Character = CurrentGameInstance->GetPlayerClass(0);
 	if (Player1Character)
@@ -40,7 +39,7 @@ void ADefaultGameMode::BeginPlay()
 		FVector Player1SpawnLocation = FVector(0);
 		FRotator Player1SpawnRotation = FRotator(0);
 		//Spawn Character and let Controller posses him. 
-		AEternalGrace_ProtoCharacter* Player1 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player1Character, Player1SpawnLocation, Player1SpawnRotation);
+		AEternalGrace_ProtoCharacter* Player1 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player1Character, StartActor->GetActorLocation(), StartActor->GetActorRotation());
 		if (!Player1)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Player1 Could not be spawned! (DefaultGameMode)"));
@@ -89,7 +88,7 @@ void ADefaultGameMode::BeginPlay()
 			AEG_PlayerController* SecondPlayerController = Cast<AEG_PlayerController>(PlayerControllerRef2);
 			if (SecondPlayerController)
 			{
-				AEternalGrace_ProtoCharacter* Player2 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player2Character, Player2SpawnLocation, Player2SpawnRotation);
+				AEternalGrace_ProtoCharacter* Player2 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player2Character, StartActor->GetActorLocation(), StartActor->GetActorRotation());
 				if (!Player2)
 				{
 					UE_LOG(LogTemp, Error, TEXT("Player2 Could not be spawned! (DefaultGameMode)"));
