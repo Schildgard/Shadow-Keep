@@ -7,6 +7,7 @@
 #include "Saveable.h"
 #include "GameFramework/Character.h"
 #include "GroomComponent.h"
+#include "ActionState.h"
 #include "CharacterBase.generated.h"
 
 class UEternalGrace_SaveGame;
@@ -46,10 +47,19 @@ protected:
 	UPROPERTY()
 	UEternalGrace_SaveGame* SaveGameObject;
 
+	UPROPERTY()
+	EActionState CurrentActionState;
+
 
 public:	
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	EActionState GetCurrentActionState();
+
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentActionState(EActionState ActionState);
 
 };

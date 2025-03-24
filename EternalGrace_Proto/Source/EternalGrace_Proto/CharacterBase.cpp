@@ -10,6 +10,7 @@ ACharacterBase::ACharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SaveGameObject = nullptr;
+	CurrentActionState = EActionState::Idle;
 
 	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FaceComp");
 	HeadMesh->SetupAttachment(GetMesh());
@@ -72,5 +73,15 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+EActionState ACharacterBase::GetCurrentActionState()
+{
+	return CurrentActionState;
+}
+
+void ACharacterBase::SetCurrentActionState(EActionState ActionState)
+{
+	CurrentActionState = ActionState;
 }
 

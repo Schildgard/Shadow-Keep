@@ -15,12 +15,7 @@ class ETERNALGRACE_PROTO_API UWeaponComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UWeaponComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
@@ -28,10 +23,14 @@ public:
 
 	UPROPERTY()
 	AWeaponBase* CurrentWeaponObject;
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
 	EWeaponType ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
+
+	UPROPERTY()
+	TArray<UAnimMontage*> NormalWeaponAttacks;
+
+	UPROPERTY()
+	UAnimMontage* RunningAttack;
 
 };

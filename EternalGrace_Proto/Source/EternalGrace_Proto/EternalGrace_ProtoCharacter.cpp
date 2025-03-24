@@ -81,7 +81,7 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>("Inventory");
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon");
-	WeaponComponent->SetupAttachment(GetMesh(),"s_hand_r");
+	WeaponComponent->SetupAttachment(GetMesh(), "s_hand_r");
 
 }
 
@@ -101,6 +101,29 @@ void AEternalGrace_ProtoCharacter::ShowInventory()
 	}
 }
 
+void AEternalGrace_ProtoCharacter::NormalAttack()
+{
+	int AttackCount = EGAnimInstance->AttackCount;
+	switch (CurrentActionState)
+	{
+	case EActionState::Running:
+		CurrentActionState = EActionState::Attacking;
+		EGAnimInstance->Montage_Play(WeaponComponent->RunningAttack, true);
+		break;
+	case EActionState::Jumping:
+		UE_LOG(LogTemp, Warning, TEXT("No Jumping Attack Implemented yet"));
+		break;
+	case EActionState::Attacking:
+		if (!EGAnimInstance->bCanContinueAttack) return;
+		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
+		break;
+	default:
+		CurrentActionState = EActionState::Attacking;
+		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
+		break;
+	}
+}
+
 void AEternalGrace_ProtoCharacter::TriggerCurrentInteractable()
 {
 	Interact_Implementation();
@@ -111,12 +134,12 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	EGAnimInstance = Cast<UEG_AnimInstance>(GetMesh()->GetAnimInstance());
-	if(!EGAnimInstance)
+	if (!EGAnimInstance)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to Cast AnimInstance (PlayerCharacter)"))
 			return;
 	}
-	if(WeaponComponent->CurrentWeaponClass)
+	if (WeaponComponent->CurrentWeaponClass)
 	{
 		EquipWeapon(WeaponComponent->CurrentWeaponClass);
 	}
@@ -153,6 +176,9 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Look);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Interact_Implementation);
 		EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::ShowInventory);
+
+		//Attacking
+		EnhancedInputComponent->BindAction(NormalAttackAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::NormalAttack);
 
 
 	}
@@ -219,7 +245,6 @@ void AEternalGrace_ProtoCharacter::EquipWeapon(TSubclassOf<AWeaponBase> WeaponSu
 {
 	EWeaponType NewWeaponCategory = WeaponComponent->ChangeWeapon(WeaponSubclass);
 	EGAnimInstance->SetWeaponType(NewWeaponCategory);
-	UE_LOG(LogTemp, Warning, TEXT("Weapon Category is %s"), *UEnum::GetValueAsString(NewWeaponCategory));
 }
 
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)
@@ -301,7 +326,7 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 			//Load Inventory
 			PlayerInventory->ArmorInventoryMap = SaveDataInfo.SavedArmorDataMap;
 			PlayerInventory->PantsInventoryMap = SaveDataInfo.SavedPantsDataMap;
-			PlayerInventory->HelmetInventoryMap =SaveDataInfo.SavedHelmetDataMap;
+			PlayerInventory->HelmetInventoryMap = SaveDataInfo.SavedHelmetDataMap;
 
 
 		}

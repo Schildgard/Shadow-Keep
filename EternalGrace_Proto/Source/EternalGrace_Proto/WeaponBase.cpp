@@ -3,27 +3,19 @@
 
 #include "WeaponBase.h"
 
-// Sets default values
 AWeaponBase::AWeaponBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	WeaponCategory = EWeaponType::StraightSword;
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("Weapon Mesh");
+	RootComponent = WeaponMesh;
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMesh->SetCollisionResponseToAllChannels(ECR_Overlap);
 
 }
 
-// Called when the game starts or when spawned
-void AWeaponBase::BeginPlay()
+TArray<UAnimMontage*> AWeaponBase::GetNormalAttacks()
 {
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AWeaponBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	return RegularAttackMontages;
 }
 

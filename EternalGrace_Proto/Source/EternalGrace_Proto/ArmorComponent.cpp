@@ -30,11 +30,6 @@ UArmorComponent::UArmorComponent()
 
 }
 
-void UArmorComponent::BeginPlay()
-{
-
-}
-
 void UArmorComponent::EquipBreastPlate(FName ArmorName)
 {
 	CurrentBreastplateName = ArmorName;

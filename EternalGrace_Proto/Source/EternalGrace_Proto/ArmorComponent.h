@@ -18,8 +18,6 @@ public:
 
 protected:
 
-	void BeginPlay()override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))
 	UDataTable* BreastPlateArmorTable;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess))

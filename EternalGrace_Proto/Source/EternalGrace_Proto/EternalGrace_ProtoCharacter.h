@@ -60,6 +60,9 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MenuAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* NormalAttackAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta =(AllowPrivateAccess))
 	UWeaponComponent* WeaponComponent;
 
@@ -98,6 +101,9 @@ protected:
 
 	UFUNCTION(CallInEditor)
 	void ShowInventory();
+
+	UFUNCTION()
+	void NormalAttack();
 
 	UFUNCTION()
 	void TriggerCurrentInteractable();

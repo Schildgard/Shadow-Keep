@@ -85,10 +85,10 @@ void UTitleScreenOptions::ShowAviableSaveGames()
 			LoadBUttonScrollBox->AddChild(CloseSaveFileButton);
 			CloseSaveFileButton->SetVisibility(ESlateVisibility::Visible);
 			bAreLoadButtonsVisible = true;
+			StartNewGameButton->SetVisibility(ESlateVisibility::Collapsed);
+			LoadGameButton->SetVisibility(ESlateVisibility::Collapsed);
 		}
 
-		StartNewGameButton->SetVisibility(ESlateVisibility::Collapsed);
-		LoadGameButton->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	else
 	{
@@ -154,30 +154,30 @@ void UTitleScreenOptions::PlayOnSelectedSound()
 
 void UTitleScreenOptions::ShowClassSelection()
 {
-	
-	if(ClassSelectionWidgetClass)
+
+	if (ClassSelectionWidgetClass)
 	{
 		UUserWidget* ClassSelect = CreateWidget<UUserWidget>(GetOwningPlayer(), ClassSelectionWidgetClass);
-		if(ClassSelect)
+		if (ClassSelect)
 		{
 			ClassSelect->AddToPlayerScreen();
 			UE_LOG(LogTemp, Warning, TEXT("ClassSelect added to viewport. Owned by Controller: %s"), *GetOwningPlayer()->GetFName().ToString());
 			//ClassSelect->SetFocus();
 		}
 	}
-//	if (ClassSelectionWidget->GetVisibility() != ESlateVisibility::Visible)
-//	{
-		SinglePlayerModeSelectionButton->SetVisibility(ESlateVisibility::Collapsed);
-		MultiPlayerModeSelectionButton->SetVisibility(ESlateVisibility::Collapsed);
-		GoBackButton->SetVisibility(ESlateVisibility::Collapsed);
-//
-//		ClassSelectionWidget->SetVisibility(ESlateVisibility::Visible);
-//	}
-//	else
-//	{
-//		ClassSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
-//		ShowPlayerModeOptions();
-//	}
+	//	if (ClassSelectionWidget->GetVisibility() != ESlateVisibility::Visible)
+	//	{
+	SinglePlayerModeSelectionButton->SetVisibility(ESlateVisibility::Collapsed);
+	MultiPlayerModeSelectionButton->SetVisibility(ESlateVisibility::Collapsed);
+	GoBackButton->SetVisibility(ESlateVisibility::Collapsed);
+	//
+	//		ClassSelectionWidget->SetVisibility(ESlateVisibility::Visible);
+	//	}
+	//	else
+	//	{
+	//		ClassSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	//		ShowPlayerModeOptions();
+	//	}
 }
 
 void UTitleScreenOptions::SetPlayerStartingClass()
