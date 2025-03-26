@@ -10,6 +10,7 @@
 #include "Playable.h"
 #include "ObjectType.h"
 #include "WeaponType.h"
+#include "InputType.h"
 #include "EternalGrace_ProtoCharacter.generated.h"
 
 class USpringArmComponent;
@@ -21,6 +22,7 @@ class UInventoryComponent;
 class UWeaponComponent;
 class AWeaponBase;
 class UEG_AnimInstance;
+class UInputBufferComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -63,11 +65,17 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* NormalAttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* NormalOffhandAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta =(AllowPrivateAccess))
 	UWeaponComponent* WeaponComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	UEG_AnimInstance* EGAnimInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputBufferComponent* InputBufferingComponent;
 
 
 
@@ -86,6 +94,12 @@ protected:
 	virtual void Interact_Implementation()override;
 	virtual void ShowInteractUI_Implementation(AActor* ActorToInteractWith)override;
 	virtual void HideInteractUI_Implementation()override;
+	//Attackable Implementations
+	virtual UCapsuleComponent* GetHitBox_Implementation()override;
+	virtual AWeaponBase* GetWeapon_Implementation()override;
+
+	void CancelGuard()override;
+	void Jump()override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer", meta = (AllowPrivateAccess))
 	int32 PlayerIndex;
@@ -104,7 +118,8 @@ protected:
 
 	UFUNCTION()
 	void NormalAttack();
-
+	UFUNCTION()
+	void PerformOffhandAction();
 	UFUNCTION()
 	void TriggerCurrentInteractable();
 
@@ -150,5 +165,14 @@ public:
 
 	UFUNCTION()
 	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
+
+	UFUNCTION()
+	void EquipOffhandWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
+
+	UFUNCTION(BlueprintCallable)
+	void FireBufferedInput(EInputType BufferedInput);
+
+	UFUNCTION()
+	UInputBufferComponent* GetInputBufferComponent();
 };
 

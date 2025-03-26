@@ -8,12 +8,15 @@
 #include "GameFramework/Character.h"
 #include "GroomComponent.h"
 #include "ActionState.h"
+#include "Attackable.h"
 #include "CharacterBase.generated.h"
 
+class AWeaponBase;
+class UCapsuleComponent;
 class UEternalGrace_SaveGame;
 class UEternalGrace_GameInstance;
 UCLASS()
-class ETERNALGRACE_PROTO_API ACharacterBase : public ACharacter, public ISaveable
+class ETERNALGRACE_PROTO_API ACharacterBase : public ACharacter, public ISaveable, public IAttackable
 {
 	GENERATED_BODY()
 
@@ -42,6 +45,16 @@ protected:
 	UFUNCTION(CallInEditor, Category = "SaveGame")
 	void MakeLoadCall();
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess))
+	TArray<TEnumAsByte<EObjectTypeQuery>> HittableObjectTypes;
+
+	UFUNCTION()
+	virtual UCapsuleComponent* GetHitBox_Implementation()override;
+	UFUNCTION()
+	virtual TArray<TEnumAsByte<EObjectTypeQuery>> GetHittableObjectTypes_Implementation() override;
+	UFUNCTION()
+	virtual AWeaponBase* GetWeapon_Implementation()override;
+
 	UPROPERTY()
 	UEternalGrace_GameInstance* CurrentGameInstance;
 	UPROPERTY()
@@ -58,6 +71,9 @@ public:
 
 	UFUNCTION()
 	EActionState GetCurrentActionState();
+
+	UFUNCTION()
+	virtual void CancelGuard();
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentActionState(EActionState ActionState);

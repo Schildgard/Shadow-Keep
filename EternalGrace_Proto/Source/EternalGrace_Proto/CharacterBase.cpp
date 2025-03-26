@@ -2,6 +2,7 @@
 
 
 #include "CharacterBase.h"
+#include "WeaponBase.h"
 #include "EternalGrace_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "EternalGrace_GameInstance.h"
@@ -61,6 +62,21 @@ void ACharacterBase::MakeLoadCall()
 	}
 }
 
+UCapsuleComponent* ACharacterBase::GetHitBox_Implementation()
+{
+	return nullptr;
+}
+
+AWeaponBase* ACharacterBase::GetWeapon_Implementation()
+{
+	return nullptr;
+}
+
+TArray<TEnumAsByte<EObjectTypeQuery>> ACharacterBase::GetHittableObjectTypes_Implementation()
+{
+	return HittableObjectTypes;
+}
+
 // Called every frame
 void ACharacterBase::Tick(float DeltaTime)
 {
@@ -78,6 +94,15 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 EActionState ACharacterBase::GetCurrentActionState()
 {
 	return CurrentActionState;
+}
+
+void ACharacterBase::CancelGuard()
+{
+	if (CurrentActionState == EActionState::Guarding)
+	{
+		CurrentActionState = EActionState::Idle;
+	}
+	else return;
 }
 
 void ACharacterBase::SetCurrentActionState(EActionState ActionState)

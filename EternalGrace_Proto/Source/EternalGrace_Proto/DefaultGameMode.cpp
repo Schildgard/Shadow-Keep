@@ -35,9 +35,6 @@ void ADefaultGameMode::BeginPlay()
 	Player1Character = CurrentGameInstance->GetPlayerClass(0);
 	if (Player1Character)
 	{
-		// Todo: Change the Spawnpoint to PlayerStart...
-		FVector Player1SpawnLocation = FVector(0);
-		FRotator Player1SpawnRotation = FRotator(0);
 		//Spawn Character and let Controller posses him. 
 		AEternalGrace_ProtoCharacter* Player1 = GetWorld()->SpawnActor<AEternalGrace_ProtoCharacter>(Player1Character, StartActor->GetActorLocation(), StartActor->GetActorRotation());
 		if (!Player1)
@@ -76,9 +73,6 @@ void ADefaultGameMode::BeginPlay()
 		Player2Character = CurrentGameInstance->GetPlayerClass(1);
 		if (Player2Character)
 		{
-			FVector Player2SpawnLocation = FVector(100);
-			FRotator Player2SpawnRotation = FRotator(0);
-
 			APlayerController* PlayerControllerRef2 = UGameplayStatics::GetPlayerController(GetWorld(), 1);
 			if(!PlayerControllerRef2)
 			{

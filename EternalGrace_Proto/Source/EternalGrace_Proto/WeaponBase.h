@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "WeaponType.h"
+#include "ElementalType.h"
 #include "WeaponBase.generated.h"
 
+class UCapsuleComponent;
 UCLASS()
 class ETERNALGRACE_PROTO_API AWeaponBase : public AActor
 {
@@ -14,15 +16,32 @@ class ETERNALGRACE_PROTO_API AWeaponBase : public AActor
 	
 public:	
 	AWeaponBase();
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	TArray<UAnimMontage*> RegularAttackMontages;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UAnimMontage* OffhandAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UCapsuleComponent* Hitbox;
+
+
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
 	UStaticMeshComponent* WeaponMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
-	TArray<UAnimMontage*> RegularAttackMontages;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	EWeaponType WeaponCategory;
-
+	UPROPERTY()
+	EElementalType ElementalType;
 	UFUNCTION()
 	TArray<UAnimMontage*> GetNormalAttacks();
+
+	UFUNCTION()
+	UAnimMontage* GetOffhandAttack();
+
+	UFUNCTION()
+	UCapsuleComponent* GetHitbox();
+
+	UFUNCTION()
+	FTransform GetSocket(FName SocketName);
 
 };

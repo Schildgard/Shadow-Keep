@@ -22,6 +22,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta =(AllowPrivateAccess))
 	EWeaponType WeaponClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess))
+	EActionState CharacterActionState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
 	AEternalGrace_ProtoCharacter* OwningCharacter;
@@ -31,12 +33,16 @@ protected:
 public:
 	UFUNCTION()
 	void SetWeaponType(EWeaponType NewWeaponClass);
+	UFUNCTION()
+	void SetActionState(EActionState NewActionState);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta =(AllowPrivateAccess))
 	int AttackCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess))
 	bool bCanContinueAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess))
+	bool bCanOffhandAttack;
 
 	UFUNCTION(BlueprintCallable)
 	void ResetAttackState();

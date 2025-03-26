@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class ETERNALGRACE_PROTO_API UNotify_Combo : public UAnimNotify
 {
 	GENERATED_BODY()

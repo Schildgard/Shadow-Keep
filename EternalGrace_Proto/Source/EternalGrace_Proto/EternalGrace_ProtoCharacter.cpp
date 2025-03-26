@@ -22,6 +22,7 @@
 #include "WeaponComponent.h"
 #include "WeaponBase.h"
 #include "EG_AnimInstance.h"
+#include "InputBufferComponent.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -83,6 +84,8 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon");
 	WeaponComponent->SetupAttachment(GetMesh(), "s_hand_r");
 
+	InputBufferingComponent = CreateDefaultSubobject<UInputBufferComponent>("InputBuffering");
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -104,17 +107,22 @@ void AEternalGrace_ProtoCharacter::ShowInventory()
 void AEternalGrace_ProtoCharacter::NormalAttack()
 {
 	int AttackCount = EGAnimInstance->AttackCount;
+	if (AttackCount >= WeaponComponent->NormalWeaponAttacks.Num()) return; // Make sure the Attack does not break Attack Array Size
 	switch (CurrentActionState)
 	{
-	case EActionState::Running:
+	case EActionState::Running: //if Running, perform running Attack
 		CurrentActionState = EActionState::Attacking;
 		EGAnimInstance->Montage_Play(WeaponComponent->RunningAttack, true);
 		break;
-	case EActionState::Jumping:
+	case EActionState::Jumping: //if in Midair, do Nothing. Maybe implement JumpAttacks later.
 		UE_LOG(LogTemp, Warning, TEXT("No Jumping Attack Implemented yet"));
 		break;
 	case EActionState::Attacking:
-		if (!EGAnimInstance->bCanContinueAttack) return;
+		if (!EGAnimInstance->bCanContinueAttack) //If already in Attack, buffer input
+		{
+			InputBufferingComponent->SaveInput(EInputType::NormalAttack);
+			return;
+		}
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
 		break;
 	default:
@@ -122,6 +130,31 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
 		break;
 	}
+}
+
+void AEternalGrace_ProtoCharacter::PerformOffhandAction()
+{
+	int AttackCount = EGAnimInstance->AttackCount;
+	if (AttackCount >= WeaponComponent->NormalWeaponAttacks.Num()) return; // Make sure the Attack does not break Attack Array Size
+	switch (CurrentActionState)
+	{
+	case EActionState::Idle: //if in Idle, go into Guard Pose
+		SetCurrentActionState(EActionState::Guarding);
+		EGAnimInstance->SetActionState(EActionState::Guarding);
+		break;
+	case EActionState::Attacking: //if attacking, check if an offhand attack can be performed and perform or buffer if necessary
+		if (!WeaponComponent->OffhandAttack || !EGAnimInstance->bCanOffhandAttack) return;
+		if (!EGAnimInstance->bCanContinueAttack)
+		{
+			InputBufferingComponent->SaveInput(EInputType::OffhandAttack);
+			return;
+		}
+		EGAnimInstance->Montage_Play(WeaponComponent->OffhandAttack, true);
+		break;
+	default: //Offhand can only be used while Idle(Includes running, not sprinting) or Attacking
+		break;
+	}
+
 }
 
 void AEternalGrace_ProtoCharacter::TriggerCurrentInteractable()
@@ -142,6 +175,10 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	if (WeaponComponent->CurrentWeaponClass)
 	{
 		EquipWeapon(WeaponComponent->CurrentWeaponClass);
+	}
+	if (WeaponComponent->OffhandWeaponClass)
+	{
+		EquipOffhandWeapon(WeaponComponent->OffhandWeaponClass);
 	}
 
 }
@@ -179,6 +216,8 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 
 		//Attacking
 		EnhancedInputComponent->BindAction(NormalAttackAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::NormalAttack);
+		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::PerformOffhandAction);
+		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Completed, this, &AEternalGrace_ProtoCharacter::CancelGuard);
 
 
 	}
@@ -245,6 +284,44 @@ void AEternalGrace_ProtoCharacter::EquipWeapon(TSubclassOf<AWeaponBase> WeaponSu
 {
 	EWeaponType NewWeaponCategory = WeaponComponent->ChangeWeapon(WeaponSubclass);
 	EGAnimInstance->SetWeaponType(NewWeaponCategory);
+}
+
+void AEternalGrace_ProtoCharacter::EquipOffhandWeapon(TSubclassOf<AWeaponBase> WeaponSubclass)
+{
+	WeaponComponent->ChangeOffhandWeapon(WeaponSubclass);
+}
+
+void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
+{
+	switch (BufferedInput)
+	{
+	case EInputType::NormalAttack:
+		NormalAttack();
+		break;
+	case EInputType::HeavyAttack:
+		//NO HEAVY ATTACK YET
+		break;
+	case EInputType::OffhandAttack:
+		PerformOffhandAction();
+		break;
+	case EInputType::Dodge:
+		//NO DODGE YET
+		break;
+	case EInputType::Interact:
+		Interact_Implementation();
+		break;
+	case EInputType::Jump:
+		Jump();
+		UE_LOG(LogTemp, Warning, TEXT("TriggeredJump Input"));
+		break;
+	default:
+		break;
+	}
+}
+
+UInputBufferComponent* AEternalGrace_ProtoCharacter::GetInputBufferComponent()
+{
+	return InputBufferingComponent;
 }
 
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)
@@ -395,5 +472,45 @@ void AEternalGrace_ProtoCharacter::HideInteractUI_Implementation()
 		EGController->HideInteractInfoWidget();
 		//Remove Current Interactable
 		CurrentInteractable = nullptr;
+	}
+}
+
+UCapsuleComponent* AEternalGrace_ProtoCharacter::GetHitBox_Implementation()
+{
+	if (WeaponComponent->CurrentWeaponObject)
+	{
+		return WeaponComponent->CurrentWeaponObject->GetHitbox();
+	}
+	UE_LOG(LogTemp, Error, TEXT("Failed to get Current Weapon in Attempt to get hitbox (ProtoCharacterClass)"))
+	return nullptr;
+}
+
+AWeaponBase* AEternalGrace_ProtoCharacter::GetWeapon_Implementation()
+{
+	return WeaponComponent->CurrentWeaponObject;
+}
+
+void AEternalGrace_ProtoCharacter::CancelGuard()
+{
+	//Change this, so the AnimInstance does not always has to be manually set....
+	Super::CancelGuard();
+	EGAnimInstance->SetActionState(EActionState::Idle);
+	UE_LOG(LogTemp, Error, TEXT("Trigger Cancel Block State"));
+}
+
+void AEternalGrace_ProtoCharacter::Jump()
+{
+	switch (CurrentActionState)
+	{
+	case EActionState::Attacking:
+		InputBufferingComponent->SaveInput(EInputType::Jump);
+		return;
+	case EActionState::Jumping:
+		InputBufferingComponent->SaveInput(EInputType::Jump);
+		return;
+	default:
+		SetCurrentActionState(EActionState::Jumping);
+		Super::Jump();
+		break;
 	}
 }

@@ -9,7 +9,7 @@
  * 
  */
 
-UENUM()
+UENUM(BlueprintType)
 enum class EActionState : uint8
 {
 	Idle UMETA(DisplayName = "IdleState"),

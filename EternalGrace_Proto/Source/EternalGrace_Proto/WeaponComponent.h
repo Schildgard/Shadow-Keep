@@ -20,17 +20,26 @@ public:
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	TSubclassOf<AWeaponBase> CurrentWeaponClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	TSubclassOf<AWeaponBase> OffhandWeaponClass;
 
 	UPROPERTY()
 	AWeaponBase* CurrentWeaponObject;
+	UPROPERTY()
+	AWeaponBase* OffhandWeaponObject;
 
 	UFUNCTION()
 	EWeaponType ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
+	UFUNCTION()
+	void ChangeOffhandWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
 
 	UPROPERTY()
 	TArray<UAnimMontage*> NormalWeaponAttacks;
 
 	UPROPERTY()
 	UAnimMontage* RunningAttack;
+
+	UPROPERTY()
+	UAnimMontage* OffhandAttack;
 
 };
