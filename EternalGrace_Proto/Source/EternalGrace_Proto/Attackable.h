@@ -30,6 +30,8 @@ public:
 	//Get Weapon is Deprecated / not used !
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AWeaponBase* GetWeapon();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AWeaponBase* GetOffhandWeapon();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	TArray<TEnumAsByte<EObjectTypeQuery>> GetHittableObjectTypes();

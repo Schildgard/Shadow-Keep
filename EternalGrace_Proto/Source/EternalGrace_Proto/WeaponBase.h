@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	UCapsuleComponent* Hitbox;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UAudioComponent* AudioComponent;
+
 
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
@@ -43,5 +46,8 @@ public:
 
 	UFUNCTION()
 	FTransform GetSocket(FName SocketName);
+
+	UFUNCTION()
+	UAudioComponent* GetAudioComponent();
 
 };

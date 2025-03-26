@@ -6,6 +6,7 @@
 #include "EternalGrace_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "EternalGrace_GameInstance.h"
+#include "HealthComponent.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -22,7 +23,8 @@ ACharacterBase::ACharacterBase()
 	MustacheComponent = CreateDefaultSubobject<UGroomComponent>("MustacheComp");
 	MustacheComponent->SetupAttachment(HeadMesh);
 	
-
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
+	HealthComponent->GetHitSoundComponent()->SetupAttachment(GetMesh());
 }
 
 void ACharacterBase::BeginPlay()
@@ -68,6 +70,24 @@ UCapsuleComponent* ACharacterBase::GetHitBox_Implementation()
 }
 
 AWeaponBase* ACharacterBase::GetWeapon_Implementation()
+{
+	return nullptr;
+}
+AWeaponBase* ACharacterBase::GetOffhandWeapon_Implementation()
+{
+	return nullptr;
+}
+
+void ACharacterBase::GetDamage_Implementation()
+{
+}
+
+UNiagaraSystem* ACharacterBase::GetHitEffectSystem_Implementation()
+{
+	return nullptr;
+}
+
+UAudioComponent* ACharacterBase::GetHitSoundComponent_Implementation()
 {
 	return nullptr;
 }

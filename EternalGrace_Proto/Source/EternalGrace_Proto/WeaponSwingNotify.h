@@ -19,6 +19,8 @@ class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 {
 	GENERATED_BODY()
 
+	UWeaponSwingNotify();
+
 	 void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)override;
 	 void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)override;
 	 void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)override;
@@ -30,6 +32,14 @@ class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 	 UPROPERTY()
 	 EElementalType WeaponElement;
 	 UPROPERTY()
+	 UWorld* World;
+	 UPROPERTY()
+	 UAudioComponent* AudioComponent;
+
+	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OnHit", meta = (AllowPrivateAccess))
+	 bool bIsOffHandWeapon;
+
+	 UPROPERTY()
 	 UCapsuleComponent* Hitbox;
 	 float HitCapsuleRadius;
 	 float HitCapsuleHalfHeight;
@@ -39,7 +49,7 @@ class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 	 UPROPERTY()
 	 TArray<AActor*> IgnoreList;
 
-	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ReactionType", meta =(AllowPrivateAccess))
+	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OnHit", meta =(AllowPrivateAccess))
 	 TMap<EElementalType, UNiagaraSystem*> HitReactionMap;
 
 	

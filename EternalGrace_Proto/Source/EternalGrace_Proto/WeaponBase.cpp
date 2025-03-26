@@ -3,6 +3,7 @@
 
 #include "WeaponBase.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/AudioComponent.h"
 
 AWeaponBase::AWeaponBase()
 {
@@ -15,6 +16,9 @@ AWeaponBase::AWeaponBase()
 	Hitbox = CreateDefaultSubobject<UCapsuleComponent>("Hitbox");
 	Hitbox->SetupAttachment(RootComponent);
 
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>("Audio Component");
+	AudioComponent->SetupAttachment(RootComponent);
+	AudioComponent->SetAutoActivate(false);
 	OffhandAttack = nullptr;
 
 }
@@ -41,5 +45,10 @@ FTransform AWeaponBase::GetSocket(FName SocketName)
 		return WeaponMesh->GetSocketTransform(SocketName);
 	}
 	return FTransform::Identity;
+}
+
+UAudioComponent* AWeaponBase::GetAudioComponent()
+{
+	return AudioComponent;
 }
 

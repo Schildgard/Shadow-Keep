@@ -97,6 +97,12 @@ protected:
 	//Attackable Implementations
 	virtual UCapsuleComponent* GetHitBox_Implementation()override;
 	virtual AWeaponBase* GetWeapon_Implementation()override;
+	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
+	//Damageable Implementations
+	virtual void GetDamage_Implementation()override;
+	virtual UAudioComponent* GetHitSoundComponent_Implementation()override;
+	virtual UNiagaraSystem* GetHitEffectSystem_Implementation()override;
+
 
 	void CancelGuard()override;
 	void Jump()override;

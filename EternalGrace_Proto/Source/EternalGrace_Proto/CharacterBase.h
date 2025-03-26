@@ -9,14 +9,16 @@
 #include "GroomComponent.h"
 #include "ActionState.h"
 #include "Attackable.h"
+#include "Damageable.h"
 #include "CharacterBase.generated.h"
 
 class AWeaponBase;
 class UCapsuleComponent;
 class UEternalGrace_SaveGame;
 class UEternalGrace_GameInstance;
+class UHealthComponent;
 UCLASS()
-class ETERNALGRACE_PROTO_API ACharacterBase : public ACharacter, public ISaveable, public IAttackable
+class ETERNALGRACE_PROTO_API ACharacterBase : public ACharacter, public ISaveable, public IAttackable, public IDamageable
 {
 	GENERATED_BODY()
 
@@ -34,12 +36,14 @@ protected:
 	UGroomComponent* BeardComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
 	UGroomComponent* MustacheComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UHealthComponent* HealthComponent;
 
+	//Save Interface Implementations
 	UFUNCTION(CallInEditor, Category = "SaveGame")
 	virtual void SaveData_Implementation()override;
 	UFUNCTION(CallInEditor, Category = "SaveGame")
 	virtual void LoadData_Implementation()override;
-
 	UFUNCTION(CallInEditor, Category = "SaveGame")
 	void MakeSaveCall();
 	UFUNCTION(CallInEditor, Category = "SaveGame")
@@ -48,12 +52,25 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess))
 	TArray<TEnumAsByte<EObjectTypeQuery>> HittableObjectTypes;
 
+	//Attackable Interface Implementations
 	UFUNCTION()
 	virtual UCapsuleComponent* GetHitBox_Implementation()override;
 	UFUNCTION()
 	virtual TArray<TEnumAsByte<EObjectTypeQuery>> GetHittableObjectTypes_Implementation() override;
 	UFUNCTION()
 	virtual AWeaponBase* GetWeapon_Implementation()override;
+	UFUNCTION()
+	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
+
+	//Damageable Interface Implementations
+	UFUNCTION()
+	void GetDamage_Implementation()override;
+	UFUNCTION()
+	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
+	UFUNCTION()
+	UAudioComponent* GetHitSoundComponent_Implementation()override;
+
+
 
 	UPROPERTY()
 	UEternalGrace_GameInstance* CurrentGameInstance;

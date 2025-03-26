@@ -23,6 +23,7 @@
 #include "WeaponBase.h"
 #include "EG_AnimInstance.h"
 #include "InputBufferComponent.h"
+#include "HealthComponent.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -489,6 +490,27 @@ AWeaponBase* AEternalGrace_ProtoCharacter::GetWeapon_Implementation()
 {
 	return WeaponComponent->CurrentWeaponObject;
 }
+
+AWeaponBase* AEternalGrace_ProtoCharacter::GetOffhandWeapon_Implementation()
+{
+	return WeaponComponent->OffhandWeaponObject;
+}
+
+void AEternalGrace_ProtoCharacter::GetDamage_Implementation()
+{
+
+}
+
+UAudioComponent* AEternalGrace_ProtoCharacter::GetHitSoundComponent_Implementation()
+{
+	return HealthComponent->GetHitSoundComponent();
+}
+
+UNiagaraSystem* AEternalGrace_ProtoCharacter::GetHitEffectSystem_Implementation()
+{
+	return HealthComponent->GetHitEffect();
+}
+
 
 void AEternalGrace_ProtoCharacter::CancelGuard()
 {

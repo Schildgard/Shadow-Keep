@@ -6,7 +6,25 @@
 #include "Attackable.h"
 #include "Components/CapsuleComponent.h"
 #include "TraceUtils.h"
+#include "Components/AudioComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Damageable.h"
+
+
+UWeaponSwingNotify::UWeaponSwingNotify()
+{
+	AttackingActor = nullptr;
+	AttackingWeapon = nullptr;
+	WeaponElement = EElementalType::Physical;
+	World = nullptr;
+	AudioComponent = nullptr;
+	bIsOffHandWeapon = false;
+	Hitbox = nullptr;
+	HitCapsuleHalfHeight = 0.0f;
+	HitCapsuleRadius = 0.0f;
+
+}
 
 void UWeaponSwingNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
@@ -15,12 +33,23 @@ void UWeaponSwingNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
 		IgnoreList.Empty();
 	}
 
+	// Save Attacker in Variable
 	AttackingActor = MeshComp->GetOwner();
 	if (AttackingActor)
 	{
+		// World reference for Hittrace, niagara and sound spawning
+		World = AttackingActor->GetWorld();
+		//Check Interface to get Attack Properties
 		if (AttackingActor->Implements<UAttackable>())
 		{
-			AttackingWeapon = IAttackable::Execute_GetWeapon(AttackingActor);
+			if (bIsOffHandWeapon)
+			{
+				AttackingWeapon = IAttackable::Execute_GetOffhandWeapon(AttackingActor);
+			}
+			else
+			{
+				AttackingWeapon = IAttackable::Execute_GetWeapon(AttackingActor);
+			}
 			if (AttackingWeapon)
 			{
 				WeaponElement = AttackingWeapon->ElementalType;
@@ -41,10 +70,7 @@ void UWeaponSwingNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
 			}
 		}
 	}
-	else //redundant.
-	{
-		UE_LOG(LogTemp, Error, TEXT("(WeaponSwingNotify) failed to get Actor"));
-	}
+
 
 }
 
@@ -52,25 +78,45 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 {
 	if (Hitbox)
 	{
+		//Prepare Hit Detection via Capsule Trace
 		FVector CapsulePosition = Hitbox->GetComponentLocation();
 		FRotator CapsuleRotation = Hitbox->GetComponentRotation();
 		IgnoreList.Add(AttackingActor);
 		TArray<FHitResult> Hitted;
-		UTraceUtils::CapsuleTraceMultiForObjects(AttackingActor->GetWorld(), CapsulePosition, CapsulePosition, HitCapsuleRadius, HitCapsuleHalfHeight, CapsuleRotation, HittableObjectTypes, false, IgnoreList, EDrawDebugTrace::ForDuration, Hitted, true);
+		UTraceUtils::CapsuleTraceMultiForObjects(World, CapsulePosition, CapsulePosition, HitCapsuleRadius, HitCapsuleHalfHeight, CapsuleRotation, HittableObjectTypes, false, IgnoreList, EDrawDebugTrace::ForDuration, Hitted, true);
 
-		for (FHitResult Hit : Hitted)
+		//On Hit, Add to Ignore List, Spawn Niagara and Weapon Hit Sound Effect
+		for (const FHitResult& Hit : Hitted)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Hitted %s"), *Hit.GetActor()->GetFName().ToString())
-				IgnoreList.Add(Hit.GetActor());
+			AActor* HittedActor = Hit.GetActor();
+			if (!HittedActor)return;
+			UE_LOG(LogTemp, Display, TEXT("Hitted %s"), *HittedActor->GetFName().ToString())
 
-			UNiagaraSystem* HitEffectToSpawn = *HitReactionMap.Find(WeaponElement);
-			if (HitEffectToSpawn)
+				IgnoreList.Add(HittedActor);
+
+			UNiagaraSystem* HitNiagara;
+
+			//Check if Hitted Actor Implements Interface. Determine wether to use weapons environmental hit properties or hittable targets properties.
+			if (HittedActor->Implements<UDamageable>())
 			{
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(AttackingActor->GetWorld(), HitEffectToSpawn, Hit.Location, FRotator(Hit.ImpactNormal.X, Hit.ImpactNormal.Y, Hit.ImpactNormal.Z));
+				HitNiagara = IDamageable::Execute_GetHitEffectSystem(HittedActor);
+				AudioComponent = IDamageable::Execute_GetHitSoundComponent(HittedActor);
+				//Call get Damage here.
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Hit Effect for this ElementType"));
+				HitNiagara = *HitReactionMap.Find(WeaponElement); // TO Do: Change the way to determine the hit effect..maybe datatables ?
+				AudioComponent = AttackingWeapon->GetAudioComponent();
+			}
+
+			//Play Audio and Niagara
+			if (HitNiagara)
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, HitNiagara, Hit.Location, FRotator(Hit.ImpactNormal.X, Hit.ImpactNormal.Y, Hit.ImpactNormal.Z));
+			}
+			if (AudioComponent)
+			{
+				AudioComponent->Play();
 			}
 		}
 	}

@@ -21,9 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EElementalType ElementalProperty;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	//UNiagaraSystem* HitNiagaraEffect;
-	
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UNiagaraSystem* HitNiagaraEffect;
 
 };
