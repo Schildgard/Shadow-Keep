@@ -5,6 +5,7 @@
 #include "WeaponBase.h"
 #include "EternalGrace_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet//KismetSystemLibrary.h"
 #include "EternalGrace_GameInstance.h"
 #include "HealthComponent.h"
 
@@ -12,6 +13,7 @@ ACharacterBase::ACharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SaveGameObject = nullptr;
+	GroundSurfaceDataTable = nullptr;
 	CurrentActionState = EActionState::Idle;
 
 	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FaceComp");
@@ -30,6 +32,7 @@ ACharacterBase::ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	World = GetWorld();
 
 	UGameInstance* GameInstanceReference = UGameplayStatics::GetGameInstance(GetWorld());
 	CurrentGameInstance = Cast<UEternalGrace_GameInstance>(GameInstanceReference);
@@ -97,13 +100,6 @@ TArray<TEnumAsByte<EObjectTypeQuery>> ACharacterBase::GetHittableObjectTypes_Imp
 	return HittableObjectTypes;
 }
 
-// Called every frame
-void ACharacterBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 // Called to bind functionality to input
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -128,5 +124,26 @@ void ACharacterBase::CancelGuard()
 void ACharacterBase::SetCurrentActionState(EActionState ActionState)
 {
 	CurrentActionState = ActionState;
+}
+
+void ACharacterBase::PlayFootStepSound(FName FootSocket)
+{
+	UE_LOG(LogTemp, Warning, TEXT("No override for PlayFootStepSound (Character Base Class) %s"), *GetFName().ToString())
+}
+
+UPhysicalMaterial* ACharacterBase::GetGroundMaterial()
+{
+	FVector ActorLocation = GetActorLocation();
+	FVector ScanDirection = FVector(ActorLocation.X, ActorLocation.Y, ActorLocation.Z - GroundScanDistance);
+	FHitResult OutHit;;
+
+	bool Hit = UKismetSystemLibrary::LineTraceSingle(World, ActorLocation, ScanDirection, UEngineTypes::ConvertToTraceType(ECC_Visibility), true, {}, EDrawDebugTrace::None, OutHit, true);
+
+	if (!Hit)
+	{
+		return nullptr;
+	}
+	UPhysicalMaterial* HitMaterial = OutHit.PhysMaterial.Get();
+	return HitMaterial;
 }
 

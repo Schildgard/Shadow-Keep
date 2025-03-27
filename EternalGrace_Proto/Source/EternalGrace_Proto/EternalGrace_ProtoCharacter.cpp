@@ -24,6 +24,7 @@
 #include "EG_AnimInstance.h"
 #include "InputBufferComponent.h"
 #include "HealthComponent.h"
+#include "SurfaceType.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,6 +81,8 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 
 	UpperArmor->GetHelmetMesh()->SetupAttachment(HeadMesh);
 	UpperArmor->GetHelmetMesh()->SetLeaderPoseComponent(HeadMesh);
+
+	UpperArmor->GetArmorSoundComponent()->SetupAttachment(GetMesh());
 
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>("Inventory");
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon");
@@ -509,6 +512,30 @@ UAudioComponent* AEternalGrace_ProtoCharacter::GetHitSoundComponent_Implementati
 UNiagaraSystem* AEternalGrace_ProtoCharacter::GetHitEffectSystem_Implementation()
 {
 	return HealthComponent->GetHitEffect();
+}
+
+void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
+{
+	//Check if Character wears armor and play it if true
+	//Check Data Table for Ground Material and play assigned Sound
+	UPhysicalMaterial* GroundMaterial = GetGroundMaterial();
+	if(GroundMaterial && GroundSurfaceDataTable)
+	{
+		static const FString Context = FString("GroundContext");
+		FSurfaceType* SurfaceRow = GroundSurfaceDataTable->FindRow<FSurfaceType>(GroundMaterial->GetFName(), Context);
+		if(SurfaceRow)
+		{
+			UGameplayStatics::PlaySoundAtLocation(World, SurfaceRow->FootStepSound, FVector(GetMesh()->GetSocketLocation(FootSocket)));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SurfaceRow not found (Eternal grace proto character)"));
+		}
+	}
+	if(UpperArmor->bIsWearingHeavyArmor)
+	{
+		UpperArmor->GetArmorSoundComponent()->Play();
+	}
 }
 
 

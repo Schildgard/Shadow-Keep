@@ -28,6 +28,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	UWorld* World;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UDataTable* GroundSurfaceDataTable;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
 	USkeletalMeshComponent* HeadMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
@@ -82,8 +87,6 @@ protected:
 
 
 public:	
-
-	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
@@ -94,5 +97,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentActionState(EActionState ActionState);
+
+	//FootSteps
+	UFUNCTION(BlueprintCallable)
+	virtual void PlayFootStepSound(FName FootSocket);
+	UFUNCTION()
+	UPhysicalMaterial* GetGroundMaterial();
+	const float GroundScanDistance = 150.0f;
 
 };

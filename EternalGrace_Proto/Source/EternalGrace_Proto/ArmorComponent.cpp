@@ -27,7 +27,12 @@ UArmorComponent::UArmorComponent()
 	Helmet->PrimaryComponentTick.bCanEverTick = false;
 	CurrentHelmetsName = "NoHelmet";
 
+	ArmorSoundComponent = CreateDefaultSubobject<UAudioComponent>("Armor Sound");
+}
 
+UAudioComponent* UArmorComponent::GetArmorSoundComponent()
+{
+	return ArmorSoundComponent;
 }
 
 void UArmorComponent::EquipBreastPlate(FName ArmorName)
@@ -41,6 +46,7 @@ void UArmorComponent::EquipBreastPlate(FName ArmorName)
 		Body->SetSkeletalMesh(ArmorData->BreastplateMesh.LoadSynchronous());
 		Arms->SetSkeletalMesh(ArmorData->ArmsMesh.LoadSynchronous());
 		Shoulders->SetSkeletalMesh(ArmorData->ShoulderMesh.LoadSynchronous());
+		bIsWearingHeavyArmor = ArmorData->bIsHeavyArmor;
 	}
 	else
 	{

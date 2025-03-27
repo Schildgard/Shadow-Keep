@@ -4,6 +4,7 @@
 #include "WeaponBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/AudioComponent.h"
+#include "Camera/CameraShakeSourceComponent.h"
 
 AWeaponBase::AWeaponBase()
 {
@@ -19,6 +20,9 @@ AWeaponBase::AWeaponBase()
 	AudioComponent = CreateDefaultSubobject<UAudioComponent>("Audio Component");
 	AudioComponent->SetupAttachment(RootComponent);
 	AudioComponent->SetAutoActivate(false);
+
+	CameraShakeComponent = CreateDefaultSubobject<UCameraShakeSourceComponent>("CameraShake");
+	CameraShakeComponent->SetupAttachment(RootComponent);
 	OffhandAttack = nullptr;
 
 }
@@ -50,5 +54,10 @@ FTransform AWeaponBase::GetSocket(FName SocketName)
 UAudioComponent* AWeaponBase::GetAudioComponent()
 {
 	return AudioComponent;
+}
+
+UCameraShakeSourceComponent* AWeaponBase::GetCameraShakeComponent()
+{
+	return CameraShakeComponent;
 }
 

@@ -31,4 +31,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<USkeletalMesh> ArmsMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsHeavyArmor;
 };

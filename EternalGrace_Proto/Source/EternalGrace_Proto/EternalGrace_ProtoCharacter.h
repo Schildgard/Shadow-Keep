@@ -102,6 +102,8 @@ protected:
 	virtual void GetDamage_Implementation()override;
 	virtual UAudioComponent* GetHitSoundComponent_Implementation()override;
 	virtual UNiagaraSystem* GetHitEffectSystem_Implementation()override;
+	//FootStep Sound
+	virtual void PlayFootStepSound(FName FootSocket)override;
 
 
 	void CancelGuard()override;

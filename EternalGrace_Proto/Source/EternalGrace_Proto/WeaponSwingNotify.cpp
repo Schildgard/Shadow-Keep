@@ -10,6 +10,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Damageable.h"
+#include "Camera/CameraShakeSourceComponent.h"
 
 
 UWeaponSwingNotify::UWeaponSwingNotify()
@@ -117,6 +118,15 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 			if (AudioComponent)
 			{
 				AudioComponent->Play();
+			}
+
+			if(*AttackingWeapon->GetCameraShakeComponent()->CameraShake)
+			{
+				AttackingWeapon->GetCameraShakeComponent()->Start();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("No Camera Shake (WeaponSwingNotify)"));
 			}
 		}
 	}

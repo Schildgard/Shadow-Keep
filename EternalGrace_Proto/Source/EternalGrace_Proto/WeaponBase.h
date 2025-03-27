@@ -9,6 +9,7 @@
 #include "WeaponBase.generated.h"
 
 class UCapsuleComponent;
+class UCameraShakeSourceComponent;
 UCLASS()
 class ETERNALGRACE_PROTO_API AWeaponBase : public AActor
 {
@@ -26,6 +27,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	UAudioComponent* AudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UCameraShakeSourceComponent* CameraShakeComponent;
 
 
 public:	
@@ -49,5 +53,8 @@ public:
 
 	UFUNCTION()
 	UAudioComponent* GetAudioComponent();
+
+	UFUNCTION()
+	UCameraShakeSourceComponent* GetCameraShakeComponent();
 
 };

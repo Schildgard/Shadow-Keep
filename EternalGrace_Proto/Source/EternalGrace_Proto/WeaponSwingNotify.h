@@ -14,7 +14,7 @@
 class AWeaponBase;
 class UCapsuleComponent;
 class AEternalGrace_CharacterBase;
-UCLASS()
+UCLASS(Blueprintable)
 class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 {
 	GENERATED_BODY()

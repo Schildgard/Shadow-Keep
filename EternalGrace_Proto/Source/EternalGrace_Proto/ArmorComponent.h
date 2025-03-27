@@ -47,8 +47,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment", meta = (AllowPrivateAccess))
 	USkeletalMeshComponent* Helmet;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment", meta = (AllowPrivateAccess))
+	UAudioComponent* ArmorSoundComponent;
+
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsWearingHeavyArmor;
+
+	UFUNCTION()
+	UAudioComponent* GetArmorSoundComponent();
 
 	UFUNCTION(BlueprintCallable)
 	void EquipBreastPlate(FName ArmorName);
