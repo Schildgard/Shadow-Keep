@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "WeaponType.h"
+#include "ObjectType.h"
 #include "ElementalType.h"
 #include "WeaponBase.generated.h"
 
@@ -31,14 +32,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	UCameraShakeSourceComponent* CameraShakeComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	FName WeaponName;
+
+
 
 public:	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UTexture2D> ThumpNailImage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
 	UStaticMeshComponent* WeaponMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	EWeaponType WeaponCategory;
 	UPROPERTY()
 	EElementalType ElementalType;
+	UPROPERTY()
+	EObjectType ObjectType;
 	UFUNCTION()
 	TArray<UAnimMontage*> GetNormalAttacks();
 
@@ -56,5 +65,8 @@ public:
 
 	UFUNCTION()
 	UCameraShakeSourceComponent* GetCameraShakeComponent();
+
+	UFUNCTION()
+	FName GetWeaponName();
 
 };

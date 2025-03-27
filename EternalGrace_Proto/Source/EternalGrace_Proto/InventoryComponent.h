@@ -10,6 +10,7 @@
 struct FArmor;
 struct FPants;
 struct FHelmet;
+class AWeaponBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UInventoryComponent : public UActorComponent
@@ -30,13 +31,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GlobalData", meta = (AllowPrivateAccess))
 	UDataTable* GlobalHelmetInventory;
 
-	//Attempt to replace Datatables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta =(AllowPrivateAccess))
 	TMap<FName, int> ArmorInventoryMap;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
 	TMap<FName, int> PantsInventoryMap;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
 	TMap<FName, int> HelmetInventoryMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
+	TArray<TSubclassOf<AWeaponBase>> WeaponInventory;
+
 
 	//This function is not used because I am to lazy to also make a setter. And since the component is already only accessible through a Getter, I think having the maps public should be fine.
 	TMap<FName, int>* GetInventoryOfType(EObjectType ItemCategory);
@@ -48,6 +52,8 @@ public:
 	UFUNCTION()
 	void AddHelmetToInventory(FHelmet HelmetToAdd);
 
+	UFUNCTION()
+	void AddWeaponToInventory(TSubclassOf<AWeaponBase> WeaponToAdd);
 	UFUNCTION()
 	void TryToObtainItem(FName ObjectName, EObjectType ItemCategory);
 

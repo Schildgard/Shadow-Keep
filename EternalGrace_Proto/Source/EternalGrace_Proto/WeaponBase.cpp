@@ -10,6 +10,7 @@ AWeaponBase::AWeaponBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	WeaponCategory = EWeaponType::StraightSword;
+	ObjectType = EObjectType::Weapon;
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("Weapon Mesh");
 	RootComponent = WeaponMesh;
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -59,5 +60,10 @@ UAudioComponent* AWeaponBase::GetAudioComponent()
 UCameraShakeSourceComponent* AWeaponBase::GetCameraShakeComponent()
 {
 	return CameraShakeComponent;
+}
+
+FName AWeaponBase::GetWeaponName()
+{
+	return WeaponName;
 }
 

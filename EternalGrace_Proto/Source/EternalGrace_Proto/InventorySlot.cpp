@@ -35,7 +35,6 @@ void UInventorySlot::UseInventorySlot()
 		OwningCharacter->ChangeUpperArmor(ItemName);
 		break;
 	case EObjectType::HeadEquipment:
-		//OwningCharacter->GetArmorComponent()->EquipHelmet(ItemName);
 		OwningCharacter->ChangeHelmet(ItemName);
 		break;
 	case EObjectType::LegEquipment:
@@ -50,6 +49,8 @@ void UInventorySlot::UseInventorySlot()
 	case EObjectType::KeyItem:
 		UE_LOG(LogTemp, Warning, TEXT("KeyItems are not to be used. Check InventorySlotClass"))
 			break;
+	case EObjectType::Weapon:
+		OwningCharacter->EquipWeapon(WeaponClass);
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("No Valid ObjectType. Check InventorySlotClass"))
 			break;
@@ -82,4 +83,9 @@ void UInventorySlot::SetImage(UTexture2D* ImageToSet)
 void UInventorySlot::SetItemName(FName Name)
 {
 	ItemName = Name;
+}
+
+void UInventorySlot::SetWeapon(TSubclassOf<AWeaponBase> WeaponToRepresent)
+{
+	WeaponClass = WeaponToRepresent;
 }

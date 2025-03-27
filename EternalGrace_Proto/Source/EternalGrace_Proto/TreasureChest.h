@@ -14,6 +14,7 @@
  */
 class AEternalGrace_ProtoCharacter;
 class UEternalGrace_SaveGame;
+class AWeaponBase;
 UCLASS()
 class ETERNALGRACE_PROTO_API ATreasureChest : public AInteractableActor_Dynamic, public ISaveable
 {
@@ -30,12 +31,11 @@ protected:
 	TArray<FName> ContainedUseables;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess))
 	TArray<FName> ContainedKeyItems;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess))
+	TArray<TSubclassOf<AWeaponBase>> ContainedWeapons;
 
 	UPROPERTY()
 	AEternalGrace_ProtoCharacter* Interactor;
-
-	//UPROPERTY()
-	//UEternalGrace_SaveGame* CurrentSavegame;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Save", meta = (AllowPrivateAccess))
 	FName ObjectID;

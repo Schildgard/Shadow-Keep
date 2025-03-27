@@ -11,6 +11,7 @@
 #include "InventoryComponent.h"
 #include "Armor.h"
 #include "Pants.h"
+#include "WeaponBase.h"
 
 AEG_PlayerController::AEG_PlayerController()
 {
@@ -110,6 +111,24 @@ void AEG_PlayerController::ShowInventory()
 					}
 					z++;
 
+				}
+
+				for (TSubclassOf<AWeaponBase> Weapon : OwningCharacter->GetInventory()->WeaponInventory)
+				{
+					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
+					if(CurrentInventorySlot[z])
+					{
+						//create reference instance to get values
+						AWeaponBase* WeaponInstance = Weapon->GetDefaultObject<AWeaponBase>();
+
+						CurrentInventorySlot[z]->AddToPlayerScreen();
+						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
+						CurrentInventorySlot[z]->SetImage(WeaponInstance->ThumpNailImage.LoadSynchronous());
+						CurrentInventorySlot[z]->SetWeapon(Weapon);
+						CurrentInventorySlot[z]->SetObjectType(EObjectType::Weapon);
+						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
+					}
+					z++;
 				}
 
 				if(CurrentInventorySlot.Num() >=1)

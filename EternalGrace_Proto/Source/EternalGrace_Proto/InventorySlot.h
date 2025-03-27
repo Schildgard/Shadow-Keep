@@ -32,6 +32,9 @@ protected:
 	FName ItemName;
 
 	UPROPERTY()
+	TSubclassOf<AWeaponBase> WeaponClass;
+
+	UPROPERTY()
 	AEternalGrace_ProtoCharacter* OwningCharacter;
 
 	UPROPERTY()
@@ -50,4 +53,6 @@ public:
 	void SetImage(UTexture2D* ImageToSet);
 	UFUNCTION()
 	void SetItemName(FName Name);
+	UFUNCTION()
+	void SetWeapon(TSubclassOf<AWeaponBase> WeaponToRepresent);
 };

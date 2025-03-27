@@ -19,14 +19,16 @@ EWeaponType UWeaponComponent::ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 {
 	if (WeaponToEquip)
 	{
-
 		ACharacterBase* OwningCharacter = Cast<ACharacterBase>(GetOwner());
 		if (!OwningCharacter)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Failed to Cast Character (WeaponComponent"));
 			return EWeaponType::NoWeapon;
 		}
-		//CurrentWeaponObject->Destroy();
+		if(CurrentWeaponObject)
+		{
+			CurrentWeaponObject->Destroy();
+		}
 		CurrentWeaponClass = WeaponToEquip;
 		CurrentWeaponObject = GetWorld()->SpawnActor<AWeaponBase>(CurrentWeaponClass);
 		if (!CurrentWeaponObject)
@@ -34,9 +36,13 @@ EWeaponType UWeaponComponent::ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 			UE_LOG(LogTemp, Error, TEXT("Failed to Spawn Weapon (WeaponComponent"));
 			return EWeaponType::NoWeapon;
 		}
-		//CurrentWeaponObject->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		CurrentWeaponObject->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "s_hand_r");
 		NormalWeaponAttacks = CurrentWeaponObject->GetNormalAttacks();
+		if (WeaponToEquip->GetDefaultObject<AWeaponBase>()->WeaponCategory == EWeaponType::GreatSword && OffhandWeaponObject)
+		{
+			OffhandWeaponObject->Destroy();
+			OffhandAttack = nullptr;
+		}
 
 		return CurrentWeaponObject->WeaponCategory;
 	}
@@ -58,7 +64,11 @@ void UWeaponComponent::ChangeOffhandWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 			return;
 		}
 
-		//CurrentWeaponObject->Destroy();
+		if(OffhandWeaponObject)
+		{
+		OffhandWeaponObject->Destroy();
+		OffhandAttack = nullptr;
+		}
 		OffhandWeaponClass = WeaponToEquip;
 		OffhandWeaponObject = GetWorld()->SpawnActor<AWeaponBase>(OffhandWeaponClass);
 		if (!OffhandWeaponObject)
@@ -67,7 +77,6 @@ void UWeaponComponent::ChangeOffhandWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 			return;
 		}
 		OffhandWeaponObject->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "s_hand_l");
-	//	OffhandWeaponObject->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		OffhandAttack = OffhandWeaponObject->GetOffhandAttack();
 	}
 

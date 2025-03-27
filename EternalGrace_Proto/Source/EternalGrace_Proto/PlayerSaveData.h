@@ -6,6 +6,7 @@
 #include "Armor.h"
 #include "Pants.h"
 #include "Helmet.h"
+#include "WeaponBase.h"
 #include "PlayerSaveData.generated.h"
 
 /**
@@ -36,5 +37,9 @@ public:
 	TMap<FName,int> SavedPantsDataMap;
 	UPROPERTY()
 	TMap<FName,int> SavedHelmetDataMap;
-	void UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave);
+
+	UPROPERTY()
+	TArray<TSubclassOf<AWeaponBase>> SavedWeaponInventory;
+
+	void UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave, TArray<TSubclassOf<AWeaponBase>>* WeaponToSave);
 };

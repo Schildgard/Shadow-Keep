@@ -6,6 +6,7 @@
 #include "Armor.h"
 #include "Pants.h"
 #include "Helmet.h"
+#include "WeaponBase.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -42,16 +43,16 @@ TMap<FName, int>* UInventoryComponent::GetInventoryOfType(EObjectType ItemCatego
 
 void UInventoryComponent::AddArmorToInventory(FArmor ArmorToAdd)
 {
-	if(!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
-	{
-		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 1);
-		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
-	}
-	else
-	{
-		ArmorInventoryMap[ArmorToAdd.ArmorName] += 1;
-		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
-	}
+//	if(!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
+//	{
+//		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 1);
+//		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
+//	}
+//	else
+//	{
+//		ArmorInventoryMap[ArmorToAdd.ArmorName] += 1;
+//		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
+//	}
 
 
 }
@@ -82,6 +83,13 @@ void UInventoryComponent::AddHelmetToInventory(FHelmet HelmetToAdd)
 		HelmetInventoryMap[HelmetToAdd.HelmetName] += 1;
 		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *HelmetToAdd.HelmetName.ToString())
 	}
+}
+
+void UInventoryComponent::AddWeaponToInventory(TSubclassOf<AWeaponBase> WeaponToAdd)
+{
+	WeaponInventory.Add(WeaponToAdd);
+
+	//UE_LOG(LogTemp, Display, TEXT("Added to Inventory %s"), *WeaponToAdd->GetWeaponName().ToString());
 }
 
 void UInventoryComponent::TryToObtainItem(FName ObjectName, EObjectType ItemCategory)

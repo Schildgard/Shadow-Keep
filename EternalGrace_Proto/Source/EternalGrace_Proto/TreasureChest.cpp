@@ -6,6 +6,7 @@
 #include "InventoryComponent.h"
 #include "EternalGrace_GameInstance.h"
 #include "EternalGrace_SaveGame.h"
+#include "WeaponBase.h"
 
 void ATreasureChest::GetAllTreasure()
 {
@@ -28,17 +29,25 @@ void ATreasureChest::GetAllTreasure()
 		Interactor->ObtainArmor(ArmorName, EObjectType::BodyEquipment);
 	}
 	ContainedArmory.Empty();
+
 	for (FName PantsName : ContainedLegArmor)
 	{
 		Interactor->ObtainArmor(PantsName, EObjectType::LegEquipment);
 	}
 	ContainedLegArmor.Empty();
+
 	for (FName HelmetName : ContainedHelmets)
 	{
 		Interactor->ObtainArmor(HelmetName, EObjectType::HeadEquipment);
 	}
-
 	ContainedHelmets.Empty();
+
+	for(TSubclassOf<AWeaponBase> Weapon : ContainedWeapons)
+	{
+		Interactor->GetInventory()->AddWeaponToInventory(Weapon);
+	}
+	ContainedWeapons.Empty();
+
 	bCanbeActivated = false;
 	Execute_SaveData(this);
 

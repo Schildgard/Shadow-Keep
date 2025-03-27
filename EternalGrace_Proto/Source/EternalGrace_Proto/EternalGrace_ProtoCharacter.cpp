@@ -373,7 +373,7 @@ void AEternalGrace_ProtoCharacter::SaveData_Implementation()
 	if (SaveGameObject)
 	{
 		//Update localSaveData Struct
-		SaveDataInfo.UpdatePlayerData(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), &PlayerInventory->ArmorInventoryMap, &PlayerInventory->PantsInventoryMap, &PlayerInventory->HelmetInventoryMap);
+		SaveDataInfo.UpdatePlayerData(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), &PlayerInventory->ArmorInventoryMap, &PlayerInventory->PantsInventoryMap, &PlayerInventory->HelmetInventoryMap, &PlayerInventory->WeaponInventory);
 		//Actually Save Data from Struct To SaveGame
 		SaveGameObject->SavePlayerData(ObjectID, SaveDataInfo);
 		UE_LOG(LogTemp, Warning, TEXT("%s called SavePlayerData on SaveGameID %s"), *ObjectID.ToString(), *SaveGameObject->SlotID);
@@ -408,6 +408,7 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 			PlayerInventory->ArmorInventoryMap = SaveDataInfo.SavedArmorDataMap;
 			PlayerInventory->PantsInventoryMap = SaveDataInfo.SavedPantsDataMap;
 			PlayerInventory->HelmetInventoryMap = SaveDataInfo.SavedHelmetDataMap;
+			PlayerInventory->WeaponInventory = SaveDataInfo.SavedWeaponInventory;
 
 
 		}
