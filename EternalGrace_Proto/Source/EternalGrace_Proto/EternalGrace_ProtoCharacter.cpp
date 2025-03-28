@@ -432,7 +432,7 @@ void AEternalGrace_ProtoCharacter::Interact_Implementation()
 		if (CurrentInteractable->Implements<UInteractable>()) //This if is almost redundant
 		{
 			IInteractable::Execute_GetInteractedWith(CurrentInteractable, this);
-			Execute_SaveData(this);
+			//Execute_SaveData(this);
 		}
 		else
 		{

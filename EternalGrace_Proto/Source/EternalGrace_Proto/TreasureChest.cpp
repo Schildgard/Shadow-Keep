@@ -7,6 +7,7 @@
 #include "EternalGrace_GameInstance.h"
 #include "EternalGrace_SaveGame.h"
 #include "WeaponBase.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void ATreasureChest::GetAllTreasure()
 {
@@ -47,17 +48,42 @@ void ATreasureChest::GetAllTreasure()
 		Interactor->GetInventory()->AddWeaponToInventory(Weapon);
 	}
 	ContainedWeapons.Empty();
-
-	bCanbeActivated = false;
 	Execute_SaveData(this);
 
 	Interactor = nullptr;
 }
 
+void ATreasureChest::TriggerChest(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+{
+	if (Mesh->AnimationData.AnimToPlay && Interactor)
+	{
+		Mesh->Play(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s has no Animation assigned or is already open"), *GetFName().ToString());
+	}
+}
+
 void ATreasureChest::GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)
 {
+	if (!bCanbeActivated)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Trease can not be Activated anymore"));
+		return;
+	} 
+	bCanbeActivated = false;
 	Interactor = InteractingPlayer;
-	Super::GetInteractedWith_Implementation(InteractingPlayer);
+	UAnimInstance* PlayerAnimationInstance = Interactor->GetMesh()->GetAnimInstance();
+	if(PlayerAnimationInstance)
+	{
+		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(Interactor->GetActorLocation(), GetActorLocation());
+		FRotator DesiredActorRotation = FRotator(0, LookAtRotation.Yaw, 0);
+		Interactor->SetActorRotation(DesiredActorRotation, ETeleportType::ResetPhysics);
+		PlayerAnimationInstance->Montage_Play(ActorInteractMontage);
+		
+		PlayerAnimationInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ATreasureChest::TriggerChest);
+	}
 }
 
 void ATreasureChest::SaveData_Implementation()

@@ -43,9 +43,14 @@ protected:
 	UPROPERTY()
 	FTreasureChestSaveData SaveDataInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess))
+	UAnimMontage* ActorInteractMontage;
+
 public:
 	UFUNCTION()
 	void GetAllTreasure();
+	UFUNCTION()
+	void TriggerChest(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	virtual void GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)override;
 	virtual void SaveData_Implementation()override;
 	virtual void LoadData_Implementation()override;
