@@ -157,10 +157,12 @@ void UTitleScreenOptions::ShowClassSelection()
 
 	if (ClassSelectionWidgetClass)
 	{
-		UUserWidget* ClassSelect = CreateWidget<UUserWidget>(GetOwningPlayer(), ClassSelectionWidgetClass);
+		APlayerController* Player1Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		UUserWidget* ClassSelect = CreateWidget<UUserWidget>(Player1Controller, ClassSelectionWidgetClass);
 		if (ClassSelect)
 		{
 			ClassSelect->AddToPlayerScreen();
+			ClassSelect->SetUserFocus(Player1Controller);
 			UE_LOG(LogTemp, Warning, TEXT("ClassSelect added to viewport. Owned by Controller: %s"), *GetOwningPlayer()->GetFName().ToString());
 			//ClassSelect->SetFocus();
 		}
