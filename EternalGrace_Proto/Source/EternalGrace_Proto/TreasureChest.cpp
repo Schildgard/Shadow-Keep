@@ -8,6 +8,20 @@
 #include "EternalGrace_SaveGame.h"
 #include "WeaponBase.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "GeometryCollection/GeometryCollectionComponent.h"
+
+ATreasureChest::ATreasureChest()
+{
+	GeometryComponent = CreateDefaultSubobject<UGeometryCollectionComponent>("GeometryComponent");
+	GeometryComponent->SetupAttachment(RootComponent);
+	GeometryComponent->SetVisibility(false);
+	GeometryComponent->SetAutoActivate(false);
+	GeometryComponent->SetSimulatePhysics(false);
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>("AudioComponent");
+	AudioComponent->SetupAttachment(Mesh);
+}
 
 void ATreasureChest::GetAllTreasure()
 {
@@ -22,7 +36,7 @@ void ATreasureChest::GetAllTreasure()
 		UE_LOG(LogTemp, Warning, TEXT("This Chest %s has already been opened"), *GetFName().ToString())
 			return;
 	}
-
+	Interactor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	// Interactor checks in Armor Component if this Armor generally exists.
 	// If so, The Inventory Component checks if its already in player inventory and adds it accordingly.
 	for (FName ArmorName : ContainedArmory)
@@ -43,7 +57,7 @@ void ATreasureChest::GetAllTreasure()
 	}
 	ContainedHelmets.Empty();
 
-	for(TSubclassOf<AWeaponBase> Weapon : ContainedWeapons)
+	for (TSubclassOf<AWeaponBase> Weapon : ContainedWeapons)
 	{
 		Interactor->GetInventory()->AddWeaponToInventory(Weapon);
 	}
@@ -58,11 +72,21 @@ void ATreasureChest::TriggerChest(FName NotifyName, const FBranchingPointNotifyP
 	if (Mesh->AnimationData.AnimToPlay && Interactor)
 	{
 		Mesh->Play(false);
+		if (OpenSound)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), OpenSound, GetActorLocation());
+
+		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s has no Animation assigned or is already open"), *GetFName().ToString());
 	}
+}
+
+UGeometryCollectionComponent* ATreasureChest::GetGeometryComp()
+{
+	return GeometryComponent;
 }
 
 void ATreasureChest::GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)
@@ -71,17 +95,18 @@ void ATreasureChest::GetInteractedWith_Implementation(AEternalGrace_ProtoCharact
 	{
 		UE_LOG(LogTemp, Error, TEXT("Trease can not be Activated anymore"));
 		return;
-	} 
+	}
 	bCanbeActivated = false;
 	Interactor = InteractingPlayer;
+	Interactor->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "s_Interact");
 	UAnimInstance* PlayerAnimationInstance = Interactor->GetMesh()->GetAnimInstance();
-	if(PlayerAnimationInstance)
+	if (PlayerAnimationInstance)
 	{
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(Interactor->GetActorLocation(), GetActorLocation());
 		FRotator DesiredActorRotation = FRotator(0, LookAtRotation.Yaw, 0);
 		Interactor->SetActorRotation(DesiredActorRotation, ETeleportType::ResetPhysics);
 		PlayerAnimationInstance->Montage_Play(ActorInteractMontage);
-		
+
 		PlayerAnimationInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ATreasureChest::TriggerChest);
 	}
 }
@@ -117,13 +142,40 @@ void ATreasureChest::LoadData_Implementation()
 				if (SavedData)
 				{
 					SaveDataInfo = *SavedData;
-						if (!SaveDataInfo.bCanBeInteractedWith)
-						{
-							//When Chest has already been opened, trigger open anim
-							Mesh->Play(false);
-						}
+					if (!SaveDataInfo.bCanBeInteractedWith)
+					{
+						//When Chest has already been opened, trigger open anim
+						Mesh->Play(false);
+					}
 				}
 			}
 		}
 	}
+}
+
+void ATreasureChest::GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)
+{
+	if (bCanbeActivated) return;
+	//GetDamage Enables the ChaosDestruction To Function
+	Mesh->SetVisibility(false);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GeometryComponent->SetVisibility(true);
+	GeometryComponent->SetSimulatePhysics(true);
+
+	GeometryComponent->ApplyExternalStrain(0, ImpactPoint, 100.0f, 1, 1.0f, 50000.0f);
+	GeometryComponent->ApplyLinearVelocity(0, Attacker->GetActorForwardVector() * DamageValue);
+	GeometryComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	
+
+	AudioComponent->Play();
+}
+
+UAudioComponent* ATreasureChest::GetHitSoundComponent_Implementation()
+{
+	return AudioComponent;
+}
+
+UNiagaraSystem* ATreasureChest::GetHitEffectSystem_Implementation()
+{
+	return nullptr;
 }

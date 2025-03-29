@@ -500,7 +500,7 @@ AWeaponBase* AEternalGrace_ProtoCharacter::GetOffhandWeapon_Implementation()
 	return WeaponComponent->OffhandWeaponObject;
 }
 
-void AEternalGrace_ProtoCharacter::GetDamage_Implementation()
+void AEternalGrace_ProtoCharacter::GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)
 {
 
 }

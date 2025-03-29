@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"CoreUObject",
-				"UMG"
+				"UMG",
+				"FieldSystemEngine"
 			]
 		}
 	],
@@ -44,6 +45,10 @@
 		},
 		{
 			"Name": "SlateInsights",
+			"Enabled": true
+		},
+		{
+			"Name": "FieldSystemPlugin",
 			"Enabled": true
 		}
 	]

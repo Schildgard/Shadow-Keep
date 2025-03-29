@@ -81,7 +81,7 @@ AWeaponBase* ACharacterBase::GetOffhandWeapon_Implementation()
 	return nullptr;
 }
 
-void ACharacterBase::GetDamage_Implementation()
+void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)
 {
 }
 

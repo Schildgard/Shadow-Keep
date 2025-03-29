@@ -37,7 +37,10 @@ protected:
 
 
 
-public:	
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	float ImpactForce;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	TSoftObjectPtr<UTexture2D> ThumpNailImage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))

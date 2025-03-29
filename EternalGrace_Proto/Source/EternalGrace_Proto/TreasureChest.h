@@ -6,7 +6,10 @@
 #include "InteractableActor_Dynamic.h"
 #include "ObjectType.h"
 #include "Saveable.h"
+#include "Damageable.h"
 #include "TreasureChestSaveData.h"
+#include "Chaos/ChaosSolverActor.h"
+#include "Chaos/ChaosEngineInterface.h"
 #include "TreasureChest.generated.h"
 
 /**
@@ -15,12 +18,18 @@
 class AEternalGrace_ProtoCharacter;
 class UEternalGrace_SaveGame;
 class AWeaponBase;
+class UGeometryCollectionComponent;
 UCLASS()
-class ETERNALGRACE_PROTO_API ATreasureChest : public AInteractableActor_Dynamic, public ISaveable
+class ETERNALGRACE_PROTO_API ATreasureChest : public AInteractableActor_Dynamic, public ISaveable, public IDamageable
 {
 	GENERATED_BODY()
 
 protected:
+	ATreasureChest();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Physics", meta = (AllowPrivateAccess))
+	UGeometryCollectionComponent* GeometryComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess))
 	TArray<FName> ContainedArmory;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess))
@@ -46,13 +55,31 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess))
 	UAnimMontage* ActorInteractMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess))
+	USoundBase* OpenSound;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess))
+	USoundBase* DestructionSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess))
+	UAudioComponent* AudioComponent;
+	
+
 public:
 	UFUNCTION()
 	void GetAllTreasure();
 	UFUNCTION()
 	void TriggerChest(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+
+	UFUNCTION()
+	UGeometryCollectionComponent* GetGeometryComp();
+
+	//Save Interface Implementations
 	virtual void GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)override;
 	virtual void SaveData_Implementation()override;
 	virtual void LoadData_Implementation()override;
+	//Damageable Interface Implementations
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)override;
+	virtual UAudioComponent* GetHitSoundComponent_Implementation()override;
+	virtual UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	
 };

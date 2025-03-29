@@ -99,7 +99,7 @@ protected:
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
 	//Damageable Implementations
-	virtual void GetDamage_Implementation()override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)override;
 	virtual UAudioComponent* GetHitSoundComponent_Implementation()override;
 	virtual UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	//FootStep Sound

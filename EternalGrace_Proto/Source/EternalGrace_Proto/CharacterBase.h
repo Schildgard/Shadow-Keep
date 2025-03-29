@@ -69,7 +69,7 @@ protected:
 
 	//Damageable Interface Implementations
 	UFUNCTION()
-	void GetDamage_Implementation()override;
+	void GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)override;
 	UFUNCTION()
 	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	UFUNCTION()

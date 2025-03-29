@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Damageable.h"
 #include "Camera/CameraShakeSourceComponent.h"
+#include "GeometryCollection/GeometryCollectionComponent.h"
 
 
 UWeaponSwingNotify::UWeaponSwingNotify()
@@ -101,8 +102,8 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 			if (HittedActor->Implements<UDamageable>())
 			{
 				HitNiagara = IDamageable::Execute_GetHitEffectSystem(HittedActor);
-				AudioComponent = IDamageable::Execute_GetHitSoundComponent(HittedActor);
-				//Call get Damage here.
+				AudioComponent = AttackingWeapon->GetAudioComponent();
+				IDamageable::Execute_GetDamage(HittedActor, AttackingActor, AttackingWeapon->ImpactForce, Hit.Location);
 			}
 			else
 			{
@@ -120,7 +121,7 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 				AudioComponent->Play();
 			}
 
-			if(*AttackingWeapon->GetCameraShakeComponent()->CameraShake)
+			if (*AttackingWeapon->GetCameraShakeComponent()->CameraShake)
 			{
 				AttackingWeapon->GetCameraShakeComponent()->Start();
 			}

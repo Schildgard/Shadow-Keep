@@ -51,6 +51,5 @@ class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 
 	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OnHit", meta =(AllowPrivateAccess))
 	 TMap<EElementalType, UNiagaraSystem*> HitReactionMap;
-
 	
 };
