@@ -115,6 +115,7 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 	switch (CurrentActionState)
 	{
 	case EActionState::Running: //if Running, perform running Attack
+		CancelSprint();
 		CurrentActionState = EActionState::Attacking;
 		EGAnimInstance->Montage_Play(WeaponComponent->RunningAttack, true);
 		break;
@@ -129,11 +130,22 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 		}
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
 		break;
+	case EActionState::Dodging:
+		UE_LOG(LogTemp, Warning, TEXT("Buffer Dodge Attack"))
+		InputBufferingComponent->SaveInput(EInputType::DodgeAttack);
+		break;
 	default:
 		CurrentActionState = EActionState::Attacking;
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
 		break;
 	}
+}
+
+void AEternalGrace_ProtoCharacter::PerformDodgeAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Trigger Dodge Attack"))
+	SetCurrentActionState(EActionState::Attacking);
+	EGAnimInstance->Montage_Play(WeaponComponent->DodgeAttack, true);
 }
 
 void AEternalGrace_ProtoCharacter::PerformOffhandAction()
@@ -164,6 +176,35 @@ void AEternalGrace_ProtoCharacter::PerformOffhandAction()
 void AEternalGrace_ProtoCharacter::TriggerCurrentInteractable()
 {
 	Interact_Implementation();
+}
+
+void AEternalGrace_ProtoCharacter::Sprint()
+{
+	if (CurrentActionState == EActionState::Idle)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trigger run"))
+		CurrentActionState = EActionState::Running;
+		GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	}
+}
+
+void AEternalGrace_ProtoCharacter::CancelSprint()
+{
+	if (CurrentActionState == EActionState::Running)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trigger Cancel Run"))
+		CurrentActionState = EActionState::Idle;
+		GetCharacterMovement()->MaxWalkSpeed = 250.f;
+	}
+}
+
+void AEternalGrace_ProtoCharacter::Dodge()
+{
+	if(CurrentActionState == EActionState::Idle)
+	{
+		SetCurrentActionState(EActionState::Dodging);
+		EGAnimInstance->Montage_Play(DodgeMontage, true);
+	}
 }
 
 void AEternalGrace_ProtoCharacter::BeginPlay()
@@ -222,6 +263,13 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 		EnhancedInputComponent->BindAction(NormalAttackAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::NormalAttack);
 		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::PerformOffhandAction);
 		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Completed, this, &AEternalGrace_ProtoCharacter::CancelGuard);
+
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Sprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AEternalGrace_ProtoCharacter::CancelSprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AEternalGrace_ProtoCharacter::CancelSprint);
+
+		//Dodging
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Dodge);
 
 
 	}
@@ -297,6 +345,7 @@ void AEternalGrace_ProtoCharacter::EquipOffhandWeapon(TSubclassOf<AWeaponBase> W
 
 void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Command Fire Buffered Input"))
 	switch (BufferedInput)
 	{
 	case EInputType::NormalAttack:
@@ -317,6 +366,10 @@ void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
 	case EInputType::Jump:
 		Jump();
 		UE_LOG(LogTemp, Warning, TEXT("TriggeredJump Input"));
+		break;
+	case EInputType::DodgeAttack:
+		UE_LOG(LogTemp, Warning, TEXT("Command Dodge Attack"))
+		PerformDodgeAttack();
 		break;
 	default:
 		break;
@@ -426,12 +479,12 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 
 void AEternalGrace_ProtoCharacter::Interact_Implementation()
 {
-	UE_LOG(LogTemp, Display, TEXT("Player calls Interact Implementation"));
 	if (CurrentInteractable)
 	{
 		if (CurrentInteractable->Implements<UInteractable>()) //This if is almost redundant
 		{
 			IInteractable::Execute_GetInteractedWith(CurrentInteractable, this);
+			IPlayable::Execute_HideInteractUI(this);
 			//Execute_SaveData(this);
 		}
 		else
@@ -487,7 +540,7 @@ UCapsuleComponent* AEternalGrace_ProtoCharacter::GetHitBox_Implementation()
 		return WeaponComponent->CurrentWeaponObject->GetHitbox();
 	}
 	UE_LOG(LogTemp, Error, TEXT("Failed to get Current Weapon in Attempt to get hitbox (ProtoCharacterClass)"))
-	return nullptr;
+		return nullptr;
 }
 
 AWeaponBase* AEternalGrace_ProtoCharacter::GetWeapon_Implementation()
@@ -520,11 +573,11 @@ void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
 	//Check if Character wears armor and play it if true
 	//Check Data Table for Ground Material and play assigned Sound
 	UPhysicalMaterial* GroundMaterial = GetGroundMaterial();
-	if(GroundMaterial && GroundSurfaceDataTable)
+	if (GroundMaterial && GroundSurfaceDataTable)
 	{
 		static const FString Context = FString("GroundContext");
 		FSurfaceType* SurfaceRow = GroundSurfaceDataTable->FindRow<FSurfaceType>(GroundMaterial->GetFName(), Context);
-		if(SurfaceRow)
+		if (SurfaceRow)
 		{
 			UGameplayStatics::PlaySoundAtLocation(World, SurfaceRow->FootStepSound, FVector(GetMesh()->GetSocketLocation(FootSocket)));
 		}
@@ -533,7 +586,7 @@ void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
 			UE_LOG(LogTemp, Warning, TEXT("SurfaceRow not found (Eternal grace proto character)"));
 		}
 	}
-	if(UpperArmor->bIsWearingHeavyArmor)
+	if (UpperArmor->bIsWearingHeavyArmor)
 	{
 		UpperArmor->GetArmorSoundComponent()->Play();
 	}
@@ -543,9 +596,12 @@ void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
 void AEternalGrace_ProtoCharacter::CancelGuard()
 {
 	//Change this, so the AnimInstance does not always has to be manually set....
+	if(CurrentActionState == EActionState::Guarding)
+	{
 	Super::CancelGuard();
 	EGAnimInstance->SetActionState(EActionState::Idle);
 	UE_LOG(LogTemp, Error, TEXT("Trigger Cancel Block State"));
+	}
 }
 
 void AEternalGrace_ProtoCharacter::Jump()

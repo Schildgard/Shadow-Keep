@@ -133,7 +133,7 @@ void AEG_PlayerController::ShowInventory()
 
 				if(CurrentInventorySlot.Num() >=1)
 				{
-					CurrentInventorySlot[0]->SetKeyboardFocus();
+					CurrentInventorySlot[0]->SetUserFocus(this);
 				}
 
 				FInputModeGameAndUI InputMode;
@@ -146,6 +146,12 @@ void AEG_PlayerController::ShowInventory()
 void AEG_PlayerController::ShowInteractInfoWidget()
 {
 	UE_LOG(LogTemp, Display, TEXT("PlayerController now opens InteractInfoWidget"));
+	if (InteractInfoWidgetClass && !InteractInfoWidget)
+	{
+		InteractInfoWidget = CreateWidget<UUserWidget>(this, InteractInfoWidgetClass);
+		InteractInfoWidget->AddToPlayerScreen();
+	}
+
 }
 
 void AEG_PlayerController::HideInteractInfoWidget()

@@ -42,4 +42,7 @@ public:
 	UPROPERTY()
 	UAnimMontage* OffhandAttack;
 
+	UPROPERTY()
+	UAnimMontage* DodgeAttack;
+
 };

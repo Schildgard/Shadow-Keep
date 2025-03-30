@@ -43,16 +43,16 @@ TMap<FName, int>* UInventoryComponent::GetInventoryOfType(EObjectType ItemCatego
 
 void UInventoryComponent::AddArmorToInventory(FArmor ArmorToAdd)
 {
-//	if(!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
-//	{
-//		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 1);
-//		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
-//	}
-//	else
-//	{
-//		ArmorInventoryMap[ArmorToAdd.ArmorName] += 1;
-//		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
-//	}
+	if(!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
+	{
+		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 0);
+		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
+	}
+	else
+	{
+		ArmorInventoryMap[ArmorToAdd.ArmorName] += 1;
+		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
+	}
 
 
 }

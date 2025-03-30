@@ -23,6 +23,13 @@ protected:
 	TArray<UAnimMontage*> RegularAttackMontages;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	UAnimMontage* OffhandAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UAnimMontage* RunningAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
+	UAnimMontage* DodgeAttack;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	UCapsuleComponent* Hitbox;
 
@@ -56,6 +63,12 @@ public:
 
 	UFUNCTION()
 	UAnimMontage* GetOffhandAttack();
+
+	UFUNCTION()
+	UAnimMontage* GetRunningAttack();
+
+	UFUNCTION()
+	UAnimMontage* GetDodgeAttack();
 
 	UFUNCTION()
 	UCapsuleComponent* GetHitbox();

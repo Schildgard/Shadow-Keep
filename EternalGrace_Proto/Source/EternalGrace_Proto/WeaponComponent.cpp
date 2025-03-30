@@ -28,6 +28,9 @@ EWeaponType UWeaponComponent::ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 		if(CurrentWeaponObject)
 		{
 			CurrentWeaponObject->Destroy();
+			NormalWeaponAttacks.Empty();
+			RunningAttack = nullptr;
+			DodgeAttack = nullptr;
 		}
 		CurrentWeaponClass = WeaponToEquip;
 		CurrentWeaponObject = GetWorld()->SpawnActor<AWeaponBase>(CurrentWeaponClass);
@@ -38,6 +41,8 @@ EWeaponType UWeaponComponent::ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 		}
 		CurrentWeaponObject->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "s_hand_r");
 		NormalWeaponAttacks = CurrentWeaponObject->GetNormalAttacks();
+		RunningAttack = CurrentWeaponObject->GetRunningAttack();
+		DodgeAttack = CurrentWeaponObject->GetDodgeAttack();
 		if (WeaponToEquip->GetDefaultObject<AWeaponBase>()->WeaponCategory == EWeaponType::GreatSword && OffhandWeaponObject)
 		{
 			OffhandWeaponObject->Destroy();

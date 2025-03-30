@@ -38,6 +38,16 @@ UAnimMontage* AWeaponBase::GetOffhandAttack()
 	return OffhandAttack;
 }
 
+UAnimMontage* AWeaponBase::GetRunningAttack()
+{
+	return RunningAttack;
+}
+
+UAnimMontage* AWeaponBase::GetDodgeAttack()
+{
+	return DodgeAttack;
+}
+
 UCapsuleComponent* AWeaponBase::GetHitbox()
 {
 	return Hitbox;

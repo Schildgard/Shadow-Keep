@@ -124,6 +124,7 @@ void ACharacterBase::CancelGuard()
 void ACharacterBase::SetCurrentActionState(EActionState ActionState)
 {
 	CurrentActionState = ActionState;
+	//Also Update ActionState of AnimInstance
 }
 
 void ACharacterBase::PlayFootStepSound(FName FootSocket)

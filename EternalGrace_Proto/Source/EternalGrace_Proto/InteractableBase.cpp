@@ -28,7 +28,7 @@ void AInteractableBase::BeginPlay()
 void AInteractableBase::RegisterInteractionRadiusEntry(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//Show Interactable UI and Set CurrentInteractable on Player 
-	if (OtherActor->Implements<UPlayable>())
+	if (bCanbeActivated && OtherActor->Implements<UPlayable>())
 	{
 		UE_LOG(LogTemp, Display, TEXT("%s registered radius entry"), *GetFName().ToString());
 			IPlayable::Execute_ShowInteractUI(OtherActor, this); //Rename this function so it is clear that it also sets player current interactable

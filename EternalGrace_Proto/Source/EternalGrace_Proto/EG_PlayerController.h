@@ -38,6 +38,8 @@ protected:
 	UPROPERTY()
 	AEternalGrace_ProtoCharacter* OwningCharacter;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
+	TSubclassOf<UUserWidget> InteractInfoWidgetClass;
 	UPROPERTY()
 	UUserWidget* InteractInfoWidget;
 public:

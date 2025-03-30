@@ -14,6 +14,7 @@ enum class EInputType :uint8
 	NoInput UMETA(DisplayName = "NoInput"),
 	NormalAttack UMETA(DisplayName = "NormalAttackAction"),
 	HeavyAttack UMETA(DisplayName = "HeavyAttackAction"),
+	DodgeAttack UMETA(DisplayName = "DodgeAttackAction"),
 	OffhandAttack UMETA(DisplayName = "OffhandAttackAction"),
 	Dodge UMETA(DisplayName = "DodgeAction"),
 	Interact UMETA(DisplayName = "InteractAction"),

@@ -57,6 +57,9 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -67,6 +70,9 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* NormalOffhandAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DodgeAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta =(AllowPrivateAccess))
 	UWeaponComponent* WeaponComponent;
@@ -121,15 +127,29 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment", meta = (AllowPrivateAccess))
 	UArmorComponent* UpperArmor;
 
-	UFUNCTION(CallInEditor)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess))
+	UAnimMontage* DodgeMontage;
+
+
+	UFUNCTION()
 	void ShowInventory();
 
 	UFUNCTION()
 	void NormalAttack();
 	UFUNCTION()
+	void PerformDodgeAttack();
+	UFUNCTION()
 	void PerformOffhandAction();
 	UFUNCTION()
 	void TriggerCurrentInteractable();
+
+	UFUNCTION()
+	void Sprint();
+	UFUNCTION()
+	void CancelSprint();
+
+	UFUNCTION()
+	void Dodge();
 
 	UPROPERTY()
 	AActor* CurrentInteractable;
