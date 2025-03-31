@@ -23,6 +23,7 @@ class UWeaponComponent;
 class AWeaponBase;
 class UEG_AnimInstance;
 class UInputBufferComponent;
+class ULockOnComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -74,6 +75,11 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DodgeAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* LockOnAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SwitchTargetAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta =(AllowPrivateAccess))
 	UWeaponComponent* WeaponComponent;
 
@@ -82,6 +88,9 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputBufferComponent* InputBufferingComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	ULockOnComponent* LockOnComponent;
 
 
 
@@ -151,6 +160,11 @@ protected:
 	UFUNCTION()
 	void Dodge();
 
+	UFUNCTION()
+	void LockOn();
+	UFUNCTION()
+	void SwitchTarget(const FInputActionValue& Value);
+
 	UPROPERTY()
 	AActor* CurrentInteractable;
 
@@ -190,6 +204,8 @@ public:
 	//While Object ID is an Identifier for the Save Game, the PlayerIndex holds track to wether its Player 1 or 2
 	UFUNCTION()
 	void SetPlayerIndex(int AssigendPlayerIndex);
+	UFUNCTION()
+	int GetPlayerIndex();
 
 	UFUNCTION()
 	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponToEquip);
@@ -202,5 +218,7 @@ public:
 
 	UFUNCTION()
 	UInputBufferComponent* GetInputBufferComponent();
+	UFUNCTION()
+	void SetLockOn(bool Value);
 };
 

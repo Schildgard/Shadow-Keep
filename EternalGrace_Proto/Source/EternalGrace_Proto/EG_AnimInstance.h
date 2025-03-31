@@ -40,6 +40,9 @@ public:
 	int AttackCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess))
+	bool bIsLockedOn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess))
 	bool bCanContinueAttack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess))
 	bool bCanOffhandAttack;

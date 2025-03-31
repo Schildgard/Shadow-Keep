@@ -25,6 +25,7 @@
 #include "InputBufferComponent.h"
 #include "HealthComponent.h"
 #include "SurfaceType.h"
+#include "LockOnComponent.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -89,6 +90,7 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 	WeaponComponent->SetupAttachment(GetMesh(), "s_hand_r");
 
 	InputBufferingComponent = CreateDefaultSubobject<UInputBufferComponent>("InputBuffering");
+	LockOnComponent = CreateDefaultSubobject<ULockOnComponent>("LockOnSystem");
 
 }
 
@@ -207,6 +209,18 @@ void AEternalGrace_ProtoCharacter::Dodge()
 	}
 }
 
+void AEternalGrace_ProtoCharacter::LockOn()
+{
+	LockOnComponent->ToggeLockOn();
+}
+
+void AEternalGrace_ProtoCharacter::SwitchTarget(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	LockOnComponent->FilterTargetsByDirection(LookAxisVector.X);
+	UE_LOG(LogTemp, Display, TEXT("Value is %f"), LookAxisVector.X);
+}
+
 void AEternalGrace_ProtoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -271,6 +285,10 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 		//Dodging
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Dodge);
 
+		//LockOn
+		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::LockOn);
+		EnhancedInputComponent->BindAction(SwitchTargetAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::SwitchTarget);
+
 
 	}
 	else
@@ -332,6 +350,11 @@ void AEternalGrace_ProtoCharacter::SetPlayerIndex(int AssignedPlayerIndex)
 	}
 }
 
+int AEternalGrace_ProtoCharacter::GetPlayerIndex()
+{
+	return PlayerIndex;
+}
+
 void AEternalGrace_ProtoCharacter::EquipWeapon(TSubclassOf<AWeaponBase> WeaponSubclass)
 {
 	EWeaponType NewWeaponCategory = WeaponComponent->ChangeWeapon(WeaponSubclass);
@@ -379,6 +402,11 @@ void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
 UInputBufferComponent* AEternalGrace_ProtoCharacter::GetInputBufferComponent()
 {
 	return InputBufferingComponent;
+}
+
+void AEternalGrace_ProtoCharacter::SetLockOn(bool Value)
+{
+	EGAnimInstance->bIsLockedOn = Value;
 }
 
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)

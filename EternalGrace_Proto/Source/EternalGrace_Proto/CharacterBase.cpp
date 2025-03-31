@@ -6,6 +6,7 @@
 #include "EternalGrace_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet//KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "EternalGrace_GameInstance.h"
 #include "HealthComponent.h"
 
@@ -146,5 +147,14 @@ UPhysicalMaterial* ACharacterBase::GetGroundMaterial()
 	}
 	UPhysicalMaterial* HitMaterial = OutHit.PhysMaterial.Get();
 	return HitMaterial;
+}
+
+void ACharacterBase::RotateTowardsTarget(AActor* Target)
+{
+	//GET LOOK ROTATION BETWEEN PLAYER AND TARGET
+	FRotator Look = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
+	//BREAK LOOK ROTATION TO YAW ONLY
+	FRotator DesiredRotation = FRotator(0, Look.Yaw, 0);
+	SetActorRotation(DesiredRotation);
 }
 

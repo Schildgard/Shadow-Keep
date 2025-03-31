@@ -105,4 +105,7 @@ public:
 	UPhysicalMaterial* GetGroundMaterial();
 	const float GroundScanDistance = 150.0f;
 
+	UFUNCTION()
+	void RotateTowardsTarget(AActor* Target);
+
 };
