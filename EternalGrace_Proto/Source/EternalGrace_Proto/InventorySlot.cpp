@@ -12,6 +12,15 @@ void UInventorySlot::NativeConstruct()
 	ItemCategory = EObjectType::KeyItem;
 }
 
+void UInventorySlot::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
+{
+	RegisterSelection();
+}
+
+void UInventorySlot::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
+{
+}
+
 void UInventorySlot::UseInventorySlot()
 {
 
@@ -88,4 +97,9 @@ void UInventorySlot::SetItemName(FName Name)
 void UInventorySlot::SetWeapon(TSubclassOf<AWeaponBase> WeaponToRepresent)
 {
 	WeaponClass = WeaponToRepresent;
+}
+
+void UInventorySlot::RegisterSelection()
+{
+	PlaySound(SelectionSound);
 }

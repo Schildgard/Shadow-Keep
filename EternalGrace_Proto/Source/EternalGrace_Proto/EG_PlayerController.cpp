@@ -12,6 +12,9 @@
 #include "Armor.h"
 #include "Pants.h"
 #include "WeaponBase.h"
+#include "ObtainWidget.h"
+#include "ItemObtainContainerWidget.h"
+#include "Components/StackBox.h"
 
 AEG_PlayerController::AEG_PlayerController()
 {
@@ -33,14 +36,14 @@ void AEG_PlayerController::ShowInventory()
 	if (InventoryClass)
 	{
 		//Check if Inventory is already open. If so, just close and empty it.
-		if(CurrentInventory && CurrentInventory->IsInViewport())
+		if (CurrentInventory && CurrentInventory->IsInViewport())
 		{
 			CurrentInventorySlot.Empty();
 			CurrentInventory->RemoveFromParent();
 			FInputModeGameOnly GameOnlyInputMode;
 			SetInputMode(GameOnlyInputMode);
 			bShowMouseCursor = false;
-			
+
 			return;
 		}
 		CurrentInventory = CreateWidget<UInventory>(this, InventoryClass);
@@ -56,13 +59,13 @@ void AEG_PlayerController::ShowInventory()
 				UWrapBox* InventoryWrapBox = CurrentInventory->GetWrapBox();
 
 				int z = 0;
-					static const FString Context2(TEXT("TestContext"));
-				for(TPair<FName,int> ArmorData : OwningCharacter->GetInventory()->ArmorInventoryMap)
+				static const FString Context2(TEXT("TestContext"));
+				for (TPair<FName, int> ArmorData : OwningCharacter->GetInventory()->ArmorInventoryMap)
 				{
 					FArmor* Armor = OwningCharacter->GetInventory()->GlobalArmorInventory->FindRow<FArmor>(ArmorData.Key, Context2, true);
 
 					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
-					if(CurrentInventorySlot[z])
+					if (CurrentInventorySlot[z])
 					{
 						CurrentInventorySlot[z]->AddToPlayerScreen();
 						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
@@ -75,7 +78,7 @@ void AEG_PlayerController::ShowInventory()
 
 				}
 
-;
+				;
 				for (TPair<FName, int> ArmorData : OwningCharacter->GetInventory()->PantsInventoryMap)
 				{
 					FPants* Armor = OwningCharacter->GetInventory()->GlobalPantsInventory->FindRow<FPants>(ArmorData.Key, Context2, true);
@@ -116,7 +119,7 @@ void AEG_PlayerController::ShowInventory()
 				for (TSubclassOf<AWeaponBase> Weapon : OwningCharacter->GetInventory()->WeaponInventory)
 				{
 					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
-					if(CurrentInventorySlot[z])
+					if (CurrentInventorySlot[z])
 					{
 						//create reference instance to get values
 						AWeaponBase* WeaponInstance = Weapon->GetDefaultObject<AWeaponBase>();
@@ -131,7 +134,7 @@ void AEG_PlayerController::ShowInventory()
 					z++;
 				}
 
-				if(CurrentInventorySlot.Num() >=1)
+				if (CurrentInventorySlot.Num() >= 1)
 				{
 					CurrentInventorySlot[0]->SetUserFocus(this);
 				}
@@ -156,7 +159,7 @@ void AEG_PlayerController::ShowInteractInfoWidget()
 
 void AEG_PlayerController::HideInteractInfoWidget()
 {
-	if(InteractInfoWidget && InteractInfoWidget->IsInViewport())
+	if (InteractInfoWidget && InteractInfoWidget->IsInViewport())
 	{
 		InteractInfoWidget->RemoveFromParent();
 		InteractInfoWidget = nullptr;
@@ -171,4 +174,27 @@ AEternalGrace_ProtoCharacter* AEG_PlayerController::GetOwningCharacter()
 void AEG_PlayerController::SetOwningCharacterVariable(AEternalGrace_ProtoCharacter* SetCharacter)
 {
 	OwningCharacter = SetCharacter;
+}
+
+void AEG_PlayerController::ShowObtainWidget(FName ObjectID, TSoftObjectPtr<UTexture2D> ItemImage)
+{
+	if (ObtainedItemsContainerClass)
+	{
+		if (!ObtainedItemsContainer)
+		{
+			ObtainedItemsContainer = CreateWidget<UItemObtainContainerWidget>(this, ObtainedItemsContainerClass);
+
+		}
+		if (ObtainedItemsContainer && !ObtainedItemsContainer->IsInViewport())
+		{
+			ObtainedItemsContainer->AddToPlayerScreen();
+			ObtainedItemsContainer->SetUserFocus(this);
+		}
+		if (ObtainWidgetClass)
+		{
+			UObtainWidget* Obtain = CreateWidget<UObtainWidget>(this, ObtainWidgetClass);
+			Obtain->InitializeWidget(ObjectID, ItemImage);
+			ObtainedItemsContainer->StackBox->AddChildToStackBox(Obtain);
+		}
+	}
 }

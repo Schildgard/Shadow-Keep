@@ -40,6 +40,12 @@ protected:
 	UPROPERTY()
 	EObjectType ItemCategory;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User Feedback", meta = (AllowPrivateAccess))
+	USoundBase* SelectionSound;
+
+	void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent);
+	void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent);
+
 public:
 	UFUNCTION()
 	void UseInventorySlot();
@@ -55,4 +61,6 @@ public:
 	void SetItemName(FName Name);
 	UFUNCTION()
 	void SetWeapon(TSubclassOf<AWeaponBase> WeaponToRepresent);
+	UFUNCTION()
+	void RegisterSelection();
 };

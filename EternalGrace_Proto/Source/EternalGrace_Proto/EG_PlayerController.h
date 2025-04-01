@@ -13,6 +13,8 @@
 class UInventory;
 class UButton;
 class UInventorySlot;
+class UObtainWidget;
+class UItemObtainContainerWidget;
 UCLASS()
 class ETERNALGRACE_PROTO_API AEG_PlayerController : public APlayerController
 {
@@ -27,6 +29,16 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
 	TSubclassOf<UUserWidget> InventorySlotClass; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
+	TSubclassOf<UObtainWidget> ObtainWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess))
+	TSubclassOf<UItemObtainContainerWidget> ObtainedItemsContainerClass;
+
+	UPROPERTY()
+	UItemObtainContainerWidget* ObtainedItemsContainer;
+
 	UPROPERTY()
 	UInventory* CurrentInventory;
 	UPROPERTY()
@@ -42,6 +54,7 @@ protected:
 	TSubclassOf<UUserWidget> InteractInfoWidgetClass;
 	UPROPERTY()
 	UUserWidget* InteractInfoWidget;
+
 public:
 
 	UFUNCTION()
@@ -56,5 +69,8 @@ public:
 	AEternalGrace_ProtoCharacter* GetOwningCharacter();
 	UFUNCTION()
 	void SetOwningCharacterVariable(AEternalGrace_ProtoCharacter* SetCharacter);
+
+	UFUNCTION()
+	void ShowObtainWidget(FName ObjectID, TSoftObjectPtr<UTexture2D> ItemImage);
 	
 };

@@ -68,7 +68,6 @@ void UTitleScreenOptions::ShowAviableSaveGames()
 			SaveFile = CreateWidget<USaveFileSlot>(this, SaveFileSlotWidgetClass);
 			if (SaveFile)
 			{
-				//ButtonAllignmentBox->AddChildToVerticalBox(SaveFile);
 				LoadBUttonScrollBox->AddChild(SaveFile);
 				SaveFile->SetSlotID(SaveGameID);
 				SaveFile->SetInstigator(this);
@@ -81,7 +80,6 @@ void UTitleScreenOptions::ShowAviableSaveGames()
 		}
 		if (SaveGameList.Num() >= 1)
 		{
-			//ButtonAllignmentBox->AddChildToVerticalBox(CloseSaveFileButton);
 			LoadBUttonScrollBox->AddChild(CloseSaveFileButton);
 			CloseSaveFileButton->SetVisibility(ESlateVisibility::Visible);
 			bAreLoadButtonsVisible = true;

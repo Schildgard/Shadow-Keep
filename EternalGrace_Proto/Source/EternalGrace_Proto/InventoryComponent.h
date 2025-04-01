@@ -11,6 +11,7 @@ struct FArmor;
 struct FPants;
 struct FHelmet;
 class AWeaponBase;
+class AEG_PlayerController;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UInventoryComponent : public UActorComponent
@@ -41,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
 	TArray<TSubclassOf<AWeaponBase>> WeaponInventory;
 
+	UPROPERTY()
+	AEG_PlayerController* OwningController;
+
 
 	//This function is not used because I am to lazy to also make a setter. And since the component is already only accessible through a Getter, I think having the maps public should be fine.
 	TMap<FName, int>* GetInventoryOfType(EObjectType ItemCategory);
@@ -56,6 +60,9 @@ public:
 	void AddWeaponToInventory(TSubclassOf<AWeaponBase> WeaponToAdd);
 	UFUNCTION()
 	void TryToObtainItem(FName ObjectName, EObjectType ItemCategory);
+
+	UFUNCTION()
+	void ShowObtainItemWidget(FName ObjectID, TSoftObjectPtr<UTexture2D> ThumpNail);
 
 		
 };
