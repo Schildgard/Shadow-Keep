@@ -17,5 +17,6 @@ enum class EActionState : uint8
 	Running UMETA(DisplayName = "RunningState"),
 	Guarding UMETA(DisplayName = "GuardState"),
 	Jumping UMETA(DisplayName = "JumpState"),
-	Dodging UMETA(DisplayName = "DodgeState")
+	Dodging UMETA(DisplayName = "DodgeState"),
+	Climbing UMETA(DisplayName = "Climbing")
 };

@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "EternalGrace_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "EternalGrace_GameInstance.h"
 #include "ArmorComponent.h"
 #include "EG_PlayerController.h"
@@ -92,6 +93,10 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 	InputBufferingComponent = CreateDefaultSubobject<UInputBufferComponent>("InputBuffering");
 	LockOnComponent = CreateDefaultSubobject<ULockOnComponent>("LockOnSystem");
 
+	ScanDistance = 150.0f;
+	WallDistanceOffset = 20.f;
+	CapsuleHeightOffset = 10.f;
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -113,7 +118,7 @@ void AEternalGrace_ProtoCharacter::ShowInventory()
 void AEternalGrace_ProtoCharacter::NormalAttack()
 {
 	int AttackCount = EGAnimInstance->AttackCount;
-	if (AttackCount >= WeaponComponent->NormalWeaponAttacks.Num()) return; // Make sure the Attack does not break Attack Array Size
+	if (AttackCount >= WeaponComponent->NormalWeaponAttacks.Num() || bIsCurrentlyClimbingUp) return; // Make sure the Attack does not break Attack Array Size
 	switch (CurrentActionState)
 	{
 	case EActionState::Running: //if Running, perform running Attack
@@ -134,7 +139,10 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 		break;
 	case EActionState::Dodging:
 		UE_LOG(LogTemp, Warning, TEXT("Buffer Dodge Attack"))
-		InputBufferingComponent->SaveInput(EInputType::DodgeAttack);
+			InputBufferingComponent->SaveInput(EInputType::DodgeAttack);
+		break;
+	case EActionState::Climbing:
+		InputBufferingComponent->SaveInput(EInputType::NormalAttack);
 		break;
 	default:
 		CurrentActionState = EActionState::Attacking;
@@ -146,7 +154,7 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 void AEternalGrace_ProtoCharacter::PerformDodgeAttack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Trigger Dodge Attack"))
-	SetCurrentActionState(EActionState::Attacking);
+		SetCurrentActionState(EActionState::Attacking);
 	EGAnimInstance->Montage_Play(WeaponComponent->DodgeAttack, true);
 }
 
@@ -168,6 +176,9 @@ void AEternalGrace_ProtoCharacter::PerformOffhandAction()
 			return;
 		}
 		EGAnimInstance->Montage_Play(WeaponComponent->OffhandAttack, true);
+	case EActionState::Climbing:
+		InputBufferingComponent->SaveInput(EInputType::OffhandAttack);
+		break;
 		break;
 	default: //Offhand can only be used while Idle(Includes running, not sprinting) or Attacking
 		break;
@@ -185,7 +196,7 @@ void AEternalGrace_ProtoCharacter::Sprint()
 	if (CurrentActionState == EActionState::Idle)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trigger run"))
-		CurrentActionState = EActionState::Running;
+			CurrentActionState = EActionState::Running;
 		GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	}
 }
@@ -195,14 +206,14 @@ void AEternalGrace_ProtoCharacter::CancelSprint()
 	if (CurrentActionState == EActionState::Running)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trigger Cancel Run"))
-		CurrentActionState = EActionState::Idle;
+			CurrentActionState = EActionState::Idle;
 		GetCharacterMovement()->MaxWalkSpeed = 250.f;
 	}
 }
 
 void AEternalGrace_ProtoCharacter::Dodge()
 {
-	if(CurrentActionState == EActionState::Idle)
+	if (CurrentActionState == EActionState::Idle)
 	{
 		SetCurrentActionState(EActionState::Dodging);
 		EGAnimInstance->Montage_Play(DodgeMontage, true);
@@ -231,6 +242,7 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("Failed to Cast AnimInstance (PlayerCharacter)"))
 			return;
 	}
+	EGAnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AEternalGrace_ProtoCharacter::FinishClimbing);
 	if (WeaponComponent->CurrentWeaponClass)
 	{
 		EquipWeapon(WeaponComponent->CurrentWeaponClass);
@@ -240,6 +252,11 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 		EquipOffhandWeapon(WeaponComponent->OffhandWeaponClass);
 	}
 
+}
+
+void AEternalGrace_ProtoCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 }
 
 void AEternalGrace_ProtoCharacter::NotifyControllerChanged()
@@ -288,6 +305,11 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 		//LockOn
 		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::LockOn);
 		EnhancedInputComponent->BindAction(SwitchTargetAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::SwitchTarget);
+
+		//Climbing
+		EnhancedInputComponent->BindAction(HoldOnLedgeAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::ClimpCheckForward);
+		EnhancedInputComponent->BindAction(HoldOnLedgeAction, ETriggerEvent::Completed, this, &AEternalGrace_ProtoCharacter::DropFromLedge);
+		EnhancedInputComponent->BindAction(ClimbAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Climb);
 
 
 	}
@@ -369,34 +391,34 @@ void AEternalGrace_ProtoCharacter::EquipOffhandWeapon(TSubclassOf<AWeaponBase> W
 void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Command Fire Buffered Input"))
-	switch (BufferedInput)
-	{
-	case EInputType::NormalAttack:
-		NormalAttack();
-		break;
-	case EInputType::HeavyAttack:
-		//NO HEAVY ATTACK YET
-		break;
-	case EInputType::OffhandAttack:
-		PerformOffhandAction();
-		break;
-	case EInputType::Dodge:
-		//NO DODGE YET
-		break;
-	case EInputType::Interact:
-		Interact_Implementation();
-		break;
-	case EInputType::Jump:
-		Jump();
-		UE_LOG(LogTemp, Warning, TEXT("TriggeredJump Input"));
-		break;
-	case EInputType::DodgeAttack:
-		UE_LOG(LogTemp, Warning, TEXT("Command Dodge Attack"))
-		PerformDodgeAttack();
-		break;
-	default:
-		break;
-	}
+		switch (BufferedInput)
+		{
+		case EInputType::NormalAttack:
+			NormalAttack();
+			break;
+		case EInputType::HeavyAttack:
+			//NO HEAVY ATTACK YET
+			break;
+		case EInputType::OffhandAttack:
+			PerformOffhandAction();
+			break;
+		case EInputType::Dodge:
+			//NO DODGE YET
+			break;
+		case EInputType::Interact:
+			Interact_Implementation();
+			break;
+		case EInputType::Jump:
+			Jump();
+			UE_LOG(LogTemp, Warning, TEXT("TriggeredJump Input"));
+			break;
+		case EInputType::DodgeAttack:
+			UE_LOG(LogTemp, Warning, TEXT("Command Dodge Attack"))
+				PerformDodgeAttack();
+			break;
+		default:
+			break;
+		}
 }
 
 UInputBufferComponent* AEternalGrace_ProtoCharacter::GetInputBufferComponent()
@@ -409,27 +431,138 @@ void AEternalGrace_ProtoCharacter::SetLockOn(bool Value)
 	EGAnimInstance->bIsLockedOn = Value;
 }
 
+void AEternalGrace_ProtoCharacter::ClimpCheckForward()
+{
+	if (CurrentActionState != EActionState::Climbing)
+	{
+		FVector Destination = GetActorLocation() + (GetActorForwardVector() * ScanDistance);
+		FHitResult Hit;
+		bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, GetActorLocation(), Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+
+		if (bHitScan)
+		{
+			if (Hit.GetActor()->ActorHasTag("Climpable"))
+			{
+				//	UE_LOG(LogTemp, Warning, TEXT("Hitted Wall of %s"), *Hit.GetActor()->GetFName().ToString())
+				FVector WallLocation = Hit.Location;
+				FVector WallNormal = Hit.Normal;
+				ClimpCheckUpward(WallLocation, WallNormal);
+			}
+		}
+	}
+}
+
+void AEternalGrace_ProtoCharacter::ClimpCheckUpward(FVector WallLocation, FVector WallNormal)
+{
+	FVector Destination = GetActorLocation() + (GetActorForwardVector() * 75.f);
+	FVector Start = Destination + FVector(0.0f, 0.0f, 500.f);
+	FHitResult Hit;
+	bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, Start, Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::None, Hit, true, FLinearColor::Yellow, FLinearColor::Blue);
+
+	if (bHitScan)
+	{
+		//	UE_LOG(LogTemp, Error, TEXT("Hitted Ledge of %s"), *Hit.GetActor()->GetFName().ToString())
+		FVector SocketLocation = GetMesh()->GetSocketLocation("s_climp");
+
+		float HeightDistance = SocketLocation.Z - Hit.Location.Z;
+		if (UKismetMathLibrary::InRange_FloatFloat(HeightDistance, -65.f, 0, true, true) && CurrentActionState != EActionState::Climbing)
+		{
+			//	UE_LOG(LogTemp, Display, TEXT("Climpable!"))
+			HangOnLedge(WallLocation, WallNormal, Hit.Location);
+		}
+	}
+
+}
+
+void AEternalGrace_ProtoCharacter::HangOnLedge(FVector SnappingPosition, FVector WallNormal, FVector HeightLocation)
+{
+	//Lock Player Position and Play Hanging Animation
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	GetCharacterMovement()->StopMovementImmediately();
+	SetCurrentActionState(EActionState::Climbing);
+	EGAnimInstance->Montage_Play(ClimpAnimation, 1.0f);
+	EGAnimInstance->Montage_Pause();
+
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	//Get Snapping Position
+	FVector OffsetDistanceToWall = (WallNormal * WallDistanceOffset) + SnappingPosition;
+	//Subtract Half of CharacterSize from height Location to position Hanging Height
+	FVector TargetHeightLocation = FVector(0.0f, 0.0f, HeightLocation.Z - CapsuleHeightOffset);
+
+	FVector TargetLocation = FVector(OffsetDistanceToWall.X, OffsetDistanceToWall.Y, TargetHeightLocation.Z);
+	FRotator TargetRotation = UKismetMathLibrary::MakeRotFromX(-WallNormal);
+
+
+	FLatentActionInfo ActionInfo;
+	ActionInfo.CallbackTarget = this;
+	ActionInfo.ExecutionFunction = FName("Climp");
+	ActionInfo.Linkage = 0;
+	ActionInfo.UUID = __LINE__;
+
+	UGameplayStatics::PlaySoundAtLocation(World, AttachToWallSound, TargetLocation);
+	UKismetSystemLibrary::MoveComponentTo(Capsule, TargetLocation, TargetRotation, true, true, 0.1f, false, EMoveComponentAction::Move, ActionInfo);
+
+
+}
+
+void AEternalGrace_ProtoCharacter::Climb()
+{
+	if (CurrentActionState == EActionState::Climbing && !bIsCurrentlyClimbingUp)
+	{
+		bIsCurrentlyClimbingUp = true;
+		EGAnimInstance->Montage_Play(ClimpAnimation);
+	}
+}
+
+void AEternalGrace_ProtoCharacter::DropFromLedge()
+{
+	if (CurrentActionState == EActionState::Climbing && !bIsCurrentlyClimbingUp)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		SetCurrentActionState(EActionState::Idle);
+		EGAnimInstance->Montage_Stop(0.25f);
+	}
+}
+
+void AEternalGrace_ProtoCharacter::FinishClimbing(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+{
+	SetCurrentActionState(EActionState::Idle);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	bIsCurrentlyClimbingUp = false;
+}
+
+void AEternalGrace_ProtoCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	SetCurrentActionState(EActionState::Idle);
+}
+
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	if (CurrentActionState != EActionState::Climbing)
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// input is a Vector2D
+		FVector2D MovementVector = Value.Get<FVector2D>();
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		if (Controller != nullptr)
+		{
+			// find out which way is forward
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+			// get forward vector
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+			// get right vector 
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+			// add movement 
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
+		}
 	}
+
 }
 
 void AEternalGrace_ProtoCharacter::Look(const FInputActionValue& Value)
@@ -626,27 +759,29 @@ void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
 void AEternalGrace_ProtoCharacter::CancelGuard()
 {
 	//Change this, so the AnimInstance does not always has to be manually set....
-	if(CurrentActionState == EActionState::Guarding)
+	if (CurrentActionState == EActionState::Guarding)
 	{
-	Super::CancelGuard();
-	EGAnimInstance->SetActionState(EActionState::Idle);
-	UE_LOG(LogTemp, Error, TEXT("Trigger Cancel Block State"));
+		Super::CancelGuard();
+		EGAnimInstance->SetActionState(EActionState::Idle);
+		UE_LOG(LogTemp, Error, TEXT("Trigger Cancel Block State"));
 	}
 }
 
 void AEternalGrace_ProtoCharacter::Jump()
 {
+	
 	switch (CurrentActionState)
 	{
-	case EActionState::Attacking:
-		InputBufferingComponent->SaveInput(EInputType::Jump);
-		return;
-	case EActionState::Jumping:
-		InputBufferingComponent->SaveInput(EInputType::Jump);
-		return;
-	default:
+	case EActionState::Idle:
 		SetCurrentActionState(EActionState::Jumping);
 		Super::Jump();
+		break;
+	case EActionState::Running:
+		SetCurrentActionState(EActionState::Jumping);
+		Super::Jump();
+		break;
+	default:
+		InputBufferingComponent->SaveInput(EInputType::Jump);
 		break;
 	}
 }

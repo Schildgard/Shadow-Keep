@@ -62,6 +62,11 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ClimbAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* HoldOnLedgeAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MenuAction;
@@ -175,6 +180,7 @@ protected:
 
 protected:
 	virtual void BeginPlay()override;
+	virtual void Tick(float DeltaSeconds)override;
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -220,5 +226,37 @@ public:
 	UInputBufferComponent* GetInputBufferComponent();
 	UFUNCTION()
 	void SetLockOn(bool Value);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
+	float ScanDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
+	float CapsuleHeightOffset;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
+	float WallDistanceOffset;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Movement", meta = (AllowPrivateAccess))
+	UAnimMontage* ClimpAnimation;
+	UPROPERTY()
+	bool bIsCurrentlyClimbingUp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
+	USoundBase* AttachToWallSound;
+	UFUNCTION()
+	void ClimpCheckForward();
+	UFUNCTION()
+	void ClimpCheckUpward(FVector HitLocation, FVector HitNormal);
+	UPROPERTY()
+	TArray<AActor*> ClimpActorsToIgnore;
+	UFUNCTION()
+	void HangOnLedge(FVector SnappingPosition, FVector WallNormal, FVector HeightLocation);
+
+	UFUNCTION()
+	void Climb();
+	UFUNCTION()
+	void DropFromLedge();
+	UFUNCTION()
+	void FinishClimbing(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+
+
+	 void Landed(const FHitResult& Hit)override;
 };
 
