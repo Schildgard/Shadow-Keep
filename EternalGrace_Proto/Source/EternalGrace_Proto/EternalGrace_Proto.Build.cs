@@ -8,6 +8,6 @@ public class EternalGrace_Proto : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","PhysicsCore", "UMG", "HairStrandsCore", "Niagara", "GeometryCollectionEngine", "Chaos" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","PhysicsCore", "UMG", "HairStrandsCore", "Niagara", "GeometryCollectionEngine", "Chaos", "AIModule", "AnimGraphRuntime" });
 	}
 }

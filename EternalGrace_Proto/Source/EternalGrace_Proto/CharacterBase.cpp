@@ -82,6 +82,11 @@ AWeaponBase* ACharacterBase::GetOffhandWeapon_Implementation()
 	return nullptr;
 }
 
+void ACharacterBase::Attack_Implementation()
+{
+	UE_LOG(LogTemp, Display, TEXT("%s perfoms an Attack"), *GetFName().ToString())
+}
+
 void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)
 {
 }

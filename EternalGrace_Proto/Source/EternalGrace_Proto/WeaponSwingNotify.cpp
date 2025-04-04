@@ -44,7 +44,7 @@ void UWeaponSwingNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
 		//Check Interface to get Attack Properties
 		if (AttackingActor->Implements<UAttackable>())
 		{
-			if (bIsOffHandWeapon)
+			if (bIsOffHandWeapon) //Is setted in Editor of the Montage Notify
 			{
 				AttackingWeapon = IAttackable::Execute_GetOffhandWeapon(AttackingActor);
 			}

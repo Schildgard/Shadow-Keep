@@ -66,6 +66,8 @@ protected:
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	UFUNCTION()
 	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
+	UFUNCTION()
+	virtual void Attack_Implementation()override;
 
 	//Damageable Interface Implementations
 	UFUNCTION()

@@ -34,5 +34,8 @@ public:
 	AWeaponBase* GetOffhandWeapon();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Attack();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	TArray<TEnumAsByte<EObjectTypeQuery>> GetHittableObjectTypes();
 };
