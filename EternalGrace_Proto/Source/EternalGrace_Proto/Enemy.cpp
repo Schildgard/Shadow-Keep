@@ -12,5 +12,10 @@ AEnemy::AEnemy()
 
 void AEnemy::NoticePlayer(APawn* SpottedPawn)
 {
+	if (!NoticedPlayer && NoticePlayerSound)
+	{
+		VoiceComponent->SetSound(NoticePlayerSound);
+		VoiceComponent->Play();
+	}
 	Super::NoticePlayer(SpottedPawn);
 }

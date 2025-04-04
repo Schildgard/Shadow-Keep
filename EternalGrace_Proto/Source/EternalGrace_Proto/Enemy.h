@@ -17,5 +17,8 @@ class ETERNALGRACE_PROTO_API AEnemy : public ANPCBase
 protected:
 	AEnemy();
 	void NoticePlayer(APawn* SpottedPawn)override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess))
+	USoundBase* NoticePlayerSound;
 	
 };

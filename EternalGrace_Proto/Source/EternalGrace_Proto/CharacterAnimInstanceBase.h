@@ -19,7 +19,7 @@ protected:
 	void NativeInitializeAnimation()override;
 	void NativeUpdateAnimation(float DeltaSeconds)override;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
 	ACharacter* Character;
 	UPROPERTY()
 	UCharacterMovementComponent* MovementComponent;

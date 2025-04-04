@@ -28,6 +28,9 @@ ACharacterBase::ACharacterBase()
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
 	HealthComponent->GetHitSoundComponent()->SetupAttachment(GetMesh());
+
+	VoiceComponent = CreateDefaultSubobject<UAudioComponent>("Voice");
+	VoiceComponent->SetupAttachment(GetMesh(), "head");
 }
 
 void ACharacterBase::BeginPlay()

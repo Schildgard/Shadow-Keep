@@ -43,6 +43,8 @@ protected:
 	UGroomComponent* MustacheComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
 	UHealthComponent* HealthComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UAudioComponent* VoiceComponent;
 
 	//Save Interface Implementations
 	UFUNCTION(CallInEditor, Category = "SaveGame")

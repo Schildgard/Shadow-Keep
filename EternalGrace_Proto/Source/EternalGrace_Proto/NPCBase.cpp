@@ -7,11 +7,13 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "WeaponComponent.h"
 
 
 ANPCBase::ANPCBase()
 {
 	SensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("Sensing");
+	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon");
 	AIController = nullptr;
 	bIsHostile = false;
 	AttackRange = 150.f;

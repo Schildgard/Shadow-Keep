@@ -10,6 +10,7 @@
  * 
  */
 class AAIController;
+class UWeaponComponent;
 class UBlackboardComponent;
 class UPawnSensingComponent;
 UCLASS()
@@ -36,6 +37,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
 	TArray<UAnimMontage*> NormalAttackArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
+	UWeaponComponent* WeaponComponent;
 
 	UPROPERTY()
 	UBlackboardComponent* BlackboardComponent;
