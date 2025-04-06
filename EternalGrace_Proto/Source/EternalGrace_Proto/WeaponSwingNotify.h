@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ElementalType.h"
 #include "NiagaraSystem.h"
+#include "AttackDirection.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "WeaponSwingNotify.generated.h"
 
@@ -51,5 +52,8 @@ class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 
 	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OnHit", meta =(AllowPrivateAccess))
 	 TMap<EElementalType, UNiagaraSystem*> HitReactionMap;
+
+	 UFUNCTION()
+	 EAttackDirection GetAttackDirection(AActor* Target);
 	
 };

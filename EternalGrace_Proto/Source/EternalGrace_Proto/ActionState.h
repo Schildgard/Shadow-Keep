@@ -19,5 +19,6 @@ enum class EActionState : uint8
 	Jumping UMETA(DisplayName = "JumpState"),
 	Dodging UMETA(DisplayName = "DodgeState"),
 	Climbing UMETA(DisplayName = "Climbing"),
-	Strafing UMETA(DisplayName = "Strafing")
+	Strafing UMETA(DisplayName = "Strafing"),
+	Staggered UMETA(DisplayName = "Staggered")
 };

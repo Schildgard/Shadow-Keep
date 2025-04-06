@@ -27,6 +27,8 @@
 #include "HealthComponent.h"
 #include "SurfaceType.h"
 #include "LockOnComponent.h"
+#include "StaggerComponent.h"
+#include "AttackDirection.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,6 +94,7 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 
 	InputBufferingComponent = CreateDefaultSubobject<UInputBufferComponent>("InputBuffering");
 	LockOnComponent = CreateDefaultSubobject<ULockOnComponent>("LockOnSystem");
+	StaggerComponent = CreateDefaultSubobject<UStaggerComponent>("StaggerSystem");
 
 	ScanDistance = 150.0f;
 	WallDistanceOffset = 20.f;
@@ -235,7 +238,7 @@ void AEternalGrace_ProtoCharacter::SwitchTarget(const FInputActionValue& Value)
 void AEternalGrace_ProtoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//Animation
 	EGAnimInstance = Cast<UEG_AnimInstance>(GetMesh()->GetAnimInstance());
 	if (!EGAnimInstance)
 	{
@@ -243,6 +246,7 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 			return;
 	}
 	EGAnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AEternalGrace_ProtoCharacter::FinishClimbing);
+	//Weapon
 	if (WeaponComponent->CurrentWeaponClass)
 	{
 		EquipWeapon(WeaponComponent->CurrentWeaponClass);
@@ -250,6 +254,11 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	if (WeaponComponent->OffhandWeaponClass)
 	{
 		EquipOffhandWeapon(WeaponComponent->OffhandWeaponClass);
+	}
+	//Health
+	if (HealthComponent)
+	{
+		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World, PlayerIndex));
 	}
 
 }
@@ -716,19 +725,20 @@ AWeaponBase* AEternalGrace_ProtoCharacter::GetOffhandWeapon_Implementation()
 	return WeaponComponent->OffhandWeaponObject;
 }
 
-void AEternalGrace_ProtoCharacter::GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)
+void AEternalGrace_ProtoCharacter::Stagger_Implementation(EAttackDirection Direction, float PoiseDamage, AActor* DamageInstigator)
 {
-
-}
-
-UAudioComponent* AEternalGrace_ProtoCharacter::GetHitSoundComponent_Implementation()
-{
-	return HealthComponent->GetHitSoundComponent();
-}
-
-UNiagaraSystem* AEternalGrace_ProtoCharacter::GetHitEffectSystem_Implementation()
-{
-	return HealthComponent->GetHitEffect();
+	if (StaggerComponent)
+	{
+		bool bCharacterGetStaggered = StaggerComponent->GetStaggered(Direction, PoiseDamage, DamageInstigator);
+		if (bCharacterGetStaggered == true)
+		{
+			SetCurrentActionState(EActionState::Staggered);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s has no StaggerComponent! (Enemy Class)"), *GetFName().ToString());
+	}
 }
 
 void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
@@ -769,7 +779,7 @@ void AEternalGrace_ProtoCharacter::CancelGuard()
 
 void AEternalGrace_ProtoCharacter::Jump()
 {
-	
+
 	switch (CurrentActionState)
 	{
 	case EActionState::Idle:

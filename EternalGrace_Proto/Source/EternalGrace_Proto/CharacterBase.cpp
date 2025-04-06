@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "EternalGrace_GameInstance.h"
 #include "HealthComponent.h"
+#include "ValueBarWidgetBase.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -90,18 +91,22 @@ void ACharacterBase::Attack_Implementation()
 	UE_LOG(LogTemp, Display, TEXT("%s perfoms an Attack"), *GetFName().ToString())
 }
 
-void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)
+void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
 {
+	//Check if here if Damage goes through Block or something
+
+	HealthComponent->GetDamage(Attacker, DamageValue, PoiseDamage, Direction);
+	HealthComponent->UpdateHPBar();
 }
 
 UNiagaraSystem* ACharacterBase::GetHitEffectSystem_Implementation()
 {
-	return nullptr;
+	return HealthComponent->GetHitEffect();
 }
 
 UAudioComponent* ACharacterBase::GetHitSoundComponent_Implementation()
 {
-	return nullptr;
+	return HealthComponent->GetHitSoundComponent();
 }
 
 TArray<TEnumAsByte<EObjectTypeQuery>> ACharacterBase::GetHittableObjectTypes_Implementation()

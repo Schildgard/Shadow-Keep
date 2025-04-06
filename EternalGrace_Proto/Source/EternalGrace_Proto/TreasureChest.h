@@ -78,7 +78,7 @@ public:
 	virtual void SaveData_Implementation()override;
 	virtual void LoadData_Implementation()override;
 	//Damageable Interface Implementations
-	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
 	virtual UAudioComponent* GetHitSoundComponent_Implementation()override;
 	virtual UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	

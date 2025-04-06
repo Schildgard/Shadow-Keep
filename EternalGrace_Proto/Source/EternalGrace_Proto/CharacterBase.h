@@ -10,6 +10,8 @@
 #include "ActionState.h"
 #include "Attackable.h"
 #include "Damageable.h"
+#include "AttackDirection.h"
+#include "Staggerable.h"
 #include "CharacterBase.generated.h"
 
 class AWeaponBase;
@@ -73,7 +75,7 @@ protected:
 
 	//Damageable Interface Implementations
 	UFUNCTION()
-	void GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)override;
+	void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
 	UFUNCTION()
 	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	UFUNCTION()

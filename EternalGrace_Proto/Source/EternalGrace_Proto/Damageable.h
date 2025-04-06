@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "Components/AudioComponent.h"
 #include "NiagaraSystem.h"
+#include "AttackDirection.h"
 #include "Damageable.generated.h"
 
 UINTERFACE(MinimalAPI)
@@ -22,7 +23,7 @@ class ETERNALGRACE_PROTO_API IDamageable
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void GetDamage(AActor* Attacker, float DamageValue, FVector ImpactPoint);
+	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection);
 
 	UFUNCTION(BlueprintNativeEvent)
 	UAudioComponent* GetHitSoundComponent();

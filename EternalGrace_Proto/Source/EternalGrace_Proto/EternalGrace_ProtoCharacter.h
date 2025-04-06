@@ -8,6 +8,7 @@
 #include "CharacterBase.h"
 #include "PlayerSaveData.h"
 #include "Playable.h"
+#include "Staggerable.h"
 #include "ObjectType.h"
 #include "WeaponType.h"
 #include "InputType.h"
@@ -24,12 +25,13 @@ class AWeaponBase;
 class UEG_AnimInstance;
 class UInputBufferComponent;
 class ULockOnComponent;
+class UStaggerComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
+class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable, public IStaggerable
 {
 	GENERATED_BODY()
 
@@ -97,6 +99,9 @@ class AEternalGrace_ProtoCharacter : public ACharacterBase, public IPlayable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	ULockOnComponent* LockOnComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UStaggerComponent* StaggerComponent;
+
 
 
 public:
@@ -119,9 +124,8 @@ protected:
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
 	//Damageable Implementations
-	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, FVector ImpactPoint)override;
-	virtual UAudioComponent* GetHitSoundComponent_Implementation()override;
-	virtual UNiagaraSystem* GetHitEffectSystem_Implementation()override;
+	//Stagerable Implementation
+	virtual void Stagger_Implementation(EAttackDirection Direction, float PoiseDamage, AActor* DamageInstigator)override;
 	//FootStep Sound
 	virtual void PlayFootStepSound(FName FootSocket)override;
 

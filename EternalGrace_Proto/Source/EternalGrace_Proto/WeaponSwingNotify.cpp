@@ -10,8 +10,10 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Damageable.h"
+#include "Staggerable.h"
 #include "Camera/CameraShakeSourceComponent.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 UWeaponSwingNotify::UWeaponSwingNotify()
@@ -91,25 +93,29 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 		for (const FHitResult& Hit : Hitted)
 		{
 			AActor* HittedActor = Hit.GetActor();
-			if (!HittedActor)return;
+			if (!HittedActor|| IgnoreList.Contains(HittedActor))return;
 			UE_LOG(LogTemp, Display, TEXT("Hitted %s"), *HittedActor->GetFName().ToString())
 
 				IgnoreList.Add(HittedActor);
 
 			UNiagaraSystem* HitNiagara;
-
 			//Check if Hitted Actor Implements Interface. Determine wether to use weapons environmental hit properties or hittable targets properties.
 			if (HittedActor->Implements<UDamageable>())
 			{
 				HitNiagara = IDamageable::Execute_GetHitEffectSystem(HittedActor);
-				AudioComponent = AttackingWeapon->GetAudioComponent();
-				IDamageable::Execute_GetDamage(HittedActor, AttackingActor, AttackingWeapon->ImpactForce, Hit.Location);
+				IDamageable::Execute_GetDamage(HittedActor, AttackingActor, AttackingWeapon->PhysicalDamage, AttackingWeapon->PoiseDamage, GetAttackDirection(HittedActor));
 			}
 			else
 			{
 				HitNiagara = *HitReactionMap.Find(WeaponElement); // TO Do: Change the way to determine the hit effect..maybe datatables ?
-				AudioComponent = AttackingWeapon->GetAudioComponent();
+				AudioComponent = AttackingWeapon->GetAudioComponent(); //This AudioComponnet is only used for Hit on Environment Sound
+
 			}
+
+
+
+
+
 
 			//Play Audio and Niagara
 			if (HitNiagara)
@@ -138,5 +144,38 @@ void UWeaponSwingNotify::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequen
 	if (!IgnoreList.IsEmpty())
 	{
 		IgnoreList.Empty();
+	}
+}
+
+EAttackDirection UWeaponSwingNotify::GetAttackDirection(AActor* Target)
+{
+	//Get Relevant Position Data
+	FVector OwnerPosition = AttackingActor->GetActorLocation();
+	FVector TargetPosition = Target->GetActorLocation();
+	FVector Direction = OwnerPosition - TargetPosition;
+	Direction.Normalize(0.0001f);
+	//Get Forward Direction of Target to compare it with Direction Vector and take the DotProduct to decide if Attack is Frontal, Back or from Side
+	FVector ForwardDirectionOfTarget = Target->GetActorForwardVector();
+	float DotProduct = UKismetMathLibrary::Dot_VectorVector(Direction, ForwardDirectionOfTarget);
+	//Get Cross Product to check if Attack comes Left or Right (DotProduct and Degrees (Do not check which side the attack comes from)
+	FVector CrossProduct = FVector::CrossProduct(ForwardDirectionOfTarget, Direction);
+	float Side = CrossProduct.Z;
+
+	//If Attack is Frontal
+	if (DotProduct >= 0.7f)
+	{
+		return EAttackDirection::Front;
+	}
+	else if (DotProduct <= -0.7f) // If Attack is from Behind
+	{
+		return EAttackDirection::Back;
+	}
+	else if (Side > 0) // Check if Attack is from Right
+	{
+		return EAttackDirection::Right;
+	}
+	else  // Check is Attack is from Left
+	{
+		return EAttackDirection::Left;
 	}
 }

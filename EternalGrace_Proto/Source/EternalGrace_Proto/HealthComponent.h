@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "AttackDirection.h"
 #include "HealthComponent.generated.h"
 
 class UNiagaraSystem;
+class UValueBarWidgetBase;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ETERNALGRACE_PROTO_API UHealthComponent : public UActorComponent
 {
@@ -23,6 +25,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HitReaction", meta = (AllowPrivateAccess))
 	UAudioComponent* HitSoundComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
+	float MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
+	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
+	TSubclassOf<UValueBarWidgetBase> HPBarClass;
+	UPROPERTY()
+	UValueBarWidgetBase* HPBar;
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -30,6 +42,16 @@ public:
 	UNiagaraSystem* GetHitEffect();
 	UFUNCTION()
 	UAudioComponent* GetHitSoundComponent();
+
+	UFUNCTION()
+	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction);
+
+	UFUNCTION()
+	void ShowHPBar(APlayerController* PlayerController);
+	UFUNCTION()
+	UValueBarWidgetBase* GetHPBar();
+	UFUNCTION()
+	void UpdateHPBar();
 
 		
 };
