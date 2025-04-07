@@ -5,6 +5,8 @@
 #include "Components/AudioComponent.h"
 #include "ValueBarWidgetBase.h"
 #include "Staggerable.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -21,10 +23,13 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OwningCharacter = Cast<ACharacter>(GetOwner());
+
 	//	if (HPBarClass)
 	//	{
 	//		HPBar = CreateWidget<UValueBarWidgetBase>(GetWorld(), HPBarClass);
 	//	}
+
 }
 
 
@@ -45,39 +50,26 @@ UAudioComponent* UHealthComponent::GetHitSoundComponent()
 
 void UHealthComponent::GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
 {
-	AActor* Owner = GetOwner();
+	//Not Using OwningCharacter here, because of no particular reason. Might as well change this
+	AActor* Owner = GetOwner(); 
 	CurrentHealth -= DamageValue;
-	UE_LOG(LogTemp, Error, TEXT("Current Health is %f, DamageIncome was %f"), CurrentHealth, DamageValue)
 		HitSoundComponent->Play();
-	if (Owner->Implements<UStaggerable>())
+	if (OwningCharacter->Implements<UStaggerable>())
 	{
 		IStaggerable::Execute_Stagger(Owner, Direction, PoiseDamage, Attacker);
 	}
 }
 
-void UHealthComponent::ShowHPBar()
+void UHealthComponent::ShowHPBar(APlayerController* PlayerController)
 {
-
-	if (HPBarClass && !HPBar)
+	if (HPBarClass && !HPBar && PlayerController)
 	{
-		HPBar = CreateWidget<UValueBarWidgetBase>(GetWorld(), HPBarClass);
+		HPBar = CreateWidget<UValueBarWidgetBase>(PlayerController, HPBarClass);
 
 	}
 	if (HPBar)
 	{
 		HPBar->AddToPlayerScreen();
-	}
-}
-
-void UHealthComponent::ShowEnemyHPBar(APlayerController* PlayerController)
-{
-	if(HPBarClass)
-	{
-		UValueBarWidgetBase* TemporaryHPBar = CreateWidget<UValueBarWidgetBase>(PlayerController, HPBarClass);
-		if(TemporaryHPBar)
-		{
-			TemporaryHPBar->AddToPlayerScreen();
-		}
 	}
 }
 
@@ -97,5 +89,10 @@ void UHealthComponent::UpdateHPBar()
 	{
 		HPBar->UpdateProgressBar(CurrentHealth, MaxHealth);
 	}
+}
+
+float UHealthComponent::GetMaxHealth()
+{
+	return MaxHealth;
 }
 

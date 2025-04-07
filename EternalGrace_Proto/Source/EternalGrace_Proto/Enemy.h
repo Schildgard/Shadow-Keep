@@ -22,6 +22,7 @@ class ETERNALGRACE_PROTO_API AEnemy : public ANPCBase, public IStaggerable
 protected:
 	AEnemy();
 	virtual void BeginPlay()override;
+	virtual void Tick(float DeltaSeconds)override;
 	virtual void NoticePlayer(APawn* SpottedPawn)override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess))
@@ -34,6 +35,19 @@ protected:
 	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection)override;
 
 
+	//This pointers are used to project the HPBar of the Enemy to both players independently
 	UPROPERTY()
-	UValueBarWidgetBase* HPBar;
+	UValueBarWidgetBase* TemporaryHPBarInstance1;
+
+	UPROPERTY()
+	UValueBarWidgetBase* TemporaryHPBarInstance2;
+
+	UFUNCTION()
+	UValueBarWidgetBase* ShowTemporaryBar(int PlayerIndex);
+
+	UFUNCTION()
+	void UpdateTemporaryHPBarValues();
+
+	UFUNCTION()
+	void UpdateHealthbarPosition();
 };

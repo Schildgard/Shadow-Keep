@@ -84,11 +84,12 @@ void ULockOnComponent::UpdateLockOn(float DeltaTime)
 	{
 		FVector TargetSocketLocation = LockedOnTarget->GetMesh()->GetSocketLocation(FName("Target"));
 		FVector2D ScreenPosition;
-		bool Projected = GetWorld()->GetFirstPlayerController()->ProjectWorldLocationToScreen(TargetSocketLocation, ScreenPosition); //TODO Maybe change the FirstPlayerContrller to Controlling Player Controller here
+
+		bool Projected = UGameplayStatics::ProjectWorldToScreen(OwningController, TargetSocketLocation, ScreenPosition, true);
 
 		if (Projected)
 		{
-			Visualizer->SetPositionInViewport(ScreenPosition, true);
+		Visualizer->SetPositionInViewport(ScreenPosition, true);
 		}
 	}
 }

@@ -262,7 +262,7 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	//Health
 	if (HealthComponent)
 	{
-		HealthComponent->ShowHPBar();
+		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World,PlayerIndex));
 	}
 
 }

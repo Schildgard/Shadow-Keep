@@ -20,6 +20,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	
+	UPROPERTY()
+	ACharacter* OwningCharacter;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HitReaction", meta = (AllowPrivateAccess))
 	UNiagaraSystem* HitEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HitReaction", meta = (AllowPrivateAccess))
@@ -27,16 +31,19 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
 	float MaxHealth;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
-	float CurrentHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
 	TSubclassOf<UValueBarWidgetBase> HPBarClass;
 	UPROPERTY()
 	UValueBarWidgetBase* HPBar;
 
+	UPROPERTY()
+	TArray<UValueBarWidgetBase*> TemporaryHPBars;
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess))
+	float CurrentHealth;
 
 	UFUNCTION()
 	UNiagaraSystem* GetHitEffect();
@@ -47,10 +54,7 @@ public:
 	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction);
 
 	UFUNCTION()
-	void ShowHPBar();
-
-	UFUNCTION()
-	void ShowEnemyHPBar(APlayerController* PlayerController);
+	void ShowHPBar(APlayerController* PlayerController);
 
 	UFUNCTION()
 	UValueBarWidgetBase* GetHPBar();
@@ -59,6 +63,9 @@ public:
 
 	UFUNCTION()
 	void UpdateHPBar();
+
+	UFUNCTION()
+	float GetMaxHealth();
 
 		
 };
