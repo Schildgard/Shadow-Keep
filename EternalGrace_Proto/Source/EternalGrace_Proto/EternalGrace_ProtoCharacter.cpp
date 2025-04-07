@@ -29,6 +29,7 @@
 #include "LockOnComponent.h"
 #include "StaggerComponent.h"
 #include "AttackDirection.h"
+#include "Blueprint/UserWidget.h"
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -147,6 +148,9 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 	case EActionState::Climbing:
 		InputBufferingComponent->SaveInput(EInputType::NormalAttack);
 		break;
+	case EActionState::Staggered:
+		InputBufferingComponent->SaveInput(EInputType::NormalAttack);
+		break;
 	default:
 		CurrentActionState = EActionState::Attacking;
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
@@ -258,7 +262,7 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	//Health
 	if (HealthComponent)
 	{
-		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World, PlayerIndex));
+		HealthComponent->ShowHPBar();
 	}
 
 }
@@ -545,6 +549,13 @@ void AEternalGrace_ProtoCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	SetCurrentActionState(EActionState::Idle);
+}
+
+void AEternalGrace_ProtoCharacter::ShowEnemyHealthBar(ACharacterBase* Enemy)
+{
+//	TSubclassOf<UValueBarWidgetBase> HPBarClass = *Enemy->GetHealthComponent()->GetHPBarClass();
+//	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(World, PlayerIndex);
+//	UValueBarWidgetBase* EnemyHPBar = CreateWidget<UValueBarWidgetBase>(PlayerController, *HPBarClass);
 }
 
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)

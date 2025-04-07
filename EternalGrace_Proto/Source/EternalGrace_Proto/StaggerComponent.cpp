@@ -19,26 +19,31 @@ bool UStaggerComponent::GetStaggered(EAttackDirection Direction, float PoiseDama
 	CurrentPoise -= PoiseDamage;
 	if(CurrentPoise <= 0)
 	{
+		int StaggerAnimationIndex;
 		switch (Direction)
 		{
 		case EAttackDirection::Front:
-			UE_LOG(LogTemp, Warning, TEXT("Front"))
-		CharacterAnimInstance->Montage_Play(StaggerAnimations[0]);
+				StaggerAnimationIndex = 0;
 			break;
 		case EAttackDirection::Back:
-			UE_LOG(LogTemp, Warning, TEXT("Back"))
-			CharacterAnimInstance->Montage_Play(StaggerAnimations[1]);
+				StaggerAnimationIndex = 1;
 				break;
 		case EAttackDirection::Right:
-			UE_LOG(LogTemp, Warning, TEXT("Right"))
-			CharacterAnimInstance->Montage_Play(StaggerAnimations[2]);
+				StaggerAnimationIndex = 2;;
 			break;
 		case EAttackDirection::Left:
-			UE_LOG(LogTemp, Warning, TEXT("Left"))
-			CharacterAnimInstance->Montage_Play(StaggerAnimations[3]);
+				StaggerAnimationIndex = 3;
 			break;
 		}
+		CharacterAnimInstance->Montage_Play(StaggerAnimations[StaggerAnimationIndex]);
 		CurrentPoise = MaxPoise;
+
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(CharacterAnimInstance, &UCharacterAnimInstanceBase::ResetCharacterState);
+		CharacterAnimInstance->Montage_SetEndDelegate(EndDelegate, StaggerAnimations[StaggerAnimationIndex]);
+		
+
+
 		return true;
 	}
 	return false;

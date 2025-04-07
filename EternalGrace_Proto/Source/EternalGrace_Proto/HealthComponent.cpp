@@ -20,7 +20,11 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//	if (HPBarClass)
+	//	{
+	//		HPBar = CreateWidget<UValueBarWidgetBase>(GetWorld(), HPBarClass);
+	//	}
 }
 
 
@@ -39,26 +43,40 @@ UAudioComponent* UHealthComponent::GetHitSoundComponent()
 	return HitSoundComponent;
 }
 
-void UHealthComponent::GetDamage(AActor* Attacker, float DamageValue,float PoiseDamage, EAttackDirection Direction)
+void UHealthComponent::GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
 {
 	AActor* Owner = GetOwner();
 	CurrentHealth -= DamageValue;
 	UE_LOG(LogTemp, Error, TEXT("Current Health is %f, DamageIncome was %f"), CurrentHealth, DamageValue)
-	HitSoundComponent->Play();
-	if(Owner->Implements<UStaggerable>())
+		HitSoundComponent->Play();
+	if (Owner->Implements<UStaggerable>())
 	{
 		IStaggerable::Execute_Stagger(Owner, Direction, PoiseDamage, Attacker);
 	}
 }
 
-void UHealthComponent::ShowHPBar(APlayerController* PlayerController)
+void UHealthComponent::ShowHPBar()
+{
+
+	if (HPBarClass && !HPBar)
+	{
+		HPBar = CreateWidget<UValueBarWidgetBase>(GetWorld(), HPBarClass);
+
+	}
+	if (HPBar)
+	{
+		HPBar->AddToPlayerScreen();
+	}
+}
+
+void UHealthComponent::ShowEnemyHPBar(APlayerController* PlayerController)
 {
 	if(HPBarClass)
 	{
-		HPBar = CreateWidget<UValueBarWidgetBase>(PlayerController, HPBarClass);
-		if(HPBar)
+		UValueBarWidgetBase* TemporaryHPBar = CreateWidget<UValueBarWidgetBase>(PlayerController, HPBarClass);
+		if(TemporaryHPBar)
 		{
-			HPBar->AddToPlayerScreen();
+			TemporaryHPBar->AddToPlayerScreen();
 		}
 	}
 }
@@ -68,9 +86,16 @@ UValueBarWidgetBase* UHealthComponent::GetHPBar()
 	return HPBar;
 }
 
+TSubclassOf<UValueBarWidgetBase>& UHealthComponent::GetHPBarClass()
+{
+	return HPBarClass;
+}
+
 void UHealthComponent::UpdateHPBar()
 {
-	UE_LOG(LogTemp, Error, TEXT("HP Gets Updated"))
-	HPBar->UpdateProgressBar(CurrentHealth, MaxHealth);
+	if (HPBar)
+	{
+		HPBar->UpdateProgressBar(CurrentHealth, MaxHealth);
+	}
 }
 

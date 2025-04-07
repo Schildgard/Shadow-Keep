@@ -75,7 +75,7 @@ protected:
 
 	//Damageable Interface Implementations
 	UFUNCTION()
-	void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
 	UFUNCTION()
 	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	UFUNCTION()
@@ -113,5 +113,8 @@ public:
 
 	UFUNCTION()
 	void RotateTowardsTarget(AActor* Target);
+
+	UFUNCTION()
+	UHealthComponent* GetHealthComponent();
 
 };

@@ -11,6 +11,8 @@
 /**
  * 
  */
+class UValueBarWidgetBase;
+class UWidgetComponent;
 class UStaggerComponent; // todo: Make that CharacterBase has a stagger component
 UCLASS()
 class ETERNALGRACE_PROTO_API AEnemy : public ANPCBase, public IStaggerable
@@ -29,5 +31,9 @@ protected:
 
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	virtual void Stagger_Implementation(EAttackDirection Direction, float PoiseDamage, AActor* DamageInstigator)override;
-	
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection)override;
+
+
+	UPROPERTY()
+	UValueBarWidgetBase* HPBar;
 };

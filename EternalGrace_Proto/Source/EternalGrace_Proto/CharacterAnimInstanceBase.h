@@ -10,6 +10,7 @@
 /**
  * 
  */
+class ACharacterBase;
 class UCharacterMovementComponent;
 UCLASS()
 class ETERNALGRACE_PROTO_API UCharacterAnimInstanceBase : public UAnimInstance
@@ -20,9 +21,12 @@ protected:
 	void NativeUpdateAnimation(float DeltaSeconds)override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
-	ACharacter* Character;
-	UPROPERTY()
+	ACharacterBase* Character;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCharacterMovementComponent* MovementComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
+	FVector Velocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
 	float GroundSpeed;
@@ -38,5 +42,9 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess))
 	EActionState CurrentActionState;
+
+	//Used for Delegates when Characters Animation is finished
+	UFUNCTION()
+	void ResetCharacterState(UAnimMontage* Montage, bool Interrupted);
 	
 };

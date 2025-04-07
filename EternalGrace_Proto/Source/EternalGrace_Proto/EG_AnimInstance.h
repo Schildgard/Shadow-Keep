@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "WeaponType.h"
 #include "ActionState.h"
+#include "CharacterAnimInstanceBase.h"
 #include "EG_AnimInstance.generated.h"
 
 /**
@@ -13,7 +14,7 @@
  */
 class AEternalGrace_ProtoCharacter;
 UCLASS()
-class ETERNALGRACE_PROTO_API UEG_AnimInstance : public UAnimInstance
+class ETERNALGRACE_PROTO_API UEG_AnimInstance : public UCharacterAnimInstanceBase
 {
 	GENERATED_BODY()
 

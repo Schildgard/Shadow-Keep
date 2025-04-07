@@ -55,7 +55,6 @@ void ULockOnComponent::UpdateLockOn(float DeltaTime)
 	{
 		return;
 	}
-	//IT IS WEIRD THAT THE LOCK ON SYSTEM GETS ITS PLAYER CONTROLLER BUT THE PLAYER CONTROLLER CALLS THIS FUNCTION..TODO: CHANGE THIS FUNCTION TO ONLY DO CALCULATIONS AND ROTATE IN THE CONTROLLER
 	//While sprinting the character rotates freely
 	if (LockingActor->GetCurrentActionState() != EActionState::Running)
 	{
@@ -85,7 +84,7 @@ void ULockOnComponent::UpdateLockOn(float DeltaTime)
 	{
 		FVector TargetSocketLocation = LockedOnTarget->GetMesh()->GetSocketLocation(FName("Target"));
 		FVector2D ScreenPosition;
-		bool Projected = GetWorld()->GetFirstPlayerController()->ProjectWorldLocationToScreen(TargetSocketLocation, ScreenPosition);
+		bool Projected = GetWorld()->GetFirstPlayerController()->ProjectWorldLocationToScreen(TargetSocketLocation, ScreenPosition); //TODO Maybe change the FirstPlayerContrller to Controlling Player Controller here
 
 		if (Projected)
 		{

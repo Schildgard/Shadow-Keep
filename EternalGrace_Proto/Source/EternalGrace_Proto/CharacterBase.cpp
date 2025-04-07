@@ -171,3 +171,8 @@ void ACharacterBase::RotateTowardsTarget(AActor* Target)
 	SetActorRotation(DesiredRotation);
 }
 
+UHealthComponent* ACharacterBase::GetHealthComponent()
+{
+	return HealthComponent;
+}
+

@@ -5,10 +5,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "KismetAnimationLibrary.h"
+#include "CharacterBase.h"
 
 void UCharacterAnimInstanceBase::NativeInitializeAnimation()
 {
-	Character = Cast<ACharacter>(GetOwningActor());
+	Character = Cast<ACharacterBase>(GetOwningActor());
 	if (Character)
 	{
 		MovementComponent = Character->GetCharacterMovement();
@@ -27,7 +28,7 @@ void UCharacterAnimInstanceBase::NativeInitializeAnimation()
 
 void UCharacterAnimInstanceBase::NativeUpdateAnimation(float DeltaSeconds)
 {
-	if (Character->IsValidLowLevel() && MovementComponent->IsValidLowLevel())
+	if (Character && Character->IsValidLowLevel() && MovementComponent->IsValidLowLevel())
 	{
 		FVector HorizontalMovementSpeed = FVector(MovementComponent->Velocity.X, MovementComponent->Velocity.Y, 0.0f);
 		GroundSpeed = HorizontalMovementSpeed.Length();
@@ -36,5 +37,13 @@ void UCharacterAnimInstanceBase::NativeUpdateAnimation(float DeltaSeconds)
 		bShouldMove = GroundSpeed > 3.0f;
 
 		bIsFalling = MovementComponent->IsFalling();
+
+		Velocity = MovementComponent->Velocity;
 	}
+}
+
+void UCharacterAnimInstanceBase::ResetCharacterState(UAnimMontage* Montage, bool Interrupted)
+{
+	CurrentActionState = EActionState::Idle;
+	Character->SetCurrentActionState(EActionState::Idle);
 }

@@ -261,6 +261,10 @@ public:
 	void FinishClimbing(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 
-	 void Landed(const FHitResult& Hit)override;
+	 virtual void Landed(const FHitResult& Hit)override;
+
+	 UFUNCTION()
+	 void ShowEnemyHealthBar(ACharacterBase* Enemy);
+
 };
 

@@ -47,9 +47,16 @@ public:
 	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction);
 
 	UFUNCTION()
-	void ShowHPBar(APlayerController* PlayerController);
+	void ShowHPBar();
+
+	UFUNCTION()
+	void ShowEnemyHPBar(APlayerController* PlayerController);
+
 	UFUNCTION()
 	UValueBarWidgetBase* GetHPBar();
+	UFUNCTION()
+	TSubclassOf<UValueBarWidgetBase>& GetHPBarClass();
+
 	UFUNCTION()
 	void UpdateHPBar();
 
