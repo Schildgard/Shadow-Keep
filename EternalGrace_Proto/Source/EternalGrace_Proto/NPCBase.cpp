@@ -115,3 +115,35 @@ void ANPCBase::ResetAttackState2()
 	BlackboardComponent->SetValueAsBool("bCanAttack", true);
 	UE_LOG(LogTemp, Error, TEXT("Reseted its AttackState %s"), *GetFName().ToString())
 }
+
+void ANPCBase::RaiseAggro_Implementation(AActor* Attacker, float AggroValue)
+{
+
+	if(AggroList.Contains(Attacker))
+	{
+	 AggroList[Attacker] += AggroValue;
+	 UE_LOG(LogTemp, Error, TEXT("Added Aggro!"))
+	}
+	else
+	{
+		AggroList.Add(Attacker, AggroValue);
+		UE_LOG(LogTemp, Error, TEXT("New Challenger!"))
+	}
+
+	 AActor* HighestAggroActor = nullptr;
+	 float HighestAggroValue = 0;
+	 for(TPair<AActor*, float> AggroCandidate : AggroList)
+	 {
+		 if(AggroCandidate.Value > HighestAggroValue)
+		 {
+			 HighestAggroActor = AggroCandidate.Key;
+			 HighestAggroValue = AggroCandidate.Value;
+		 }
+	 }
+	 if(HighestAggroActor && NoticedPlayer!=HighestAggroActor)
+	 {
+		 UE_LOG(LogTemp, Error, TEXT("Change Aggro!"))
+	 NoticedPlayer = Cast<ACharacter>(HighestAggroActor);
+		 BlackboardComponent->SetValueAsObject("TargetPlayer", NoticedPlayer);
+	 }
+}

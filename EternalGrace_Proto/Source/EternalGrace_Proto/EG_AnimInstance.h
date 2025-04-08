@@ -30,12 +30,8 @@ protected:
 	void NativeBeginPlay()override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "States", meta = (AllowPrivateAccess))
-	EActionState CharacterActionState; //Inherited Class also has "Current Action State" - remove that one!
 	UFUNCTION()
 	void SetWeaponType(EWeaponType NewWeaponClass);
-	UFUNCTION()
-	void SetActionState(EActionState NewActionState);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta =(AllowPrivateAccess))
 	int AttackCount;

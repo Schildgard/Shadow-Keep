@@ -39,6 +39,8 @@ class ETERNALGRACE_PROTO_API UWeaponSwingNotify : public UAnimNotifyState
 
 	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OnHit", meta = (AllowPrivateAccess))
 	 bool bIsOffHandWeapon;
+	 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OnHit", meta = (AllowPrivateAccess))
+	 float ThreatValue;
 
 	 UPROPERTY()
 	 UCapsuleComponent* Hitbox;

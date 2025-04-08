@@ -14,6 +14,7 @@
 #include "Camera/CameraShakeSourceComponent.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Aggroable.h"
 
 
 UWeaponSwingNotify::UWeaponSwingNotify()
@@ -109,9 +110,11 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 			{
 				HitNiagara = *HitReactionMap.Find(WeaponElement); // TO Do: Change the way to determine the hit effect..maybe datatables ?
 				AudioComponent = AttackingWeapon->GetAudioComponent(); //This AudioComponnet is only used for Hit on Environment Sound
-
 			}
-
+			if(HittedActor->Implements<UAggroable>())
+			{
+				IAggroable::Execute_RaiseAggro(HittedActor,AttackingActor, ThreatValue);
+			}
 
 
 

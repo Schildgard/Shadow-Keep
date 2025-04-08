@@ -7,7 +7,6 @@
 
 UEG_AnimInstance::UEG_AnimInstance()
 {
-	CharacterActionState = EActionState::Idle;
 	WeaponClass = EWeaponType::NoWeapon;
 	AttackCount = 0;
 	OwningCharacter = nullptr;
@@ -27,11 +26,6 @@ void UEG_AnimInstance::NativeBeginPlay()
 void UEG_AnimInstance::SetWeaponType(EWeaponType NewWeaponClass)
 {
 	WeaponClass = NewWeaponClass;
-}
-
-void UEG_AnimInstance::SetActionState(EActionState NewActionState)
-{
-	CharacterActionState = NewActionState;
 }
 
 void UEG_AnimInstance::ResetAttackState()

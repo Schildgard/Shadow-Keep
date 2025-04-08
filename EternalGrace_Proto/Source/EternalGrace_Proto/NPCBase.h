@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterBase.h"
+#include "Aggroable.h"
 #include "NPCBase.generated.h"
 
 /**
@@ -14,7 +15,7 @@ class UWeaponComponent;
 class UBlackboardComponent;
 class UPawnSensingComponent;
 UCLASS()
-class ETERNALGRACE_PROTO_API ANPCBase : public ACharacterBase
+class ETERNALGRACE_PROTO_API ANPCBase : public ACharacterBase, public IAggroable
 {
 	GENERATED_BODY()
 
@@ -37,6 +38,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
 	TArray<UAnimMontage*> NormalAttackArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
+	TMap<AActor*, float> AggroList;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
 	UWeaponComponent* WeaponComponent;
@@ -64,5 +68,7 @@ public:
 	//Test for Blueprint
 	UFUNCTION(BlueprintCallable)
 	void ResetAttackState2();
+
+	virtual void RaiseAggro_Implementation(AActor* Attacker, float AggroValue);
 	
 };

@@ -767,7 +767,7 @@ void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
 void AEternalGrace_ProtoCharacter::SetCurrentActionState(EActionState ActionState)
 {
 	Super::SetCurrentActionState(ActionState);
-	EGAnimInstance->SetActionState(ActionState);
+	EGAnimInstance->CurrentActionState = ActionState;
 }
 
 
