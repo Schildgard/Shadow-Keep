@@ -9,6 +9,7 @@
 #include "ValueBarWidgetBase.h"
 #include "EternalGrace_ProtoCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "DespawningValueBarWidget.h"
 
 AEnemy::AEnemy()
 {
@@ -75,18 +76,21 @@ void AEnemy::GetDamage_Implementation(AActor* Attacker, float DamageValue, float
 	if (PlayerChar)
 	{
 		int PlayerIndex = PlayerChar->GetPlayerIndex();
-		//Check if The Player already sees the enemies HP Bar
+		UDespawningValueBarWidget* HpBarReference;
+		//Check if the enemies HP Bar is already set
 		bool bIsHpBarInstanceActive;
 		if (PlayerIndex == 0) //If Player One
 		{
 			bIsHpBarInstanceActive = TemporaryHPBarInstance1 != nullptr;
+			HpBarReference = TemporaryHPBarInstance1;
 		}
 		else //If Player Two
 		{
 			bIsHpBarInstanceActive = TemporaryHPBarInstance2 != nullptr;
+			HpBarReference = TemporaryHPBarInstance2;
 		}
 
-		//If not show HPBar to Player
+		//If not, show HPBar to Player
 		if (!bIsHpBarInstanceActive)
 		{
 			if (PlayerIndex == 0)
@@ -97,23 +101,36 @@ void AEnemy::GetDamage_Implementation(AActor* Attacker, float DamageValue, float
 			{
 				TemporaryHPBarInstance2 = ShowTemporaryBar(1);
 			}
+		} //If so, check if it is in viewport already
+		else
+		{
+			if (HpBarReference->IsInViewport())
+			{
+				HpBarReference->ResetDespawnTimer();
+			}
+			else
+			{
+				HpBarReference->AddToPlayerScreen();
+			}
 		}
+
+
 		UpdateTemporaryHPBarValues();
 	}
 
 }
 
-UValueBarWidgetBase* AEnemy::ShowTemporaryBar(int PlayerIndex)
+UDespawningValueBarWidget* AEnemy::ShowTemporaryBar(int PlayerIndex)
 {
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), PlayerIndex);
 	if (PlayerController)
 	{
-		UValueBarWidgetBase* TemporaryHPBarInstance;
+		UDespawningValueBarWidget* TemporaryHPBarInstance;
 		TSubclassOf<UValueBarWidgetBase> HPBarClass = HealthComponent->GetHPBarClass();
 		if (HPBarClass)
 		{
-			TemporaryHPBarInstance = CreateWidget<UValueBarWidgetBase>(PlayerController, HPBarClass);
+			TemporaryHPBarInstance = CreateWidget<UDespawningValueBarWidget>(PlayerController, HPBarClass);
 			if (TemporaryHPBarInstance)
 			{
 				TemporaryHPBarInstance->AddToPlayerScreen();
@@ -126,11 +143,11 @@ UValueBarWidgetBase* AEnemy::ShowTemporaryBar(int PlayerIndex)
 
 void AEnemy::UpdateTemporaryHPBarValues()
 {
-	if(TemporaryHPBarInstance1)
+	if (TemporaryHPBarInstance1)
 	{
 		TemporaryHPBarInstance1->UpdateProgressBar(HealthComponent->CurrentHealth, HealthComponent->GetMaxHealth());
 	}
-	if(TemporaryHPBarInstance2)
+	if (TemporaryHPBarInstance2)
 	{
 		TemporaryHPBarInstance2->UpdateProgressBar(HealthComponent->CurrentHealth, HealthComponent->GetMaxHealth());
 	}
@@ -144,8 +161,8 @@ void AEnemy::UpdateHealthbarPosition()
 
 	if (TemporaryHPBarInstance1)
 	{
-		bool Projected1 = UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(GetWorld(), 0),SocketPosition, Screen1Position, true);
-		if(Projected1)
+		bool Projected1 = UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(GetWorld(), 0), SocketPosition, Screen1Position, true);
+		if (Projected1)
 		{
 			TemporaryHPBarInstance1->SetPositionInViewport(Screen1Position);
 		}

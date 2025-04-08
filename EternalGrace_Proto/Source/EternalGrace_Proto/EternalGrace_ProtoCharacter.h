@@ -262,9 +262,7 @@ public:
 
 
 	 virtual void Landed(const FHitResult& Hit)override;
-
-	 UFUNCTION()
-	 void ShowEnemyHealthBar(ACharacterBase* Enemy);
+	 void SetCurrentActionState(EActionState ActionState)override;
 
 };
 

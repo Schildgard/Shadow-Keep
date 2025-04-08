@@ -13,6 +13,7 @@
  */
 class UValueBarWidgetBase;
 class UWidgetComponent;
+class UDespawningValueBarWidget;
 class UStaggerComponent; // todo: Make that CharacterBase has a stagger component
 UCLASS()
 class ETERNALGRACE_PROTO_API AEnemy : public ANPCBase, public IStaggerable
@@ -37,13 +38,13 @@ protected:
 
 	//This pointers are used to project the HPBar of the Enemy to both players independently
 	UPROPERTY()
-	UValueBarWidgetBase* TemporaryHPBarInstance1;
+	UDespawningValueBarWidget* TemporaryHPBarInstance1;
 
 	UPROPERTY()
-	UValueBarWidgetBase* TemporaryHPBarInstance2;
+	UDespawningValueBarWidget* TemporaryHPBarInstance2;
 
 	UFUNCTION()
-	UValueBarWidgetBase* ShowTemporaryBar(int PlayerIndex);
+	UDespawningValueBarWidget* ShowTemporaryBar(int PlayerIndex);
 
 	UFUNCTION()
 	void UpdateTemporaryHPBarValues();

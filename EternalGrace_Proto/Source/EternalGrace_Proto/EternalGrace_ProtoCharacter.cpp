@@ -127,7 +127,8 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 	{
 	case EActionState::Running: //if Running, perform running Attack
 		CancelSprint();
-		CurrentActionState = EActionState::Attacking;
+		SetCurrentActionState(EActionState::Attacking);
+		//CurrentActionState = EActionState::Attacking;
 		EGAnimInstance->Montage_Play(WeaponComponent->RunningAttack, true);
 		break;
 	case EActionState::Jumping: //if in Midair, do Nothing. Maybe implement JumpAttacks later.
@@ -152,7 +153,7 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 		InputBufferingComponent->SaveInput(EInputType::NormalAttack);
 		break;
 	default:
-		CurrentActionState = EActionState::Attacking;
+		SetCurrentActionState(EActionState::Attacking);
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
 		break;
 	}
@@ -160,8 +161,7 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 
 void AEternalGrace_ProtoCharacter::PerformDodgeAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Trigger Dodge Attack"))
-		SetCurrentActionState(EActionState::Attacking);
+	SetCurrentActionState(EActionState::Attacking);
 	EGAnimInstance->Montage_Play(WeaponComponent->DodgeAttack, true);
 }
 
@@ -173,7 +173,6 @@ void AEternalGrace_ProtoCharacter::PerformOffhandAction()
 	{
 	case EActionState::Idle: //if in Idle, go into Guard Pose
 		SetCurrentActionState(EActionState::Guarding);
-		EGAnimInstance->SetActionState(EActionState::Guarding);
 		break;
 	case EActionState::Attacking: //if attacking, check if an offhand attack can be performed and perform or buffer if necessary
 		if (!WeaponComponent->OffhandAttack || !EGAnimInstance->bCanOffhandAttack) return;
@@ -183,11 +182,11 @@ void AEternalGrace_ProtoCharacter::PerformOffhandAction()
 			return;
 		}
 		EGAnimInstance->Montage_Play(WeaponComponent->OffhandAttack, true);
+		break;
 	case EActionState::Climbing:
 		InputBufferingComponent->SaveInput(EInputType::OffhandAttack);
 		break;
-		break;
-	default: //Offhand can only be used while Idle(Includes running, not sprinting) or Attacking
+	default:
 		break;
 	}
 
@@ -212,8 +211,7 @@ void AEternalGrace_ProtoCharacter::CancelSprint()
 {
 	if (CurrentActionState == EActionState::Running)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Trigger Cancel Run"))
-			CurrentActionState = EActionState::Idle;
+		SetCurrentActionState(EActionState::Idle);
 		GetCharacterMovement()->MaxWalkSpeed = 250.f;
 	}
 }
@@ -236,7 +234,6 @@ void AEternalGrace_ProtoCharacter::SwitchTarget(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	LockOnComponent->FilterTargetsByDirection(LookAxisVector.X);
-	UE_LOG(LogTemp, Display, TEXT("Value is %f"), LookAxisVector.X);
 }
 
 void AEternalGrace_ProtoCharacter::BeginPlay()
@@ -262,7 +259,7 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	//Health
 	if (HealthComponent)
 	{
-		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World,PlayerIndex));
+		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World, PlayerIndex));
 	}
 
 }
@@ -307,6 +304,7 @@ void AEternalGrace_ProtoCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 		EnhancedInputComponent->BindAction(NormalAttackAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::NormalAttack);
 		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::PerformOffhandAction);
 		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Completed, this, &AEternalGrace_ProtoCharacter::CancelGuard);
+		EnhancedInputComponent->BindAction(NormalOffhandAction, ETriggerEvent::Canceled, this, &AEternalGrace_ProtoCharacter::CancelGuard);
 
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AEternalGrace_ProtoCharacter::Sprint);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AEternalGrace_ProtoCharacter::CancelSprint);
@@ -423,10 +421,8 @@ void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
 			break;
 		case EInputType::Jump:
 			Jump();
-			UE_LOG(LogTemp, Warning, TEXT("TriggeredJump Input"));
 			break;
 		case EInputType::DodgeAttack:
-			UE_LOG(LogTemp, Warning, TEXT("Command Dodge Attack"))
 				PerformDodgeAttack();
 			break;
 		default:
@@ -551,13 +547,6 @@ void AEternalGrace_ProtoCharacter::Landed(const FHitResult& Hit)
 	SetCurrentActionState(EActionState::Idle);
 }
 
-void AEternalGrace_ProtoCharacter::ShowEnemyHealthBar(ACharacterBase* Enemy)
-{
-//	TSubclassOf<UValueBarWidgetBase> HPBarClass = *Enemy->GetHealthComponent()->GetHPBarClass();
-//	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(World, PlayerIndex);
-//	UValueBarWidgetBase* EnemyHPBar = CreateWidget<UValueBarWidgetBase>(PlayerController, *HPBarClass);
-}
-
 void AEternalGrace_ProtoCharacter::Move(const FInputActionValue& Value)
 {
 	if (CurrentActionState != EActionState::Climbing)
@@ -668,7 +657,6 @@ void AEternalGrace_ProtoCharacter::Interact_Implementation()
 		{
 			IInteractable::Execute_GetInteractedWith(CurrentInteractable, this);
 			IPlayable::Execute_HideInteractUI(this);
-			//Execute_SaveData(this);
 		}
 		else
 		{
@@ -776,15 +764,19 @@ void AEternalGrace_ProtoCharacter::PlayFootStepSound(FName FootSocket)
 	}
 }
 
+void AEternalGrace_ProtoCharacter::SetCurrentActionState(EActionState ActionState)
+{
+	Super::SetCurrentActionState(ActionState);
+	EGAnimInstance->SetActionState(ActionState);
+}
+
 
 void AEternalGrace_ProtoCharacter::CancelGuard()
 {
-	//Change this, so the AnimInstance does not always has to be manually set....
+	//This is only triggered when Guard Button is let off of
 	if (CurrentActionState == EActionState::Guarding)
 	{
-		Super::CancelGuard();
-		EGAnimInstance->SetActionState(EActionState::Idle);
-		UE_LOG(LogTemp, Error, TEXT("Trigger Cancel Block State"));
+		SetCurrentActionState(EActionState::Idle);
 	}
 }
 

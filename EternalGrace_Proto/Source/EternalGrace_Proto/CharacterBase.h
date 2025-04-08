@@ -102,7 +102,7 @@ public:
 	virtual void CancelGuard();
 
 	UFUNCTION(BlueprintCallable)
-	void SetCurrentActionState(EActionState ActionState);
+	virtual void SetCurrentActionState(EActionState ActionState);
 
 	//FootSteps
 	UFUNCTION(BlueprintCallable)

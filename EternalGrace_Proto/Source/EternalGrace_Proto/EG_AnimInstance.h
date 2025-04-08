@@ -23,8 +23,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta =(AllowPrivateAccess))
 	EWeaponType WeaponClass;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess))
-	EActionState CharacterActionState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
 	AEternalGrace_ProtoCharacter* OwningCharacter;
@@ -32,6 +30,8 @@ protected:
 	void NativeBeginPlay()override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "States", meta = (AllowPrivateAccess))
+	EActionState CharacterActionState; //Inherited Class also has "Current Action State" - remove that one!
 	UFUNCTION()
 	void SetWeaponType(EWeaponType NewWeaponClass);
 	UFUNCTION()
