@@ -95,12 +95,15 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 		{
 			AActor* HittedActor = Hit.GetActor();
 			if (!HittedActor|| IgnoreList.Contains(HittedActor))return;
-			UE_LOG(LogTemp, Display, TEXT("Hitted %s"), *HittedActor->GetFName().ToString())
 
 				IgnoreList.Add(HittedActor);
 
 			UNiagaraSystem* HitNiagara;
 			//Check if Hitted Actor Implements Interface. Determine wether to use weapons environmental hit properties or hittable targets properties.
+			if(HittedActor->Implements<UAggroable>())
+			{
+				IAggroable::Execute_RaiseAggro(HittedActor,AttackingActor, ThreatValue);
+			}
 			if (HittedActor->Implements<UDamageable>())
 			{
 				HitNiagara = IDamageable::Execute_GetHitEffectSystem(HittedActor);
@@ -110,10 +113,6 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 			{
 				HitNiagara = *HitReactionMap.Find(WeaponElement); // TO Do: Change the way to determine the hit effect..maybe datatables ?
 				AudioComponent = AttackingWeapon->GetAudioComponent(); //This AudioComponnet is only used for Hit on Environment Sound
-			}
-			if(HittedActor->Implements<UAggroable>())
-			{
-				IAggroable::Execute_RaiseAggro(HittedActor,AttackingActor, ThreatValue);
 			}
 
 
@@ -133,10 +132,6 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 			if (*AttackingWeapon->GetCameraShakeComponent()->CameraShake)
 			{
 				AttackingWeapon->GetCameraShakeComponent()->Start();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("No Camera Shake (WeaponSwingNotify)"));
 			}
 		}
 	}

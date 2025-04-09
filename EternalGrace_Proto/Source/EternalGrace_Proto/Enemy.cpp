@@ -38,7 +38,7 @@ void AEnemy::Tick(float DeltaSeconds)
 
 void AEnemy::NoticePlayer(APawn* SpottedPawn)
 {
-	if (!NoticedPlayer && NoticePlayerSound)
+	if (!NoticedPlayer && NoticePlayerSound && bIsAlive)
 	{
 		VoiceComponent->SetSound(NoticePlayerSound);
 		VoiceComponent->Play();

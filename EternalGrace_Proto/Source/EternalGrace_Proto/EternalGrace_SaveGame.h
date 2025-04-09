@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PlayerSaveData.h"
 #include "TreasureChestSaveData.h"
+#include "NPCSaveDataInfoBase.h"
 #include "GameFramework/SaveGame.h"
 #include "EternalGrace_SaveGame.generated.h"
 
@@ -25,6 +26,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Groups", meta = (AllowPrivateAccess))
 	TMap<FName, FTreasureChestSaveData> TreasureChestSaveDataMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Groups", meta = (AllowPrivateAccess))
+	TMap<FName, FNPCSaveDataInfoBase> NPCSaveDataMap;
 
 
 	//General Game Settings Data
@@ -55,6 +59,8 @@ public:
 	bool CheckSaveDataMap(FName ObjectID, FPlayerSaveData PlayerData);
 	UFUNCTION()
 	bool CheckTreasureSaveDataMap(FName ObjectID, FTreasureChestSaveData TreasureData);
+	UFUNCTION()
+	bool CheckNPCSaveDataMap(FName ObjetID, FNPCSaveDataInfoBase NPCData);
 
 	UFUNCTION()
 	void SetPlayerMap(TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> PlayerMap);
@@ -64,14 +70,19 @@ public:
 
 	UFUNCTION()
 	void SavePlayerData(FName ObjectID, FPlayerSaveData NewSaveData);
+	UFUNCTION()
+	void SaveTreasureChestData(FName ObjectID, FTreasureChestSaveData NewSaveData);
+	UFUNCTION()
+	void SaveNPCData(FName ObjectID, FNPCSaveDataInfoBase NewSaveData);
+
 
 	
 	FPlayerSaveData* LoadPlayerData(FName ObjectID);
 	
 	FTreasureChestSaveData* LoadTreasureChestData(FName ObjectID);
 
-	UFUNCTION()
-	void SaveTreasureChestData(FName ObjectID, FTreasureChestSaveData NewSaveData);
+	FNPCSaveDataInfoBase* LoadNPCData(FName ObjectID);
+
 
 	
 };

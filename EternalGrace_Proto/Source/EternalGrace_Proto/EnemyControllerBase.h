@@ -20,5 +20,10 @@ protected:
 	UBehaviorTree* BehaviourTree;
 
 	void BeginPlay()override;
+
+public:
+
+	UFUNCTION()
+	UBehaviorTree* GetBehaviorTree();
 	
 };

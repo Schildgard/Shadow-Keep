@@ -8,7 +8,10 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "WeaponComponent.h"
-
+#include "EnemyControllerBase.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "Saveable.h"
+#include "EternalGrace_SaveGame.h"
 
 ANPCBase::ANPCBase()
 {
@@ -17,14 +20,26 @@ ANPCBase::ANPCBase()
 	AIController = nullptr;
 	bIsHostile = false;
 	AttackRange = 150.f;
+	bIsAlive = true;
 }
 
 void ANPCBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ISaveable::Execute_LoadData(this);
+	bIsAlive = SaveDataInfo.bIsAlive;
+	if (!bIsAlive)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Destroy this NPC because it is deafeted"));
+		Destroy();
+		return;
+	}
+
+
 	SensingComponent->OnSeePawn.AddDynamic(this, &ANPCBase::NoticePlayer);
 
-	AIController = Cast<AAIController>(GetController());
+	AIController = Cast<AEnemyControllerBase>(GetController());
 	if (!AIController)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Enemy failed to get AI Controller(NPC Base Class)"));
@@ -37,7 +52,7 @@ void ANPCBase::BeginPlay()
 		return;
 	}
 	AnimationInstance = GetMesh()->GetAnimInstance();
-	if(!AnimationInstance)
+	if (!AnimationInstance)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Enemy failed to get AnimationInstance (NPC Base Class)"));
 		return;
@@ -52,23 +67,17 @@ void ANPCBase::Tick(float DeltaSeconds)
 	if (NoticedPlayer && bIsHostile)
 	{
 		BlackboardComponent->SetValueAsBool("bIsInAttackRange", CheckDistanceToPlayer() <= AttackRange);
-		if(CheckDistanceToPlayer() > AttackRange)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Current Distance is %f from attackrange : %f"), CheckDistanceToPlayer(), AttackRange)
-		}
-		
 	}
 }
 
 void ANPCBase::NoticePlayer(APawn* SpottedPawn)
 {
-	if (!NoticedPlayer)
+	if (bIsAlive && !NoticedPlayer)
 	{
 		NoticedPlayer = Cast<ACharacter>(SpottedPawn);
 		if (NoticedPlayer)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s Spotted %s"), *GetFName().ToString(), *NoticedPlayer->GetFName().ToString())
-				BlackboardComponent->SetValueAsObject("TargetPlayer", NoticedPlayer);
+			BlackboardComponent->SetValueAsObject("TargetPlayer", NoticedPlayer);
 		}
 	}
 }
@@ -91,11 +100,11 @@ void ANPCBase::Attack_Implementation()
 	{
 		int AttackIndex = UKismetMathLibrary::RandomIntegerInRange(0, NormalAttackArray.Num() - 1);
 		UE_LOG(LogTemp, Error, TEXT("Attack Index is %i"), AttackIndex)
-		AnimationInstance->Montage_Play(NormalAttackArray[AttackIndex]);
+			AnimationInstance->Montage_Play(NormalAttackArray[AttackIndex]);
 
-	//	FOnMontageEnded AttackEndDelegate;
-	//	AttackEndDelegate.BindUObject(this, &ANPCBase::ResetAttackState);
-	//	AnimationInstance->Montage_SetEndDelegate(AttackEndDelegate, NormalAttackArray[AttackIndex]);
+		//	FOnMontageEnded AttackEndDelegate;
+		//	AttackEndDelegate.BindUObject(this, &ANPCBase::ResetAttackState);
+		//	AnimationInstance->Montage_SetEndDelegate(AttackEndDelegate, NormalAttackArray[AttackIndex]);
 
 	}
 	else
@@ -104,46 +113,92 @@ void ANPCBase::Attack_Implementation()
 	}
 }
 
+void ANPCBase::SaveData_Implementation()
+{
+	Super::SaveData_Implementation();
+	SaveGameObject->SaveNPCData(ObjectID, SaveDataInfo);
+}
+
+void ANPCBase::LoadData_Implementation()
+{
+	Super::LoadData_Implementation();
+	FNPCSaveDataInfoBase* SavedData = SaveGameObject->LoadNPCData(ObjectID);
+	if (SavedData)
+	{
+		SaveDataInfo = *SaveGameObject->LoadNPCData(ObjectID);
+	}
+}
+
+void ANPCBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
+{
+	if(!bIsAlive)
+	{
+		return;
+	}
+	Super::GetDamage_Implementation(Attacker, DamageValue, PoiseDamage, Direction);
+}
+
 void ANPCBase::ResetAttackState(UAnimMontage* AttackAnimation, bool Interrupted)
 {
 	BlackboardComponent->SetValueAsBool("bCanAttack", true);
-	UE_LOG(LogTemp, Error, TEXT("Reseted its AttackState %s"), *GetFName().ToString())
-}
-
-void ANPCBase::ResetAttackState2()
-{
-	BlackboardComponent->SetValueAsBool("bCanAttack", true);
-	UE_LOG(LogTemp, Error, TEXT("Reseted its AttackState %s"), *GetFName().ToString())
 }
 
 void ANPCBase::RaiseAggro_Implementation(AActor* Attacker, float AggroValue)
 {
-
-	if(AggroList.Contains(Attacker))
+	if (!bIsAlive)
 	{
-	 AggroList[Attacker] += AggroValue;
-	 UE_LOG(LogTemp, Error, TEXT("Added Aggro!"))
+		return;
+	}
+
+	if (AggroList.Contains(Attacker))
+	{
+		AggroList[Attacker] += AggroValue;
 	}
 	else
 	{
 		AggroList.Add(Attacker, AggroValue);
-		UE_LOG(LogTemp, Error, TEXT("New Challenger!"))
 	}
 
-	 AActor* HighestAggroActor = nullptr;
-	 float HighestAggroValue = 0;
-	 for(TPair<AActor*, float> AggroCandidate : AggroList)
-	 {
-		 if(AggroCandidate.Value > HighestAggroValue)
-		 {
-			 HighestAggroActor = AggroCandidate.Key;
-			 HighestAggroValue = AggroCandidate.Value;
-		 }
-	 }
-	 if(HighestAggroActor && NoticedPlayer!=HighestAggroActor)
-	 {
-		 UE_LOG(LogTemp, Error, TEXT("Change Aggro!"))
-	 NoticedPlayer = Cast<ACharacter>(HighestAggroActor);
-		 BlackboardComponent->SetValueAsObject("TargetPlayer", NoticedPlayer);
-	 }
+	AActor* HighestAggroActor = nullptr;
+	float HighestAggroValue = 0;
+	for (TPair<AActor*, float> AggroCandidate : AggroList)
+	{
+		if (AggroCandidate.Value > HighestAggroValue)
+		{
+			HighestAggroActor = AggroCandidate.Key;
+			HighestAggroValue = AggroCandidate.Value;
+		}
+	}
+	if (HighestAggroActor && NoticedPlayer != HighestAggroActor)
+	{
+		NoticedPlayer = Cast<ACharacter>(HighestAggroActor);
+		BlackboardComponent->SetValueAsObject("TargetPlayer", NoticedPlayer);
+		AIController->SetFocus(HighestAggroActor, EAIFocusPriority::Gameplay);
+	}
+}
+
+void ANPCBase::Die_Implementation()
+{
+
+	if (!bIsAlive)
+	{
+		return;
+	}
+	Super::Die_Implementation();
+
+
+	AIController->StopMovement();
+	BlackboardComponent->SetValueAsObject("TargetPlayer", nullptr);
+	AIController->SetFocus(nullptr);
+
+	bIsAlive = false;
+	SaveDataInfo.bIsAlive = false;
+	BlackboardComponent->SetValueAsBool("bIsAlive", false);
+
+	NoticedPlayer = nullptr;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	ISaveable::Execute_SaveData(this);
+
 }

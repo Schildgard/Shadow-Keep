@@ -136,9 +136,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer", meta = (AllowPrivateAccess))
 	int32 PlayerIndex;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess))
-	FName ObjectID;
-
 	UPROPERTY()
 	FPlayerSaveData SaveDataInfo;
 

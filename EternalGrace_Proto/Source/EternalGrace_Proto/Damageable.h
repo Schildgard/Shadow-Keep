@@ -30,4 +30,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	UNiagaraSystem* GetHitEffectSystem();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
 };

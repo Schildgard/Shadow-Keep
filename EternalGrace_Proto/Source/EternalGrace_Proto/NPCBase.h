@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CharacterBase.h"
 #include "Aggroable.h"
+#include "NPCSaveDataInfoBase.h"
 #include "NPCBase.generated.h"
 
 /**
@@ -14,6 +15,7 @@ class AAIController;
 class UWeaponComponent;
 class UBlackboardComponent;
 class UPawnSensingComponent;
+class AEnemyControllerBase;
 UCLASS()
 class ETERNALGRACE_PROTO_API ANPCBase : public ACharacterBase, public IAggroable
 {
@@ -30,7 +32,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess))
 	UPawnSensingComponent* SensingComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess))
-	AAIController* AIController;
+	AEnemyControllerBase* AIController;
 	UPROPERTY()
 	bool bIsHostile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
@@ -54,6 +56,9 @@ protected:
 	UPROPERTY()
 	UAnimInstance* AnimationInstance;
 
+	UPROPERTY()
+	bool bIsAlive;
+
 	UFUNCTION()
 	virtual void NoticePlayer(APawn* SpottedPawn);
 	UFUNCTION()
@@ -61,14 +66,21 @@ protected:
 
 	virtual void Attack_Implementation()override;
 
+	virtual void SaveData_Implementation()override;
+	virtual void LoadData_Implementation()override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
+
 	//In Case for Delegate
 	UFUNCTION()
 	void ResetAttackState(UAnimMontage* AttackAnimation, bool Interrupted);
+
+	UPROPERTY()
+	FNPCSaveDataInfoBase SaveDataInfo;
 public:
 	//Test for Blueprint
-	UFUNCTION(BlueprintCallable)
-	void ResetAttackState2();
+
 
 	virtual void RaiseAggro_Implementation(AActor* Attacker, float AggroValue);
+	virtual void Die_Implementation()override;
 	
 };

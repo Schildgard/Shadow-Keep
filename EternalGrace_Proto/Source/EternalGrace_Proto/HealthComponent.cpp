@@ -16,6 +16,7 @@ UHealthComponent::UHealthComponent()
 
 	MaxHealth = 1000.f;
 	CurrentHealth = MaxHealth;
+	DeathAnimation = nullptr;
 }
 
 
@@ -94,5 +95,10 @@ void UHealthComponent::UpdateHPBar()
 float UHealthComponent::GetMaxHealth()
 {
 	return MaxHealth;
+}
+
+UAnimMontage* UHealthComponent::GetDeathAnimation()
+{
+	return DeathAnimation;
 }
 

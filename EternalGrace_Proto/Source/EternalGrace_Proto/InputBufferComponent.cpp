@@ -19,7 +19,6 @@ void UInputBufferComponent::BeginPlay()
 }
 
 
-// Called every frame
 void UInputBufferComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -28,7 +27,6 @@ void UInputBufferComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		Timer -= DeltaTime;
 		if (Timer <= 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Input Component resets Timer"))
 			InputBuffer = EInputType::NoInput;
 			Timer = BufferTime;
 			SetComponentTickEnabled(false);
@@ -38,7 +36,6 @@ void UInputBufferComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UInputBufferComponent::SaveInput(EInputType Input)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Input Component Saves Input"))
 	if (Input != EInputType::NoInput)
 	{
 		SetComponentTickEnabled(true);

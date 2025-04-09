@@ -37,6 +37,9 @@ protected:
 	UPROPERTY()
 	UValueBarWidgetBase* HPBar;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Health", meta = (AllowPrivateAccess))
+	UAnimMontage* DeathAnimation;
+
 	UPROPERTY()
 	TArray<UValueBarWidgetBase*> TemporaryHPBars;
 
@@ -66,6 +69,9 @@ public:
 
 	UFUNCTION()
 	float GetMaxHealth();
+
+	UFUNCTION()
+	UAnimMontage* GetDeathAnimation();
 
 		
 };

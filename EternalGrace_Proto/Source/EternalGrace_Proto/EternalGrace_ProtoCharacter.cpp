@@ -201,7 +201,6 @@ void AEternalGrace_ProtoCharacter::Sprint()
 {
 	if (CurrentActionState == EActionState::Idle)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Trigger run"))
 			CurrentActionState = EActionState::Running;
 		GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	}
@@ -401,7 +400,6 @@ void AEternalGrace_ProtoCharacter::EquipOffhandWeapon(TSubclassOf<AWeaponBase> W
 
 void AEternalGrace_ProtoCharacter::FireBufferedInput(EInputType BufferedInput)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Command Fire Buffered Input"))
 		switch (BufferedInput)
 		{
 		case EInputType::NormalAttack:
@@ -470,13 +468,11 @@ void AEternalGrace_ProtoCharacter::ClimpCheckUpward(FVector WallLocation, FVecto
 
 	if (bHitScan)
 	{
-		//	UE_LOG(LogTemp, Error, TEXT("Hitted Ledge of %s"), *Hit.GetActor()->GetFName().ToString())
 		FVector SocketLocation = GetMesh()->GetSocketLocation("s_climp");
 
 		float HeightDistance = SocketLocation.Z - Hit.Location.Z;
 		if (UKismetMathLibrary::InRange_FloatFloat(HeightDistance, -65.f, 0, true, true) && CurrentActionState != EActionState::Climbing)
 		{
-			//	UE_LOG(LogTemp, Display, TEXT("Climpable!"))
 			HangOnLedge(WallLocation, WallNormal, Hit.Location);
 		}
 	}
@@ -504,9 +500,9 @@ void AEternalGrace_ProtoCharacter::HangOnLedge(FVector SnappingPosition, FVector
 
 	FLatentActionInfo ActionInfo;
 	ActionInfo.CallbackTarget = this;
-	ActionInfo.ExecutionFunction = FName("Climp");
-	ActionInfo.Linkage = 0;
-	ActionInfo.UUID = __LINE__;
+	//ActionInfo.ExecutionFunction = FName("Climp");
+	//ActionInfo.Linkage = 0;
+	//ActionInfo.UUID = __LINE__;
 
 	UGameplayStatics::PlaySoundAtLocation(World, AttachToWallSound, TargetLocation);
 	UKismetSystemLibrary::MoveComponentTo(Capsule, TargetLocation, TargetRotation, true, true, 0.1f, false, EMoveComponentAction::Move, ActionInfo);
@@ -616,7 +612,7 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 	SaveGameObject = CurrentGameInstance->GetCurrentSaveGame();
 	if (SaveGameObject)
 	{
-		UE_LOG(LogTemp, Error, TEXT("CUrrentSaveGamesName is %s"), *SaveGameObject->SlotID);
+		UE_LOG(LogTemp, Error, TEXT("CurrentSaveGamesName is %s"), *SaveGameObject->SlotID);
 		FPlayerSaveData* SaveData = SaveGameObject->LoadPlayerData(ObjectID);
 		if (SaveData)
 		{

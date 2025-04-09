@@ -17,3 +17,8 @@ void AEnemyControllerBase::BeginPlay()
 		
 	}
 }
+
+UBehaviorTree* AEnemyControllerBase::GetBehaviorTree()
+{
+	return BehaviourTree;
+}

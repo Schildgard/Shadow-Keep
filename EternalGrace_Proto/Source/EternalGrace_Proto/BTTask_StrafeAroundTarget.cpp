@@ -32,7 +32,7 @@ EBTNodeResult::Type UBTTask_StrafeAroundTarget::ExecuteTask(UBehaviorTreeCompone
 	AnimInstance = Cast<UCharacterAnimInstanceBase>(AICharacter->GetMesh()->GetAnimInstance());
 	if(!AnimInstance) return EBTNodeResult::Failed;
 
-	AIController->SetFocus(TargetActor);
+	AIController->SetFocus(TargetActor, EAIFocusPriority::Gameplay);
 	AICharacter->GetCharacterMovement()->MaxWalkSpeed = 125.f;
 	AnimInstance->CurrentActionState = EActionState::Strafing;
 

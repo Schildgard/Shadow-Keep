@@ -97,6 +97,13 @@ void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValu
 
 	HealthComponent->GetDamage(Attacker, DamageValue, PoiseDamage, Direction);
 	HealthComponent->UpdateHPBar();
+
+	if(HealthComponent->CurrentHealth <= 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s call Die Implementation"), *GetFName().ToString())
+		HealthComponent->CurrentHealth = 0;
+		IDamageable::Execute_Die(this);
+	}
 }
 
 UNiagaraSystem* ACharacterBase::GetHitEffectSystem_Implementation()
@@ -107,6 +114,15 @@ UNiagaraSystem* ACharacterBase::GetHitEffectSystem_Implementation()
 UAudioComponent* ACharacterBase::GetHitSoundComponent_Implementation()
 {
 	return HealthComponent->GetHitSoundComponent();
+}
+
+void ACharacterBase::Die_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s is defeated"), *GetFName().ToString())
+	if(HealthComponent && HealthComponent->GetDeathAnimation())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(HealthComponent->GetDeathAnimation());
+	}
 }
 
 TArray<TEnumAsByte<EObjectTypeQuery>> ACharacterBase::GetHittableObjectTypes_Implementation()

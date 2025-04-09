@@ -48,6 +48,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
 	UAudioComponent* VoiceComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess))
+	FName ObjectID;
+
 	//Save Interface Implementations
 	UFUNCTION(CallInEditor, Category = "SaveGame")
 	virtual void SaveData_Implementation()override;
@@ -80,6 +83,8 @@ protected:
 	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	UFUNCTION()
 	UAudioComponent* GetHitSoundComponent_Implementation()override;
+	UFUNCTION()
+	virtual void Die_Implementation()override;
 
 
 
