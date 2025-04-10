@@ -328,5 +328,25 @@ void UEternalGrace_GameInstance::SavePlayerData()
 	}
 
 }
+/*This Function is used when returning to Main Menu*/
+void UEternalGrace_GameInstance::ResetGameStatus(UWorld* LoadedWorld)
+{
+	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+	bIsMultiplayerActivated = false;
+	bHasMultiplayerBeenSet = false;
+	PlayerMap.Empty();
+	APlayerController* SecondPlayerController = UGameplayStatics::GetPlayerController(LoadedWorld, 1);
+	if(SecondPlayerController)
+	{
+		//UGameplayStatics::RemovePlayer(SecondPlayerController, false);
+		RemoveLocalPlayer(GetLocalPlayerByIndex(1));
+		//SecondPlayerController->Destroy();
+		UE_LOG(LogTemp, Error, TEXT("Destroyed second player controller (GameInstance)"))
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("failed to get second player controller (GameInstance)"))
+	}
+}
 
 

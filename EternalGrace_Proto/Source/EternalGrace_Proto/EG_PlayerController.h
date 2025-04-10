@@ -14,6 +14,7 @@ class UInventory;
 class UButton;
 class UInventorySlot;
 class UObtainWidget;
+class UBlendingWidget;
 class UItemObtainContainerWidget;
 UCLASS()
 class ETERNALGRACE_PROTO_API AEG_PlayerController : public APlayerController
@@ -55,7 +56,21 @@ protected:
 	UPROPERTY()
 	UUserWidget* InteractInfoWidget;
 
+	//DEATH HANDLING
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User Interface", meta = (AllowPrivateAccess))
+	TSubclassOf<UUserWidget> YouDiedScreenClass;
+	UPROPERTY()
+	UBlendingWidget* YouDiedWidget;
+
+
+
 public:
+	UFUNCTION()
+	void ShowYouDiedScreen();
+	UFUNCTION()
+	void HideYouDiedScreen();
+	UFUNCTION()
+	void HandlePlayerDeath(UEternalGrace_GameInstance* CurrentGameInstance);
 
 	UFUNCTION()
 	void ShowInventory();
@@ -72,5 +87,7 @@ public:
 
 	UFUNCTION()
 	void ShowObtainWidget(FName ObjectID, TSoftObjectPtr<UTexture2D> ItemImage);
-	
+
+	UFUNCTION()
+	void ReturnToMainMenu();
 };

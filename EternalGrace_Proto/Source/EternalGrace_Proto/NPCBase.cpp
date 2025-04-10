@@ -15,12 +15,16 @@
 
 ANPCBase::ANPCBase()
 {
+	AnimationInstance = nullptr;
+	BlackboardComponent = nullptr;
+	NoticedPlayer = nullptr;
 	SensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("Sensing");
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon");
 	AIController = nullptr;
 	bIsHostile = false;
 	AttackRange = 150.f;
 	bIsAlive = true;
+	StopChasingTimer = MaxChasingTime;
 }
 
 void ANPCBase::BeginPlay()
@@ -58,6 +62,8 @@ void ANPCBase::BeginPlay()
 		return;
 	}
 
+	BlackboardComponent->SetValueAsVector("StartPosition", GetActorLocation());
+
 }
 
 void ANPCBase::Tick(float DeltaSeconds)
@@ -66,7 +72,17 @@ void ANPCBase::Tick(float DeltaSeconds)
 
 	if (NoticedPlayer && bIsHostile)
 	{
-		BlackboardComponent->SetValueAsBool("bIsInAttackRange", CheckDistanceToPlayer() <= AttackRange);
+		/*Check Distance to Player and Update IsInAttackRangeBool. If Enemy is too long out of reach, it returns to its Initial Position and leaves Battle*/
+		float DistanceToTarget = CheckDistanceToPlayer();
+		BlackboardComponent->SetValueAsBool("bIsInAttackRange", DistanceToTarget <= AttackRange);
+		if(DistanceToTarget >= AttackRange)
+		{
+			MakeEnemyCeasyFromChasing(DeltaSeconds);
+		}
+		else if (StopChasingTimer < MaxChasingTime)
+		{
+			StopChasingTimer = MaxChasingTime;
+		}
 	}
 }
 
@@ -89,6 +105,16 @@ float ANPCBase::CheckDistanceToPlayer()
 	FVector DistanceVector = TargetLocation - ActorLocation;
 	float Distance = DistanceVector.Length();
 	return Distance;
+}
+
+void ANPCBase::MakeEnemyCeasyFromChasing(float DeltaSeconds)
+{
+	StopChasingTimer -= DeltaSeconds;
+	if (StopChasingTimer <= 0)
+	{
+		BlackboardComponent->SetValueAsObject("TargetPlayer", nullptr);
+		AIController->SetFocus(nullptr);
+	}
 }
 
 void ANPCBase::Attack_Implementation()
@@ -129,13 +155,14 @@ void ANPCBase::LoadData_Implementation()
 	}
 }
 
-void ANPCBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
+void ANPCBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)
 {
 	if(!bIsAlive)
 	{
 		return;
 	}
-	Super::GetDamage_Implementation(Attacker, DamageValue, PoiseDamage, Direction);
+	Super::GetDamage_Implementation(Attacker, DamageValue, PoiseDamage, Direction, HitLocation, HitRotation);
+	StopChasingTimer = MaxChasingTime; /*Reset Chase Timer when getting Damage*/
 }
 
 void ANPCBase::ResetAttackState(UAnimMontage* AttackAnimation, bool Interrupted)

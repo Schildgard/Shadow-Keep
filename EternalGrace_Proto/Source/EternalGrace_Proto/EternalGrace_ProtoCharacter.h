@@ -124,6 +124,7 @@ protected:
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
 	//Damageable Implementations
+	virtual void Die_Implementation()override;
 	//Stagerable Implementation
 	virtual void Stagger_Implementation(EAttackDirection Direction, float PoiseDamage, AActor* DamageInstigator)override;
 	//FootStep Sound

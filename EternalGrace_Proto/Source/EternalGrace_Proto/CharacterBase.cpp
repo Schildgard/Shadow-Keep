@@ -91,11 +91,17 @@ void ACharacterBase::Attack_Implementation()
 	UE_LOG(LogTemp, Display, TEXT("%s perfoms an Attack"), *GetFName().ToString())
 }
 
-void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
+void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)
 {
 	//Check if here if Damage goes through Block or something
+	if(CurrentActionState == EActionState::Guarding && Direction == EAttackDirection::Front)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s Blocks Attack"), *GetFName().ToString())
+			return;
+	}
 
-	HealthComponent->GetDamage(Attacker, DamageValue, PoiseDamage, Direction);
+
+	HealthComponent->GetDamage(Attacker, DamageValue, PoiseDamage, Direction, HitLocation, HitRotation);
 	HealthComponent->UpdateHPBar();
 
 	if(HealthComponent->CurrentHealth <= 0)

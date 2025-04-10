@@ -98,7 +98,7 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 
 				IgnoreList.Add(HittedActor);
 
-			UNiagaraSystem* HitNiagara;
+			UNiagaraSystem* HitNiagara = nullptr;
 			//Check if Hitted Actor Implements Interface. Determine wether to use weapons environmental hit properties or hittable targets properties.
 			if(HittedActor->Implements<UAggroable>())
 			{
@@ -106,8 +106,8 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 			}
 			if (HittedActor->Implements<UDamageable>())
 			{
-				HitNiagara = IDamageable::Execute_GetHitEffectSystem(HittedActor);
-				IDamageable::Execute_GetDamage(HittedActor, AttackingActor, AttackingWeapon->PhysicalDamage, AttackingWeapon->PoiseDamage, GetAttackDirection(HittedActor));
+				FRotator HitRotation = FRotator(Hit.ImpactNormal.X, Hit.ImpactNormal.Y, Hit.ImpactNormal.Z);
+				IDamageable::Execute_GetDamage(HittedActor, AttackingActor, AttackingWeapon->PhysicalDamage, AttackingWeapon->PoiseDamage, GetAttackDirection(HittedActor), Hit.Location,HitRotation);
 			}
 			else
 			{

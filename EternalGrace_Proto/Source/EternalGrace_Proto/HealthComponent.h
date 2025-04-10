@@ -54,7 +54,7 @@ public:
 	UAudioComponent* GetHitSoundComponent();
 
 	UFUNCTION()
-	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction);
+	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation);
 
 	UFUNCTION()
 	void ShowHPBar(APlayerController* PlayerController);

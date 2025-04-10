@@ -78,13 +78,15 @@ protected:
 
 	//Damageable Interface Implementations
 	UFUNCTION()
-	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)override;
 	UFUNCTION()
 	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	UFUNCTION()
 	UAudioComponent* GetHitSoundComponent_Implementation()override;
+public:
 	UFUNCTION()
 	virtual void Die_Implementation()override;
+protected:
 
 
 

@@ -38,6 +38,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
 	float AttackRange;
 
+	float StopChasingTimer;
+	const float MaxChasingTime = 15.0f;
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, meta = (AllowPrivateAccess))
 	TArray<UAnimMontage*> NormalAttackArray;
 
@@ -63,12 +67,14 @@ protected:
 	virtual void NoticePlayer(APawn* SpottedPawn);
 	UFUNCTION()
 	float CheckDistanceToPlayer();
+	UFUNCTION()
+	void MakeEnemyCeasyFromChasing(float DeltaSeconds);
 
 	virtual void Attack_Implementation()override;
 
 	virtual void SaveData_Implementation()override;
 	virtual void LoadData_Implementation()override;
-	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)override;
 
 	//In Case for Delegate
 	UFUNCTION()

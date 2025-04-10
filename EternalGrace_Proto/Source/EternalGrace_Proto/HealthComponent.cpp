@@ -7,6 +7,7 @@
 #include "Staggerable.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "NiagaraFunctionLibrary.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -49,12 +50,14 @@ UAudioComponent* UHealthComponent::GetHitSoundComponent()
 	return HitSoundComponent;
 }
 
-void UHealthComponent::GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
+void UHealthComponent::GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)
 {
 	//Not Using OwningCharacter here, because of no particular reason. Might as well change this
 	AActor* Owner = GetOwner(); 
 	CurrentHealth -= DamageValue;
 		HitSoundComponent->Play();
+		//Insert Hit Niagara Effect Here
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, HitLocation,HitRotation);
 	if (OwningCharacter->Implements<UStaggerable>())
 	{
 		IStaggerable::Execute_Stagger(Owner, Direction, PoiseDamage, Attacker);

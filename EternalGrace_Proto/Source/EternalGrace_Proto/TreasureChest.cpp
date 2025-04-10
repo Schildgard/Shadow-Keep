@@ -153,7 +153,7 @@ void ATreasureChest::LoadData_Implementation()
 	}
 }
 
-void ATreasureChest::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction)
+void ATreasureChest::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)
 {
 	if (bCanbeActivated) return;
 	//GetDamage Enables the ChaosDestruction To Function
@@ -162,7 +162,7 @@ void ATreasureChest::GetDamage_Implementation(AActor* Attacker, float DamageValu
 	GeometryComponent->SetVisibility(true);
 	GeometryComponent->SetSimulatePhysics(true);
 
-//	GeometryComponent->ApplyExternalStrain(0, ImpactPoint, 100.0f, 1, 1.0f, 50000.0f);
+	GeometryComponent->ApplyExternalStrain(0, HitLocation, 100.0f, 1, 1.0f, 50000.0f);
 	GeometryComponent->ApplyLinearVelocity(0, Attacker->GetActorForwardVector() * DamageValue);
 	GeometryComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	

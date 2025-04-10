@@ -24,6 +24,14 @@ void ADefaultGameMode::BeginPlay()
 	if (CurrentGameInstance)
 	{
 		bIsTwoPlayerModeActivated = CurrentGameInstance->GetTwoPlayerMode();
+		if(bIsTwoPlayerModeActivated == true)
+		{
+		UE_LOG(LogTemp, Error, TEXT("Two Player Mode is Activated"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("One Player Mode is Activated"));
+		}
 	}
 	else
 	{

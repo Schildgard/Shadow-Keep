@@ -23,7 +23,7 @@ class ETERNALGRACE_PROTO_API IDamageable
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection);
+	void GetDamage(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection, FVector HitLocation, FRotator HitRotation);
 
 	UFUNCTION(BlueprintNativeEvent)
 	UAudioComponent* GetHitSoundComponent();

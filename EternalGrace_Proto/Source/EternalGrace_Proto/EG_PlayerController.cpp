@@ -15,13 +15,16 @@
 #include "ObtainWidget.h"
 #include "ItemObtainContainerWidget.h"
 #include "Components/StackBox.h"
+#include "BlendingWidget.h"
+#include "EternalGrace_GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 AEG_PlayerController::AEG_PlayerController()
 {
 	InventoryClass = nullptr;
 	InventorySlotClass = nullptr;
 	InventoryObjectButtonWidget = nullptr;
-	OwningCharacter = nullptr;
+	OwningCharacter = nullptr; // Owning Character is set by the Game Mode. It can not be setted in Begin Play because the Game Mode does spawn no default pawn.
 }
 
 void AEG_PlayerController::BeginPlay()
@@ -29,6 +32,44 @@ void AEG_PlayerController::BeginPlay()
 	Super::BeginPlay();
 }
 
+
+void AEG_PlayerController::ShowYouDiedScreen()
+{
+	if(YouDiedScreenClass)
+	{
+		YouDiedWidget = CreateWidget<UBlendingWidget>(this, YouDiedScreenClass);
+		if(YouDiedWidget)
+		{
+			//Intentionally dont add to PlayerScreen, because when Multiplayer this Widgets only pups up when both Players die
+			YouDiedWidget->AddToViewport();
+			YouDiedWidget->PlayAnimation(YouDiedWidget->BlendingAnimation);
+			DisableInput(this);
+			FWidgetAnimationDynamicEvent ReturnToMainMenuDelegate;
+			ReturnToMainMenuDelegate.BindDynamic(this, &AEG_PlayerController::ReturnToMainMenu);
+			YouDiedWidget->BindToAnimationFinished(YouDiedWidget->BlendOutAnimation, ReturnToMainMenuDelegate);
+			//Enable Input later
+		}
+	}
+}
+
+void AEG_PlayerController::HideYouDiedScreen()
+{
+	if(YouDiedWidget && YouDiedWidget->IsInViewport())
+	{
+		YouDiedWidget->RemoveFromRoot();
+	}
+}
+
+void AEG_PlayerController::HandlePlayerDeath(UEternalGrace_GameInstance* CurrentGameInstance)
+{
+	ShowYouDiedScreen();
+	//DELETE SAVEGAME
+	CurrentGameInstance->DeleteFile(CurrentGameInstance->GetActiveSaveGameSlot());
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(CurrentGameInstance, &UEternalGrace_GameInstance::ResetGameStatus);
+	//RESET GAMEINSTANCE VALUES
+	//CurrentGameInstance->ResetGameStatus();
+	//REMOVE Second Player Splitscreen
+}
 
 void AEG_PlayerController::ShowInventory()
 {
@@ -197,4 +238,12 @@ void AEG_PlayerController::ShowObtainWidget(FName ObjectID, TSoftObjectPtr<UText
 			ObtainedItemsContainer->StackBox->AddChildToStackBox(Obtain);
 		}
 	}
+}
+
+void AEG_PlayerController::ReturnToMainMenu()
+{
+	// Gets Calle via Delegate when Death Screen is finished Blending out
+	//Load MainMenu
+	UGameplayStatics::OpenLevel(GetWorld(), "Map_MainMenu");
+	EnableInput(this);
 }

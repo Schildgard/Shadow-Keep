@@ -15,6 +15,10 @@ ULockOnComponent::ULockOnComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	Visualizer = nullptr;
+	LockedOnTarget = nullptr;
+	LockingActor = nullptr;
+	OwningController = nullptr;
 
 	ValidObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
 	ValidObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
@@ -39,6 +43,11 @@ void ULockOnComponent::LockOnTarget()
 			else
 			{
 				Visualizer->SetColorAndOpacity(FLinearColor::Red);
+			}
+			if(!Visualizer)
+			{
+				UE_LOG(LogTemp, Error, TEXT("No Visualizer (LockOnComponent), return!!"))
+				return;
 			}
 		}
 		if (!Visualizer->IsInViewport())
@@ -111,6 +120,11 @@ ACharacterBase* ULockOnComponent::GetLockedOnTarget()
 
 void ULockOnComponent::ToggeLockOn()
 {
+	if (!OwningController)
+	{
+		OwningController = UGameplayStatics::GetPlayerController(GetWorld(), LockingActor->GetPlayerIndex());
+	}
+
 	if (LockedOnTarget)
 	{
 		UnlockTarget();
@@ -254,10 +268,6 @@ void ULockOnComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	LockingActor = Cast<AEternalGrace_ProtoCharacter>(GetOwner());
-	if (LockingActor)
-	{
-		OwningController = UGameplayStatics::GetPlayerController(GetWorld(), LockingActor->GetPlayerIndex());
-	}
 }
 
 void ULockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

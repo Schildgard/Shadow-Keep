@@ -33,7 +33,7 @@ protected:
 
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	virtual void Stagger_Implementation(EAttackDirection Direction, float PoiseDamage, AActor* DamageInstigator)override;
-	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection)override;
+	virtual void GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection, FVector HitLocation, FRotator HitRotation)override;
 
 
 	//This pointers are used to project the HPBar of the Enemy to both players independently

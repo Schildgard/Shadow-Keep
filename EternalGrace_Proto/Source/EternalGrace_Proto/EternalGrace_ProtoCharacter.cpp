@@ -189,7 +189,6 @@ void AEternalGrace_ProtoCharacter::PerformOffhandAction()
 	default:
 		break;
 	}
-
 }
 
 void AEternalGrace_ProtoCharacter::TriggerCurrentInteractable()
@@ -258,6 +257,7 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	//Health
 	if (HealthComponent)
 	{
+		/*Todo: Fix issue that Player Index is set in constructor. Because of this, that value will be used in begin play instead of the index set by gamemode after construction*/
 		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World, PlayerIndex));
 	}
 
@@ -718,6 +718,16 @@ AWeaponBase* AEternalGrace_ProtoCharacter::GetWeapon_Implementation()
 AWeaponBase* AEternalGrace_ProtoCharacter::GetOffhandWeapon_Implementation()
 {
 	return WeaponComponent->OffhandWeaponObject;
+}
+
+void AEternalGrace_ProtoCharacter::Die_Implementation()
+{
+	Super::Die_Implementation();
+	AEG_PlayerController* PlayerController = Cast<AEG_PlayerController>(UGameplayStatics::GetPlayerController(World,PlayerIndex));
+	if(PlayerController)
+	{
+		PlayerController->HandlePlayerDeath(CurrentGameInstance);
+	}
 }
 
 void AEternalGrace_ProtoCharacter::Stagger_Implementation(EAttackDirection Direction, float PoiseDamage, AActor* DamageInstigator)

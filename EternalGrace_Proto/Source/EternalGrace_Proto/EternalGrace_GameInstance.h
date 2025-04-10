@@ -105,4 +105,7 @@ public:
 
 	UFUNCTION()
 	void SavePlayerData();
+
+	UFUNCTION()
+	void ResetGameStatus(UWorld* LoadedWorld);
 };

@@ -67,10 +67,10 @@ void AEnemy::Stagger_Implementation(EAttackDirection Direction, float PoiseDamag
 	}
 }
 
-void AEnemy::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection)
+void AEnemy::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection AttackDirection, FVector HitLocation, FRotator HitRotation)
 {
 	//Get Damage
-	Super::GetDamage_Implementation(Attacker, DamageValue, PoiseDamage, AttackDirection);
+	Super::GetDamage_Implementation(Attacker, DamageValue, PoiseDamage, AttackDirection, HitLocation, HitRotation);
 	//Check Which Player did the Damage, if it was a Player at all
 	AEternalGrace_ProtoCharacter* PlayerChar = Cast<AEternalGrace_ProtoCharacter>(Attacker);
 	if (PlayerChar)
