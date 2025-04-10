@@ -84,8 +84,8 @@ AEternalGrace_ProtoCharacter::AEternalGrace_ProtoCharacter()
 	UpperArmor->GetPantsMesh()->SetupAttachment(GetMesh());
 	UpperArmor->GetPantsMesh()->SetLeaderPoseComponent(GetMesh());
 
-	UpperArmor->GetHelmetMesh()->SetupAttachment(HeadMesh);
-	UpperArmor->GetHelmetMesh()->SetLeaderPoseComponent(HeadMesh);
+	UpperArmor->GetHelmetMesh()->SetupAttachment(GetMesh(), "s_head");
+	UpperArmor->GetHelmetMesh()->SetBoundsScale(2.0f);
 
 	UpperArmor->GetArmorSoundComponent()->SetupAttachment(GetMesh());
 
