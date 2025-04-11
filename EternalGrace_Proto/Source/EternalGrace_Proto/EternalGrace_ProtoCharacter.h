@@ -258,6 +258,8 @@ public:
 	UFUNCTION()
 	void FinishClimbing(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
+	void LateInitialization();
+
 
 	 virtual void Landed(const FHitResult& Hit)override;
 	 void SetCurrentActionState(EActionState ActionState)override;

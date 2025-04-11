@@ -59,6 +59,7 @@ void ADefaultGameMode::BeginPlay()
 				Player1->SetPlayerIndex(0);
 				FirstPlayerController->Possess(Player1);
 				FirstPlayerController->SetOwningCharacterVariable(Player1);
+				Player1->LateInitialization();
 			}
 			else
 			{
@@ -100,6 +101,7 @@ void ADefaultGameMode::BeginPlay()
 				Player2->SetPlayerIndex(1);
 				SecondPlayerController->Possess(Player2);
 				SecondPlayerController->SetOwningCharacterVariable(Player2);
+				Player2->LateInitialization();
 			}
 			else
 			{

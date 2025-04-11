@@ -254,12 +254,6 @@ void AEternalGrace_ProtoCharacter::BeginPlay()
 	{
 		EquipOffhandWeapon(WeaponComponent->OffhandWeaponClass);
 	}
-	//Health
-	if (HealthComponent)
-	{
-		/*Todo: Fix issue that Player Index is set in constructor. Because of this, that value will be used in begin play instead of the index set by gamemode after construction*/
-		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World, PlayerIndex));
-	}
 
 }
 
@@ -534,6 +528,17 @@ void AEternalGrace_ProtoCharacter::FinishClimbing(FName NotifyName, const FBranc
 	SetCurrentActionState(EActionState::Idle);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	bIsCurrentlyClimbingUp = false;
+}
+/*Late Initialization is called by GameMode after possessing the pawn to prevent Issues with Player Index, which is set by Player Controller but also used by Initialization of the Character.
+The Problem is that Character uses its Player Index when e.g. Initializing Health Component*/
+void AEternalGrace_ProtoCharacter::LateInitialization()
+{
+	//Health
+	if (HealthComponent)
+	{
+		/*Todo: Fix issue that Player Index is set in constructor. Because of this, that value will be used in begin play instead of the index set by gamemode after construction*/
+		HealthComponent->ShowHPBar(UGameplayStatics::GetPlayerController(World, PlayerIndex));
+	}
 }
 
 void AEternalGrace_ProtoCharacter::Landed(const FHitResult& Hit)
