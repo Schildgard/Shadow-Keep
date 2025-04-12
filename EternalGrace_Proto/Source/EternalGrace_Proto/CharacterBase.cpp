@@ -97,6 +97,8 @@ void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValu
 	if(CurrentActionState == EActionState::Guarding && Direction == EAttackDirection::Front)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s Blocks Attack"), *GetFName().ToString())
+	//		USoundBase* BlockSound;
+	//	UGameplayStatics::SpawnSoundAtLocation(World, BlockSound, HitLocation, HitRotation);
 			return;
 	}
 
