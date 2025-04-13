@@ -43,6 +43,7 @@ EWeaponType UWeaponComponent::ChangeWeapon(TSubclassOf<AWeaponBase> WeaponToEqui
 		NormalWeaponAttacks = CurrentWeaponObject->GetNormalAttacks();
 		RunningAttack = CurrentWeaponObject->GetRunningAttack();
 		DodgeAttack = CurrentWeaponObject->GetDodgeAttack();
+		/*If Weapon is TwoHanded, Unequip Offhand Weapon*/
 		if (WeaponToEquip->GetDefaultObject<AWeaponBase>()->WeaponCategory == EWeaponType::GreatSword && OffhandWeaponObject)
 		{
 			OffhandWeaponObject->Destroy();

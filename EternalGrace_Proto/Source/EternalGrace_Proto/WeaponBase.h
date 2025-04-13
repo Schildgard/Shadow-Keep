@@ -56,7 +56,7 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
-	TSoftObjectPtr<UTexture2D> ThumpNailImage;
+	TSoftObjectPtr<UTexture2D> ThumpnailImage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess))
 	UStaticMeshComponent* WeaponMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))

@@ -3,6 +3,8 @@
 
 #include "CharacterBase.h"
 #include "WeaponBase.h"
+#include "ShieldBase.h"
+#include "ShieldComponent.h"
 #include "EternalGrace_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet//KismetSystemLibrary.h"
@@ -10,6 +12,7 @@
 #include "EternalGrace_GameInstance.h"
 #include "HealthComponent.h"
 #include "ValueBarWidgetBase.h"
+#include "NiagaraFunctionLibrary.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -26,12 +29,15 @@ ACharacterBase::ACharacterBase()
 	BeardComponent->SetupAttachment(HeadMesh);
 	MustacheComponent = CreateDefaultSubobject<UGroomComponent>("MustacheComp");
 	MustacheComponent->SetupAttachment(HeadMesh);
-	
+
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
 	HealthComponent->GetHitSoundComponent()->SetupAttachment(GetMesh());
 
 	VoiceComponent = CreateDefaultSubobject<UAudioComponent>("Voice");
 	VoiceComponent->SetupAttachment(GetMesh(), "head");
+
+	ShieldComponent = CreateDefaultSubobject<UShieldComponent>("Shield Component");
+	ShieldComponent->SetupAttachment(GetMesh(), "s_hand_l");
 }
 
 void ACharacterBase::BeginPlay()
@@ -43,7 +49,12 @@ void ACharacterBase::BeginPlay()
 	CurrentGameInstance = Cast<UEternalGrace_GameInstance>(GameInstanceReference);
 
 	SaveGameObject = CurrentGameInstance->GetCurrentSaveGame();
-	
+
+	if(ShieldComponent && ShieldComponent->GetCurrentShieldClass())
+	{
+		ShieldComponent->EquipShield(ShieldComponent->GetCurrentShieldClass());
+	}
+
 }
 
 void ACharacterBase::SaveData_Implementation()
@@ -58,7 +69,7 @@ void ACharacterBase::LoadData_Implementation()
 
 void ACharacterBase::MakeSaveCall()
 {
-	if(CurrentGameInstance)
+	if (CurrentGameInstance)
 	{
 		CurrentGameInstance->RequestSave();
 	}
@@ -66,7 +77,7 @@ void ACharacterBase::MakeSaveCall()
 
 void ACharacterBase::MakeLoadCall()
 {
-	if(CurrentGameInstance)
+	if (CurrentGameInstance)
 	{
 		CurrentGameInstance->RequestLoad();
 	}
@@ -85,7 +96,10 @@ AWeaponBase* ACharacterBase::GetOffhandWeapon_Implementation()
 {
 	return nullptr;
 }
-
+AShieldBase* ACharacterBase::GetShield_Implementation()
+{
+	return ShieldComponent->GetCurrentShieldObject();
+}
 void ACharacterBase::Attack_Implementation()
 {
 	UE_LOG(LogTemp, Display, TEXT("%s perfoms an Attack"), *GetFName().ToString())
@@ -94,22 +108,26 @@ void ACharacterBase::Attack_Implementation()
 void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)
 {
 	//Check if here if Damage goes through Block or something
-	if(CurrentActionState == EActionState::Guarding && Direction == EAttackDirection::Front)
+	if (CurrentActionState == EActionState::Guarding && Direction == EAttackDirection::Front)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s Blocks Attack"), *GetFName().ToString())
-	//		USoundBase* BlockSound;
-	//	UGameplayStatics::SpawnSoundAtLocation(World, BlockSound, HitLocation, HitRotation);
-			return;
+
+		float ReducedDamage = DamageValue - ((DamageValue / 100) * ShieldComponent->BlockValue);
+		HealthComponent->CurrentHealth -= ReducedDamage;
+		GetMesh()->GetAnimInstance()->Montage_Play(ShieldComponent->GetNormalBlockAnimation());
+		UGameplayStatics::SpawnSoundAtLocation(World, ShieldComponent->GetBlockSound(), HitLocation, HitRotation);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, ShieldComponent->GetBlockEffect(), HitLocation, HitRotation);
 	}
-
-
-	HealthComponent->GetDamage(Attacker, DamageValue, PoiseDamage, Direction, HitLocation, HitRotation);
+	else
+	{
+		HealthComponent->GetDamage(Attacker, DamageValue, PoiseDamage, Direction, HitLocation, HitRotation);
+	}
 	HealthComponent->UpdateHPBar();
 
-	if(HealthComponent->CurrentHealth <= 0)
+	if (HealthComponent->CurrentHealth <= 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s call Die Implementation"), *GetFName().ToString())
-		HealthComponent->CurrentHealth = 0;
+			HealthComponent->CurrentHealth = 0;
 		IDamageable::Execute_Die(this);
 	}
 }
@@ -127,10 +145,10 @@ UAudioComponent* ACharacterBase::GetHitSoundComponent_Implementation()
 void ACharacterBase::Die_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s is defeated"), *GetFName().ToString())
-	if(HealthComponent && HealthComponent->GetDeathAnimation())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(HealthComponent->GetDeathAnimation());
-	}
+		if (HealthComponent && HealthComponent->GetDeathAnimation())
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(HealthComponent->GetDeathAnimation());
+		}
 }
 
 TArray<TEnumAsByte<EObjectTypeQuery>> ACharacterBase::GetHittableObjectTypes_Implementation()

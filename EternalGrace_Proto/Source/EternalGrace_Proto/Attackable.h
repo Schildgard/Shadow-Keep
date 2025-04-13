@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "Components/CapsuleComponent.h"
 #include "WeaponBase.h"
+#include "ShieldBase.h"
 #include "Attackable.generated.h"
 
 // This class does not need to be modified.
@@ -32,6 +33,8 @@ public:
 	AWeaponBase* GetWeapon();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AWeaponBase* GetOffhandWeapon();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AShieldBase* GetShield();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Attack();

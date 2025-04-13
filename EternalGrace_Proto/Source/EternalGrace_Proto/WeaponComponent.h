@@ -45,7 +45,4 @@ public:
 	UPROPERTY()
 	UAnimMontage* DodgeAttack;
 
-	UPROPERTY()
-	USoundBase* BlockSound;
-
 };

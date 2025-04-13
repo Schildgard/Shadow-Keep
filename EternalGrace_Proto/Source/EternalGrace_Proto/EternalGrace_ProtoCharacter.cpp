@@ -21,6 +21,7 @@
 #include "Pants.h"
 #include "Interactable.h"
 #include "WeaponComponent.h"
+#include "ShieldComponent.h"
 #include "WeaponBase.h"
 #include "EG_AnimInstance.h"
 #include "InputBufferComponent.h"
@@ -175,13 +176,14 @@ void AEternalGrace_ProtoCharacter::PerformOffhandAction()
 		SetCurrentActionState(EActionState::Guarding);
 		break;
 	case EActionState::Attacking: //if attacking, check if an offhand attack can be performed and perform or buffer if necessary
-		if (!WeaponComponent->OffhandAttack || !EGAnimInstance->bCanOffhandAttack) return;
+		if (!ShieldComponent->GetShieldAttack() || !EGAnimInstance->bCanOffhandAttack) return;
 		if (!EGAnimInstance->bCanContinueAttack)
 		{
 			InputBufferingComponent->SaveInput(EInputType::OffhandAttack);
 			return;
 		}
-		EGAnimInstance->Montage_Play(WeaponComponent->OffhandAttack, true);
+		UE_LOG(LogTemp, Warning, TEXT("Perform ShieldBash"))
+		EGAnimInstance->Montage_Play(ShieldComponent->GetShieldAttack(), true);
 		break;
 	case EActionState::Climbing:
 		InputBufferingComponent->SaveInput(EInputType::OffhandAttack);
@@ -494,9 +496,6 @@ void AEternalGrace_ProtoCharacter::HangOnLedge(FVector SnappingPosition, FVector
 
 	FLatentActionInfo ActionInfo;
 	ActionInfo.CallbackTarget = this;
-	//ActionInfo.ExecutionFunction = FName("Climp");
-	//ActionInfo.Linkage = 0;
-	//ActionInfo.UUID = __LINE__;
 
 	UGameplayStatics::PlaySoundAtLocation(World, AttachToWallSound, TargetLocation);
 	UKismetSystemLibrary::MoveComponentTo(Capsule, TargetLocation, TargetRotation, true, true, 0.1f, false, EMoveComponentAction::Move, ActionInfo);
@@ -722,7 +721,16 @@ AWeaponBase* AEternalGrace_ProtoCharacter::GetWeapon_Implementation()
 
 AWeaponBase* AEternalGrace_ProtoCharacter::GetOffhandWeapon_Implementation()
 {
-	return WeaponComponent->OffhandWeaponObject;
+	if (WeaponComponent->OffhandWeaponObject)
+	{
+		return WeaponComponent->OffhandWeaponObject;
+	}
+	else if (ShieldComponent->GetCurrentShieldObject())
+	{
+		return ShieldComponent->GetCurrentShieldObject();
+	}
+	else
+	return nullptr;
 }
 
 void AEternalGrace_ProtoCharacter::Die_Implementation()

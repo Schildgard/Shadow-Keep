@@ -101,7 +101,7 @@ void UInventoryComponent::AddWeaponToInventory(TSubclassOf<AWeaponBase> WeaponTo
 {
 	WeaponInventory.Add(WeaponToAdd);
 	AWeaponBase* ReferenceObject = WeaponToAdd.GetDefaultObject();
-	ShowObtainItemWidget(ReferenceObject->GetWeaponName(), ReferenceObject->ThumpNailImage);
+	ShowObtainItemWidget(ReferenceObject->GetWeaponName(), ReferenceObject->ThumpnailImage);
 	//UE_LOG(LogTemp, Display, TEXT("Added to Inventory %s"), *WeaponToAdd->GetWeaponName().ToString());
 }
 

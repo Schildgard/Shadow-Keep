@@ -19,6 +19,7 @@ class UCapsuleComponent;
 class UEternalGrace_SaveGame;
 class UEternalGrace_GameInstance;
 class UHealthComponent;
+class UShieldComponent;
 UCLASS()
 class ETERNALGRACE_PROTO_API ACharacterBase : public ACharacter, public ISaveable, public IAttackable, public IDamageable
 {
@@ -47,6 +48,12 @@ protected:
 	UHealthComponent* HealthComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
 	UAudioComponent* VoiceComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	UShieldComponent* ShieldComponent;
+
+	/*todo: put this later in the weapon component or shield class*/
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat" meta = (AllowPrivateAccess))
+	//USoundBase* BlockSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess))
 	FName ObjectID;
@@ -73,6 +80,8 @@ protected:
 	virtual AWeaponBase* GetWeapon_Implementation()override;
 	UFUNCTION()
 	virtual AWeaponBase* GetOffhandWeapon_Implementation()override;
+	UFUNCTION()
+	virtual AShieldBase* GetShield_Implementation()override;
 	UFUNCTION()
 	virtual void Attack_Implementation()override;
 

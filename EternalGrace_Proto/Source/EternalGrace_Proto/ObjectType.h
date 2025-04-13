@@ -19,4 +19,5 @@ enum class EObjectType : uint8
 	UseableItem		UMETA(DisplayName = "UseableObject"),
 	KeyItem			UMETA(DisplayName = "KeyObject"),
 	Weapon			UMETA(DisplayName = "Weapon"),
+	Shield			UMETA(DisplayName = "Shield")
 };

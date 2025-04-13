@@ -167,7 +167,7 @@ void AEG_PlayerController::ShowInventory()
 
 						CurrentInventorySlot[z]->AddToPlayerScreen();
 						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
-						CurrentInventorySlot[z]->SetImage(WeaponInstance->ThumpNailImage.LoadSynchronous());
+						CurrentInventorySlot[z]->SetImage(WeaponInstance->ThumpnailImage.LoadSynchronous());
 						CurrentInventorySlot[z]->SetWeapon(Weapon);
 						CurrentInventorySlot[z]->SetObjectType(EObjectType::Weapon);
 						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
