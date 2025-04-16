@@ -8,7 +8,7 @@ FPlayerSaveData::FPlayerSaveData()
 
 }
 
-void FPlayerSaveData::UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave, TArray<TSubclassOf<AWeaponBase>>* WeaponMapToSave, TSubclassOf<AWeaponBase>*  CurrentWeaponToSave, TSubclassOf<AWeaponBase>* CurrentOffHandWeaponToSave)
+void FPlayerSaveData::UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave, TArray<TSubclassOf<AWeaponBase>>* WeaponMapToSave, TSubclassOf<AWeaponBase>*  CurrentWeaponToSave, TSubclassOf<AWeaponBase>* CurrentOffHandWeaponToSave, TMap<FName, int>* KeyItemsToSave)
 {
 	//Save Player Data
 	PlayerTransform = NewTransform;
@@ -24,5 +24,7 @@ void FPlayerSaveData::UpdatePlayerData(FTransform NewTransform, FName Armor, FNa
 	SavedWeaponInventory = *WeaponMapToSave;
 	CurrentWeapon = *CurrentWeaponToSave;
 	CurrentOffHandWeapon = *CurrentOffHandWeaponToSave;
+
+	SavedKeyItemDataMap = *KeyItemsToSave;
 }
 

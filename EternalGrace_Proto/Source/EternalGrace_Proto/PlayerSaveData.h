@@ -42,9 +42,11 @@ public:
 	TMap<FName,int> SavedPantsDataMap;
 	UPROPERTY()
 	TMap<FName,int> SavedHelmetDataMap;
+	UPROPERTY()
+	TMap<FName, int> SavedKeyItemDataMap;
 
 	UPROPERTY()
 	TArray<TSubclassOf<AWeaponBase>> SavedWeaponInventory;
 
-	void UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave, TArray<TSubclassOf<AWeaponBase>>* WeaponToSave, TSubclassOf<AWeaponBase>* CurrentWeaponToSave, TSubclassOf<AWeaponBase>* CurrentOffHandWeaponToSave);
+	void UpdatePlayerData(FTransform NewTransform, FName Armor, FName Pants, FName Helmet, TMap<FName, int>* ArmorDataToSave, TMap<FName, int>* PantsDataToSave, TMap<FName, int>* HelmetDataToSave, TArray<TSubclassOf<AWeaponBase>>* WeaponToSave, TSubclassOf<AWeaponBase>* CurrentWeaponToSave, TSubclassOf<AWeaponBase>* CurrentOffHandWeaponToSave, TMap<FName, int>* KeyItemsToSave);
 };

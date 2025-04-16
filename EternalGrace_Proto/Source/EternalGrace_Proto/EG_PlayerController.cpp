@@ -11,6 +11,7 @@
 #include "InventoryComponent.h"
 #include "Armor.h"
 #include "Pants.h"
+#include "KeyItem.h"
 #include "WeaponBase.h"
 #include "ObtainWidget.h"
 #include "ItemObtainContainerWidget.h"
@@ -173,6 +174,24 @@ void AEG_PlayerController::ShowInventory()
 						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
 					}
 					z++;
+				}
+
+				for (TPair<FName, int> KeyItemData : OwningCharacter->GetInventory()->KeyItemInventoryMap)
+				{
+					FKeyItem* Item = OwningCharacter->GetInventory()->GlobalKeyItemInventory->FindRow<FKeyItem>(KeyItemData.Key, Context2, true);
+
+					CurrentInventorySlot.Add(CreateWidget<UInventorySlot>(this, InventorySlotClass));
+					if (CurrentInventorySlot[z])
+					{
+						CurrentInventorySlot[z]->AddToPlayerScreen();
+						InventoryWrapBox->AddChildToWrapBox(CurrentInventorySlot[z]);
+						CurrentInventorySlot[z]->SetImage(Item->ThumpnailImage.LoadSynchronous());
+						CurrentInventorySlot[z]->SetItemName(Item->ItemName);
+						CurrentInventorySlot[z]->SetObjectType(Item->ObjectType);
+						CurrentInventorySlot[z]->GetSlotButton()->OnClicked.AddDynamic(CurrentInventorySlot[z], &UInventorySlot::UseInventorySlot);
+					}
+					z++;
+
 				}
 
 				if (CurrentInventorySlot.Num() >= 1)

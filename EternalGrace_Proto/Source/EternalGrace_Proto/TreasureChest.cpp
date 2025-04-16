@@ -61,6 +61,15 @@ void ATreasureChest::GetAllTreasure()
 	{
 		Interactor->GetInventory()->AddWeaponToInventory(Weapon);
 	}
+
+	for (FName KeyItemName : ContainedKeyItems)
+	{
+		//Interactor->ObtainArmor(KeyItemName, EObjectType::KeyItem);
+		Interactor->GetInventory()->TryToObtainItem(KeyItemName, EObjectType::KeyItem);
+	}
+	ContainedKeyItems.Empty();
+
+	
 	ContainedWeapons.Empty();
 	Execute_SaveData(this);
 

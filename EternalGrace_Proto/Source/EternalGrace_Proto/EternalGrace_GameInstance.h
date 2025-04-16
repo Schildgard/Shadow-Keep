@@ -34,6 +34,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta =(AllowPrivateAccess))
 	TArray<FName> SaveGameSlots;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LevelLoading", meta = (AllowPrivateAccess))
+	FName EntryLevelName;
+
 	UPROPERTY()
 	FName ActiveSaveSlot;
 	//Multiplayer Section
@@ -53,10 +56,19 @@ protected:
 	// even though he right now uses CharacterClass0 and 1 which I thing might be obsolete by now..
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
 	TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> PlayerMap;
+
+	//World Actor Management
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game Progress", meta = (AllowPrivateAccess))
+	TMap<FName, AActor*> TriggerableActorMap;
 public:
 	UFUNCTION()
 	bool GetTwoPlayerMode();
 
+	UFUNCTION()
+	AActor* FindTriggerableActor(FName ObjectID);
+
+	UFUNCTION()
+	void RegisterTriggerableActor(FName ObjectID, AActor* ActorToRegister);
 
 
 
@@ -66,8 +78,6 @@ public:
 
 	UFUNCTION()
 	void RequestSave();
-	UFUNCTION()
-	void RequestSingleSave(FName ObjectID, FPlayerSaveData NewSaveData);
 	UFUNCTION()
 	void RequestLoad();
 

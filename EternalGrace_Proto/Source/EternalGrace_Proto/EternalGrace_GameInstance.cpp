@@ -17,6 +17,8 @@ UEternalGrace_GameInstance::UEternalGrace_GameInstance()
 	CurrentSaveGame = nullptr;
 	bIsMultiplayerActivated = false;
 	bHasMultiplayerBeenSet = false;
+
+	EntryLevelName = "Map_TestLevel";
 }
 
 void UEternalGrace_GameInstance::Init()
@@ -28,6 +30,26 @@ void UEternalGrace_GameInstance::Init()
 bool UEternalGrace_GameInstance::GetTwoPlayerMode()
 {
 	return bIsMultiplayerActivated;
+}
+
+AActor* UEternalGrace_GameInstance::FindTriggerableActor(FName ObjectID)
+{
+	if (TriggerableActorMap.Find(ObjectID))
+	{
+		return TriggerableActorMap[ObjectID];
+	}
+	else return nullptr;
+}
+
+void UEternalGrace_GameInstance::RegisterTriggerableActor(FName ObjectID, AActor* ActorToRegister)
+{
+
+	if(TriggerableActorMap.Contains(ObjectID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameInstance already contained %s"), *ObjectID.ToString())
+		return;
+	}
+	TriggerableActorMap.Add(ObjectID, ActorToRegister);
 }
 
 TArray<AActor*> UEternalGrace_GameInstance::GetAllSaveables()
@@ -67,31 +89,6 @@ void UEternalGrace_GameInstance::RequestSave()
 
 }
 
-void UEternalGrace_GameInstance::RequestSingleSave(FName ObjectID, FPlayerSaveData NewSaveData)
-{
-	//	FString SaveGameName = ActiveSaveSlot.ToString();
-	//	//Add any Conditions here, that may prevent Saving
-	//	USaveGame* DynamicSaveGame = nullptr;
-	//	//check if Savegame exists and apply dynamic SaveGameReference
-	//	bool bDoesSaveGameExist = UGameplayStatics::DoesSaveGameExist(SaveGameName, 0);
-	//	if (bDoesSaveGameExist)
-	//	{
-	//		DynamicSaveGame = UGameplayStatics::LoadGameFromSlot(SaveGameName, 0);
-	//	}
-	//	else
-	//	{
-	//		DynamicSaveGame = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
-	//	}
-	//	CurrentSaveGame = Cast<UEternalGrace_SaveGame>(DynamicSaveGame);
-	//	if (CurrentSaveGame)
-	//	{
-	//		//Save
-	//		CurrentSaveGame->SavePlayerData(ObjectID, NewSaveData);
-	//	}
-
-
-}
-
 void UEternalGrace_GameInstance::RequestLoad()
 {
 	FString SaveGameName = ActiveSaveSlot.ToString(); //Vielleicht wird der ActiveSaveSlot nicht zuverlässig gesetzt?
@@ -106,8 +103,6 @@ void UEternalGrace_GameInstance::RequestLoad()
 	}
 
 	UE_LOG(LogTemp, Error, TEXT("SaveGame Slot ID was %s"), *CurrentSaveGame->SlotID);
-	//	DynamicSaveGame = UGameplayStatics::LoadGameFromSlot(SaveGameName, 0);
-	//	CurrentSaveGame = Cast<UEternalGrace_SaveGame>(DynamicSaveGame);
 	if (CurrentSaveGame)
 	{
 		UE_LOG(LogTemp, Error, TEXT("SaveGame Slot ID is %s"), *CurrentSaveGame->SlotID);
@@ -221,14 +216,14 @@ void UEternalGrace_GameInstance::StartGame()
 	CurrentSaveGame->SetTwoPlayerModeInfo(bIsMultiplayerActivated);
 	CurrentSaveGame->SetPlayerMap(PlayerMap);
 	//Load The Game
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Map_EntryLevel"));
+	UGameplayStatics::OpenLevel(GetWorld(), EntryLevelName);
 }
 
 void UEternalGrace_GameInstance::ResumeGame()
 {
 	SetMultiplayer(CurrentSaveGame->GetTwoPlayerModeInfo());
 	PlayerMap = CurrentSaveGame->GetPlayerMap();
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Map_EntryLevel"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName(EntryLevelName));
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEternalGrace_GameInstance::TestLoadLevel);
 }
 
@@ -338,9 +333,7 @@ void UEternalGrace_GameInstance::ResetGameStatus(UWorld* LoadedWorld)
 	APlayerController* SecondPlayerController = UGameplayStatics::GetPlayerController(LoadedWorld, 1);
 	if(SecondPlayerController)
 	{
-		//UGameplayStatics::RemovePlayer(SecondPlayerController, false);
 		RemoveLocalPlayer(GetLocalPlayerByIndex(1));
-		//SecondPlayerController->Destroy();
 		UE_LOG(LogTemp, Error, TEXT("Destroyed second player controller (GameInstance)"))
 	}
 	else

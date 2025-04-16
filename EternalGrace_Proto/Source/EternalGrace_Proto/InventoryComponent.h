@@ -10,6 +10,7 @@
 struct FArmor;
 struct FPants;
 struct FHelmet;
+struct FKeyItem;
 class AWeaponBase;
 class AEG_PlayerController;
 
@@ -31,6 +32,9 @@ public:
 	UDataTable* GlobalPantsInventory;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GlobalData", meta = (AllowPrivateAccess))
 	UDataTable* GlobalHelmetInventory;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GlobalData", meta = (AllowPrivateAccess))
+	UDataTable* GlobalKeyItemInventory;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta =(AllowPrivateAccess))
 	TMap<FName, int> ArmorInventoryMap;
@@ -38,6 +42,8 @@ public:
 	TMap<FName, int> PantsInventoryMap;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
 	TMap<FName, int> HelmetInventoryMap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
+	TMap<FName, int> KeyItemInventoryMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LocalData", meta = (AllowPrivateAccess))
 	TArray<TSubclassOf<AWeaponBase>> WeaponInventory;
@@ -55,6 +61,8 @@ public:
 	void AddPantsToInventory(FPants PantsToAdd);
 	UFUNCTION()
 	void AddHelmetToInventory(FHelmet HelmetToAdd);
+	UFUNCTION()
+	void AddKeyItemToInventory(FKeyItem KeyItemToAdd);
 
 	UFUNCTION()
 	void AddWeaponToInventory(TSubclassOf<AWeaponBase> WeaponToAdd);

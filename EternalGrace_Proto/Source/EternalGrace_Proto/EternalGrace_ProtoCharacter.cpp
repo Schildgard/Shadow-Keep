@@ -440,13 +440,13 @@ void AEternalGrace_ProtoCharacter::ClimpCheckForward()
 	{
 		FVector Destination = GetActorLocation() + (GetActorForwardVector() * ScanDistance);
 		FHitResult Hit;
-		bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, GetActorLocation(), Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+		bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, GetActorLocation(), Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
 
 		if (bHitScan)
 		{
 			if (Hit.GetActor()->ActorHasTag("Climpable"))
 			{
-				//	UE_LOG(LogTemp, Warning, TEXT("Hitted Wall of %s"), *Hit.GetActor()->GetFName().ToString())
+					UE_LOG(LogTemp, Warning, TEXT("Hitted Wall of %s"), *Hit.GetActor()->GetFName().ToString())
 				FVector WallLocation = Hit.Location;
 				FVector WallNormal = Hit.Normal;
 				ClimpCheckUpward(WallLocation, WallNormal);
@@ -458,12 +458,13 @@ void AEternalGrace_ProtoCharacter::ClimpCheckForward()
 void AEternalGrace_ProtoCharacter::ClimpCheckUpward(FVector WallLocation, FVector WallNormal)
 {
 	FVector Destination = GetActorLocation() + (GetActorForwardVector() * 75.f);
-	FVector Start = Destination + FVector(0.0f, 0.0f, 500.f);
+	FVector Start = Destination + FVector(0.0f, 0.0f, 200.f);
 	FHitResult Hit;
-	bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, Start, Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::None, Hit, true, FLinearColor::Yellow, FLinearColor::Blue);
-
+	bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, Start, Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true, FLinearColor::Yellow, FLinearColor::Blue);
+	//UE_LOG(LogTemp, Error, TEXT("Do Hill Edge Check"))
 	if (bHitScan)
 	{
+	//	UE_LOG(LogTemp, Error, TEXT("Hill Edge Check Successfull"))
 		FVector SocketLocation = GetMesh()->GetSocketLocation("s_climp");
 
 		float HeightDistance = SocketLocation.Z - Hit.Location.Z;
@@ -471,12 +472,14 @@ void AEternalGrace_ProtoCharacter::ClimpCheckUpward(FVector WallLocation, FVecto
 		{
 			HangOnLedge(WallLocation, WallNormal, Hit.Location);
 		}
+		//	UE_LOG(LogTemp, Error, TEXT("HeightRange Check failed: HeightDistance : %f"), HeightDistance)
 	}
 
 }
 
 void AEternalGrace_ProtoCharacter::HangOnLedge(FVector SnappingPosition, FVector WallNormal, FVector HeightLocation)
 {
+	UE_LOG(LogTemp, Error, TEXT("Call Hang on ledge Function"))
 	//Lock Player Position and Play Hanging Animation
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 	GetCharacterMovement()->StopMovementImmediately();
@@ -596,7 +599,7 @@ void AEternalGrace_ProtoCharacter::SaveData_Implementation()
 	if (SaveGameObject)
 	{
 		//Update localSaveData Struct
-		SaveDataInfo.UpdatePlayerData(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), &PlayerInventory->ArmorInventoryMap, &PlayerInventory->PantsInventoryMap, &PlayerInventory->HelmetInventoryMap, &PlayerInventory->WeaponInventory, &WeaponComponent->CurrentWeaponClass, &WeaponComponent->OffhandWeaponClass);
+		SaveDataInfo.UpdatePlayerData(GetActorTransform(), UpperArmor->GetArmorName(), UpperArmor->GetPantsName(), UpperArmor->GetHelmetsName(), &PlayerInventory->ArmorInventoryMap, &PlayerInventory->PantsInventoryMap, &PlayerInventory->HelmetInventoryMap, &PlayerInventory->WeaponInventory, &WeaponComponent->CurrentWeaponClass, &WeaponComponent->OffhandWeaponClass, &PlayerInventory->KeyItemInventoryMap);
 		//Actually Save Data from Struct To SaveGame
 		SaveGameObject->SavePlayerData(ObjectID, SaveDataInfo);
 		UE_LOG(LogTemp, Warning, TEXT("%s called SavePlayerData on SaveGameID %s"), *ObjectID.ToString(), *SaveGameObject->SlotID);
@@ -634,6 +637,7 @@ void AEternalGrace_ProtoCharacter::LoadData_Implementation()
 			PlayerInventory->PantsInventoryMap = SaveDataInfo.SavedPantsDataMap;
 			PlayerInventory->HelmetInventoryMap = SaveDataInfo.SavedHelmetDataMap;
 			PlayerInventory->WeaponInventory = SaveDataInfo.SavedWeaponInventory;
+			PlayerInventory->KeyItemInventoryMap = SaveDataInfo.SavedKeyItemDataMap;
 
 
 		}

@@ -5,6 +5,7 @@
 #include "Pants.h"
 #include "Helmet.h"
 #include "WeaponBase.h"
+#include "KeyItem.h"
 #include "EternalGrace_ProtoCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "EG_PlayerController.h"
@@ -16,6 +17,7 @@ UInventoryComponent::UInventoryComponent()
 	GlobalArmorInventory = nullptr;
 	GlobalPantsInventory = nullptr;
 	GlobalHelmetInventory = nullptr;
+	GlobalKeyItemInventory = nullptr;
 }
 
 
@@ -24,10 +26,10 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	AEternalGrace_ProtoCharacter* Player = Cast<AEternalGrace_ProtoCharacter>(GetOwner());
-	if(Player)
+	if (Player)
 	{
 		OwningController = Cast<AEG_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		if(!OwningController)
+		if (!OwningController)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Inventory Component failed to Cast PlayerController"))
 		}
@@ -44,15 +46,17 @@ TMap<FName, int>* UInventoryComponent::GetInventoryOfType(EObjectType ItemCatego
 		return &PantsInventoryMap;
 	case EObjectType::HeadEquipment:
 		return &HelmetInventoryMap;
+	case EObjectType::KeyItem:
+		return &KeyItemInventoryMap;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("No Valid Object Type"))
-		return nullptr;
+			return nullptr;
 	}
 }
 
 void UInventoryComponent::AddArmorToInventory(FArmor ArmorToAdd)
 {
-	if(!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
+	if (!ArmorInventoryMap.Contains(ArmorToAdd.ArmorName))
 	{
 		ArmorInventoryMap.Add(ArmorToAdd.ArmorName, 0);
 		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *ArmorToAdd.ArmorName.ToString())
@@ -94,7 +98,22 @@ void UInventoryComponent::AddHelmetToInventory(FHelmet HelmetToAdd)
 		HelmetInventoryMap[HelmetToAdd.HelmetName] += 1;
 		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *HelmetToAdd.HelmetName.ToString())
 	}
-		ShowObtainItemWidget(HelmetToAdd.HelmetName, HelmetToAdd.ThumpNailImage);
+	ShowObtainItemWidget(HelmetToAdd.HelmetName, HelmetToAdd.ThumpNailImage);
+}
+
+void UInventoryComponent::AddKeyItemToInventory(FKeyItem KeyItemToAdd)
+{
+	if (!KeyItemInventoryMap.Contains(KeyItemToAdd.ItemName))
+	{
+		KeyItemInventoryMap.Add(KeyItemToAdd.ItemName, 0);
+		UE_LOG(LogTemp, Warning, TEXT("Added %s to Inventory"), *KeyItemToAdd.ItemName.ToString())
+	}
+	else
+	{
+		KeyItemInventoryMap[KeyItemToAdd.ItemName] += 1;
+		UE_LOG(LogTemp, Warning, TEXT("Added 1 more object of %s to Inventory"), *KeyItemToAdd.ItemName.ToString())
+	}
+	ShowObtainItemWidget(KeyItemToAdd.ItemName, KeyItemToAdd.ThumpnailImage);
 }
 
 void UInventoryComponent::AddWeaponToInventory(TSubclassOf<AWeaponBase> WeaponToAdd)
@@ -138,15 +157,24 @@ void UInventoryComponent::TryToObtainItem(FName ObjectName, EObjectType ItemCate
 		}
 		break;
 	}
+	case EObjectType::KeyItem:
+	{
+		FKeyItem* KeyItemContext = GlobalKeyItemInventory->FindRow<FKeyItem>(ObjectName, ContextString);
+		if (KeyItemContext)
+		{
+			AddKeyItemToInventory(*KeyItemContext);
+		}
+		break;
+	}
 	default:
-		UE_LOG(LogTemp, Error,TEXT("%s has no valid ItemCategory"), *ObjectName.ToString())
-		return;
+		UE_LOG(LogTemp, Error, TEXT("%s has no valid ItemCategory"), *ObjectName.ToString())
+			return;
 	}
 }
 
 void UInventoryComponent::ShowObtainItemWidget(FName ObjectID, TSoftObjectPtr<UTexture2D> ThumpNail)
 {
-	if(OwningController)
+	if (OwningController)
 	{
 		OwningController->ShowObtainWidget(ObjectID, ThumpNail);
 	}
