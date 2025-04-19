@@ -6,6 +6,7 @@
 #include "PlayerSaveData.h"
 #include "TreasureChestSaveData.h"
 #include "NPCSaveDataInfoBase.h"
+#include "TriggerableSaveData.h"
 #include "GameFramework/SaveGame.h"
 #include "EternalGrace_SaveGame.generated.h"
 
@@ -26,6 +27,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Groups", meta = (AllowPrivateAccess))
 	TMap<FName, FTreasureChestSaveData> TreasureChestSaveDataMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Groups", meta = (AllowPrivateAccess))
+	TMap<FName, FTriggerableSaveData> TriggerableSaveDataMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Groups", meta = (AllowPrivateAccess))
 	TMap<FName, FNPCSaveDataInfoBase> NPCSaveDataMap;
@@ -60,6 +64,8 @@ public:
 	UFUNCTION()
 	bool CheckTreasureSaveDataMap(FName ObjectID, FTreasureChestSaveData TreasureData);
 	UFUNCTION()
+	bool CheckTriggerableSaveDataMap(FName ObjectID, FTriggerableSaveData TriggerableData);
+	UFUNCTION()
 	bool CheckNPCSaveDataMap(FName ObjetID, FNPCSaveDataInfoBase NPCData);
 
 	UFUNCTION()
@@ -73,6 +79,8 @@ public:
 	UFUNCTION()
 	void SaveTreasureChestData(FName ObjectID, FTreasureChestSaveData NewSaveData);
 	UFUNCTION()
+	void SaveTriggerableData(FName ObjectID, FTriggerableSaveData NewSaveData);
+	UFUNCTION()
 	void SaveNPCData(FName ObjectID, FNPCSaveDataInfoBase NewSaveData);
 
 
@@ -80,6 +88,8 @@ public:
 	FPlayerSaveData* LoadPlayerData(FName ObjectID);
 	
 	FTreasureChestSaveData* LoadTreasureChestData(FName ObjectID);
+
+	FTriggerableSaveData* LoadTriggerableSaveData(FName ObjectID);
 
 	FNPCSaveDataInfoBase* LoadNPCData(FName ObjectID);
 

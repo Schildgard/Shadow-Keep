@@ -19,7 +19,7 @@ bool UStaggerComponent::GetStaggered(EAttackDirection Direction, float PoiseDama
 	CurrentPoise -= PoiseDamage;
 	if(CurrentPoise <= 0)
 	{
-		int StaggerAnimationIndex;
+		int StaggerAnimationIndex = 0;
 		switch (Direction)
 		{
 		case EAttackDirection::Front:
@@ -38,9 +38,13 @@ bool UStaggerComponent::GetStaggered(EAttackDirection Direction, float PoiseDama
 		CharacterAnimInstance->Montage_Play(StaggerAnimations[StaggerAnimationIndex]);
 		CurrentPoise = MaxPoise;
 
-		FOnMontageEnded EndDelegate;
-		EndDelegate.BindUObject(CharacterAnimInstance, &UCharacterAnimInstanceBase::ResetCharacterState);
-		CharacterAnimInstance->Montage_SetEndDelegate(EndDelegate, StaggerAnimations[StaggerAnimationIndex]);
+	//	FOnMontageEnded EndDelegate;
+	//	EndDelegate.BindUObject(CharacterAnimInstance, &UCharacterAnimInstanceBase::ResetCharacterState);
+	//	CharacterAnimInstance->Montage_SetEndDelegate(EndDelegate, StaggerAnimations[StaggerAnimationIndex]);
+
+		FOnMontageBlendingOutStarted BlendOutDelegate;
+		BlendOutDelegate.BindUObject(CharacterAnimInstance, &UCharacterAnimInstanceBase::ResetCharacterState);
+		CharacterAnimInstance->Montage_SetBlendingOutDelegate(BlendOutDelegate, StaggerAnimations[StaggerAnimationIndex]);
 		
 
 

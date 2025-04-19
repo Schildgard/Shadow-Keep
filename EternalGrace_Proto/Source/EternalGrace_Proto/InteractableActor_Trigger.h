@@ -26,7 +26,7 @@ class ETERNALGRACE_PROTO_API AInteractableActor_Trigger : public AInteractableBa
 	FName RequiredKeyObjectID;
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void TriggerRelatedObject();
 
 	virtual void GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)override;

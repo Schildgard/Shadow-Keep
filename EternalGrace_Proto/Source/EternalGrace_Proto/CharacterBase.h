@@ -92,7 +92,11 @@ protected:
 	UNiagaraSystem* GetHitEffectSystem_Implementation()override;
 	UFUNCTION()
 	UAudioComponent* GetHitSoundComponent_Implementation()override;
+
 public:
+
+	UPROPERTY()
+	bool bIsAlive;
 	UFUNCTION()
 	virtual void Die_Implementation()override;
 protected:

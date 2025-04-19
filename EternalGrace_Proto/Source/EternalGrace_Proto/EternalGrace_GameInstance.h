@@ -60,7 +60,10 @@ protected:
 	//World Actor Management
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game Progress", meta = (AllowPrivateAccess))
 	TMap<FName, AActor*> TriggerableActorMap;
+
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game Progress", meta = (AllowPrivateAccess))
+	TMap<FName, bool> DependencyActorPuzzleMap;
 	UFUNCTION()
 	bool GetTwoPlayerMode();
 

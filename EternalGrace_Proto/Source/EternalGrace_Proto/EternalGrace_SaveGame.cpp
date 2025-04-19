@@ -73,13 +73,28 @@ bool UEternalGrace_SaveGame::CheckTreasureSaveDataMap(FName ObjectID, FTreasureC
 	return true;
 }
 
+bool UEternalGrace_SaveGame::CheckTriggerableSaveDataMap(FName ObjectID, FTriggerableSaveData TriggerableSaveData)
+{
+	UE_LOG(LogTemp, Display, TEXT("Check SaveDataMap for Object ID %s"), *ObjectID.ToString())
+		if (!TriggerableSaveDataMap.Contains(ObjectID))
+		{
+			TriggerableSaveDataMap.Add(ObjectID, TriggerableSaveData);
+			if (!TriggerableSaveDataMap.Contains(ObjectID))
+			{
+				UE_LOG(LogTemp, Error, TEXT("%s could not be saved!"), *ObjectID.ToString());
+				return false;
+			}
+		}
+	return true;
+}
+
 bool UEternalGrace_SaveGame::CheckNPCSaveDataMap(FName ObjectID, FNPCSaveDataInfoBase NPCData)
 {
 	UE_LOG(LogTemp, Display, TEXT("Check SaveDataMap for Object ID %s"), *ObjectID.ToString())
-		if(!NPCSaveDataMap.Contains(ObjectID))
+		if (!NPCSaveDataMap.Contains(ObjectID))
 		{
 			NPCSaveDataMap.Add(ObjectID, NPCData);
-			if(!NPCSaveDataMap.Contains(ObjectID))
+			if (!NPCSaveDataMap.Contains(ObjectID))
 			{
 				UE_LOG(LogTemp, Error, TEXT("%s could not be saved!"), *ObjectID.ToString());
 				return false;
@@ -103,7 +118,7 @@ TMap<int, TSubclassOf<AEternalGrace_ProtoCharacter>> UEternalGrace_SaveGame::Get
 FPlayerSaveData* UEternalGrace_SaveGame::LoadPlayerData(FName ObjectID)
 {
 	FPlayerSaveData* LoadData = PlayerSaveDataMap.Find(ObjectID);
-	if(LoadData)
+	if (LoadData)
 	{
 		return LoadData;
 	}
@@ -113,8 +128,26 @@ FPlayerSaveData* UEternalGrace_SaveGame::LoadPlayerData(FName ObjectID)
 FTreasureChestSaveData* UEternalGrace_SaveGame::LoadTreasureChestData(FName ObjectID)
 {
 	FTreasureChestSaveData* LoadData = TreasureChestSaveDataMap.Find(ObjectID);
-	if(LoadData)
+	if (LoadData)
 	{
+		return LoadData;
+	}
+	return nullptr;
+}
+
+FTriggerableSaveData* UEternalGrace_SaveGame::LoadTriggerableSaveData(FName ObjectID)
+{
+	FTriggerableSaveData* LoadData = TriggerableSaveDataMap.Find(ObjectID);
+	if (LoadData)
+	{
+		if (LoadData->bHasBeenTriggered)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Load Triggerable Data, value is true"))
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Load Triggerable Data, value is false"))
+		}
 		return LoadData;
 	}
 	return nullptr;
@@ -123,7 +156,7 @@ FTreasureChestSaveData* UEternalGrace_SaveGame::LoadTreasureChestData(FName Obje
 FNPCSaveDataInfoBase* UEternalGrace_SaveGame::LoadNPCData(FName ObjectID)
 {
 	FNPCSaveDataInfoBase* LoadData = NPCSaveDataMap.Find(ObjectID);
-	if(LoadData)
+	if (LoadData)
 	{
 		return LoadData;
 	}
@@ -132,7 +165,7 @@ FNPCSaveDataInfoBase* UEternalGrace_SaveGame::LoadNPCData(FName ObjectID)
 
 void UEternalGrace_SaveGame::SavePlayerData(FName ObjectID, FPlayerSaveData NewSaveData)
 {
-	
+
 	if (CheckSaveDataMap(ObjectID, NewSaveData))
 	{
 		PlayerSaveDataMap[ObjectID] = NewSaveData;
@@ -157,9 +190,23 @@ void UEternalGrace_SaveGame::SaveTreasureChestData(FName ObjectID, FTreasureChes
 
 }
 
+void UEternalGrace_SaveGame::SaveTriggerableData(FName ObjectID, FTriggerableSaveData NewSaveData)
+{
+	if (CheckTriggerableSaveDataMap(ObjectID, NewSaveData))
+	{
+		TriggerableSaveDataMap[ObjectID] = NewSaveData;
+		SaveTheGame();
+		UE_LOG(LogTemp, Error, TEXT("Triggerable Saved"))
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("CheckTriggerableeSaveDataMap Failed"))
+	}
+}
+
 void UEternalGrace_SaveGame::SaveNPCData(FName ObjectID, FNPCSaveDataInfoBase NewSaveData)
 {
-	if(CheckNPCSaveDataMap(ObjectID, NewSaveData))
+	if (CheckNPCSaveDataMap(ObjectID, NewSaveData))
 	{
 		NPCSaveDataMap[ObjectID] = NewSaveData;
 		SaveTheGame();

@@ -29,14 +29,15 @@ ULockOnComponent::ULockOnComponent()
 
 void ULockOnComponent::LockOnTarget()
 {
-	LockedOnTarget = Cast<ACharacterBase>(FindTarget());
+	//LockedOnTarget = Cast<ACharacterBase>(FindTarget());
+	LockedOnTarget = FindTarget();
 
 	if (LockedOnTarget && VisualizerWidgetClass)
 	{
 		if (!Visualizer)
 		{
 			Visualizer = CreateWidget<UUserWidget>(OwningController, VisualizerWidgetClass);
-			if(LockedOnTarget->ActorHasTag("Ally"))
+			if (LockedOnTarget->ActorHasTag("Ally"))
 			{
 				Visualizer->SetColorAndOpacity(FLinearColor::Yellow);
 			}
@@ -44,10 +45,10 @@ void ULockOnComponent::LockOnTarget()
 			{
 				Visualizer->SetColorAndOpacity(FLinearColor::Red);
 			}
-			if(!Visualizer)
+			if (!Visualizer)
 			{
 				UE_LOG(LogTemp, Error, TEXT("No Visualizer (LockOnComponent), return!!"))
-				return;
+					return;
 			}
 		}
 		if (!Visualizer->IsInViewport())
@@ -55,6 +56,10 @@ void ULockOnComponent::LockOnTarget()
 			Visualizer->AddToPlayerScreen();
 		}
 		LockingActor->SetLockOn(true);
+	}
+	else
+	{
+		UnlockTarget();
 	}
 }
 
@@ -70,21 +75,27 @@ void ULockOnComponent::UpdateLockOn(float DeltaTime)
 		LockingActor->RotateTowardsTarget(LockedOnTarget);
 	}
 
-	//GET RELEVANT POSITIONS
-	FVector CameraPosition = LockingActor->GetFollowCamera()->GetComponentLocation();
-	FVector TargetPosition = LockedOnTarget->GetTargetLocation();
+	//	//GET RELEVANT POSITIONS
+	//	FVector CameraPosition = LockingActor->GetFollowCamera()->GetComponentLocation();
+	//	FVector TargetPosition = LockedOnTarget->GetTargetLocation();
+	//
+	//	//DIVIDE DISTANCE TO OPTIMIZE CAMERA Z ANGLE
+	//	float Influence = UKismetMathLibrary::Vector_Distance(CameraPosition, TargetPosition) / DistanceInfluenceOnZ;
+	//	float ZAdjustment = FMath::Clamp(Influence, MinZOffset, MaxZDrop);
+	//	FVector TargetCameraDirection = FVector(TargetPosition.X, TargetPosition.Y, TargetPosition.Z - ZAdjustment);
+	//
+	//	//SET CAMERA ROTATION
+	//	FRotator CameraLook = UKismetMathLibrary::FindLookAtRotation(CameraPosition, TargetCameraDirection);
+	//	FRotator InterpolatedRotation = FMath::RInterpTo(OwningController->GetControlRotation(), CameraLook, DeltaTime, CameraRotationInterpolation);
+	//
+	//	// ONLY USE INTERPOLATED PITCH AND YAW
+	//	FRotator UltimateRotation = FRotator(InterpolatedRotation.Pitch, InterpolatedRotation.Yaw, OwningController->GetControlRotation().Roll);
+	//	OwningController->SetControlRotation(UltimateRotation);
 
-	//DIVIDE DISTANCE TO OPTIMIZE CAMERA Z ANGLE
-	float Influence = UKismetMathLibrary::Vector_Distance(CameraPosition, TargetPosition) / DistanceInfluenceOnZ;
-	float ZAdjustment = FMath::Clamp(Influence, MinZOffset, MaxZDrop);
-	FVector TargetCameraDirection = FVector(TargetPosition.X, TargetPosition.Y, TargetPosition.Z - ZAdjustment);
-
-	//SET CAMERA ROTATION
-	FRotator CameraLook = UKismetMathLibrary::FindLookAtRotation(CameraPosition, TargetCameraDirection);
+	FRotator CameraLook = UKismetMathLibrary::FindLookAtRotation(LockingActor->GetActorLocation(), LockedOnTarget->GetActorLocation());
 	FRotator InterpolatedRotation = FMath::RInterpTo(OwningController->GetControlRotation(), CameraLook, DeltaTime, CameraRotationInterpolation);
-
-	// ONLY USE INTERPOLATED PITCH AND YAW
 	FRotator UltimateRotation = FRotator(InterpolatedRotation.Pitch, InterpolatedRotation.Yaw, OwningController->GetControlRotation().Roll);
+
 	OwningController->SetControlRotation(UltimateRotation);
 
 
@@ -98,7 +109,12 @@ void ULockOnComponent::UpdateLockOn(float DeltaTime)
 
 		if (Projected)
 		{
-		Visualizer->SetPositionInViewport(ScreenPosition, true);
+			Visualizer->SetPositionInViewport(ScreenPosition, true);
+		}
+
+		if (!LockedOnTarget->bIsAlive)
+		{
+			LockOnTarget();
 		}
 	}
 }
@@ -158,7 +174,7 @@ void ULockOnComponent::FilterTargetsByDirection(float InputAxisValue)
 				//if (Actor->GetActorLocation().X < LockedOnTarget->GetActorLocation().X)
 				if (TargetsRelativeLocation.Y >= 0)
 				{
-				//	UE_LOG(LogTemp, Warning, TEXT("Found %s right to LockedOnTarget, YPos: %f"), *Actor->GetFName().ToString(), TargetsRelativeLocation.Y);
+					//	UE_LOG(LogTemp, Warning, TEXT("Found %s right to LockedOnTarget, YPos: %f"), *Actor->GetFName().ToString(), TargetsRelativeLocation.Y);
 					comparison = LockingActor->GetDistanceTo(Actor);
 					if (comparison <= distance)
 					{
@@ -238,7 +254,7 @@ TArray<AActor*> ULockOnComponent::ScanForTargets()
 	return ScannedActors;
 }
 
-AActor* ULockOnComponent::FindTarget()
+ACharacterBase* ULockOnComponent::FindTarget()
 {
 	TArray<AActor*> ScannedActors = ScanForTargets();
 	if (ScannedActors.Num() <= 0)
@@ -246,18 +262,23 @@ AActor* ULockOnComponent::FindTarget()
 		UE_LOG(LogTemp, Warning, TEXT("Find Nearest Target: No Actors Scanned"))
 			return nullptr;
 	}
-	AActor* ClosestTarget = nullptr;
+	ACharacterBase* ClosestTarget = nullptr;
 	float comparison = 0.0f;
 	float distance = 10000.0f;
 
 	//ITERATE THROUGH SCANNED ACTORS TO FIND SMALLEST DISTANCE
 	for (AActor* Actor : ScannedActors)
 	{
-		comparison = LockingActor->GetDistanceTo(Actor);
-		if (comparison <= distance)
+		if (Actor->IsA<ACharacterBase>())
 		{
-			distance = comparison; //SAVE SMALLEST DISTANCE
-			ClosestTarget = Actor; //SAVE ACTOR IF DISTANCE IS SMALLEST
+
+			comparison = LockingActor->GetDistanceTo(Actor);
+			ACharacterBase* Candidate = Cast<ACharacterBase>(Actor);
+			if (Candidate->bIsAlive && comparison <= distance)
+			{
+				distance = comparison; //SAVE SMALLEST DISTANCE
+				ClosestTarget = Candidate; //SAVE ACTOR IF DISTANCE IS SMALLEST
+			}
 		}
 	}
 	return ClosestTarget;

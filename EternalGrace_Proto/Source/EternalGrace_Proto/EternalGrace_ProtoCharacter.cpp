@@ -129,7 +129,6 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 	case EActionState::Running: //if Running, perform running Attack
 		CancelSprint();
 		SetCurrentActionState(EActionState::Attacking);
-		//CurrentActionState = EActionState::Attacking;
 		EGAnimInstance->Montage_Play(WeaponComponent->RunningAttack, true);
 		break;
 	case EActionState::Jumping: //if in Midair, do Nothing. Maybe implement JumpAttacks later.
@@ -154,6 +153,7 @@ void AEternalGrace_ProtoCharacter::NormalAttack()
 		InputBufferingComponent->SaveInput(EInputType::NormalAttack);
 		break;
 	default:
+		UE_LOG(LogTemp, Warning, TEXT("Trigger Attack"))
 		SetCurrentActionState(EActionState::Attacking);
 		EGAnimInstance->Montage_Play(WeaponComponent->NormalWeaponAttacks[AttackCount], true);
 		break;
@@ -440,7 +440,7 @@ void AEternalGrace_ProtoCharacter::ClimpCheckForward()
 	{
 		FVector Destination = GetActorLocation() + (GetActorForwardVector() * ScanDistance);
 		FHitResult Hit;
-		bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, GetActorLocation(), Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
+		bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, GetActorLocation(), Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::None, Hit, true);
 
 		if (bHitScan)
 		{
@@ -460,7 +460,7 @@ void AEternalGrace_ProtoCharacter::ClimpCheckUpward(FVector WallLocation, FVecto
 	FVector Destination = GetActorLocation() + (GetActorForwardVector() * 75.f);
 	FVector Start = Destination + FVector(0.0f, 0.0f, 200.f);
 	FHitResult Hit;
-	bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, Start, Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true, FLinearColor::Yellow, FLinearColor::Blue);
+	bool bHitScan = UKismetSystemLibrary::SphereTraceSingle(World, Start, Destination, 10.0f, ETraceTypeQuery::TraceTypeQuery1, false, ClimpActorsToIgnore, EDrawDebugTrace::None, Hit, true, FLinearColor::Yellow, FLinearColor::Blue);
 	//UE_LOG(LogTemp, Error, TEXT("Do Hill Edge Check"))
 	if (bHitScan)
 	{

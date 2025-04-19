@@ -22,7 +22,9 @@ protected:
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess))
 	FName ObjectID;
+
 public:	
+	bool bIsTriggered;
 	virtual void Tick(float DeltaTime) override;
 
 	void Trigger_Implementation()override;

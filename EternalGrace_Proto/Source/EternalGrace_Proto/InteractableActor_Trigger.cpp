@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "EternalGrace_ProtoCharacter.h"
 #include "InventoryComponent.h"
+#include "Saveable.h"
 
 AInteractableActor_Trigger::AInteractableActor_Trigger()
 {
@@ -16,7 +17,23 @@ AInteractableActor_Trigger::AInteractableActor_Trigger()
 	RequiredKeyObjectID = "None";
 }
 
-void AInteractableActor_Trigger::TriggerRelatedObject()
+//void AInteractableActor_Trigger::TriggerRelatedObject()
+//{
+//	UEternalGrace_GameInstance* CurrentGameInstance = Cast<UEternalGrace_GameInstance>(GetWorld()->GetGameInstance());
+//	if (CurrentGameInstance)
+//	{
+//		AActor* TriggerableObject = CurrentGameInstance->FindTriggerableActor(TriggerableObjectID);
+//		if (TriggerableObject)
+//		{
+//			if (TriggerableObject->Implements<UTriggerable>())
+//			{
+//				ITriggerable::Execute_Trigger(TriggerableObject);
+//			}
+//		}
+//	}
+//}
+
+void AInteractableActor_Trigger::TriggerRelatedObject_Implementation()
 {
 	UEternalGrace_GameInstance* CurrentGameInstance = Cast<UEternalGrace_GameInstance>(GetWorld()->GetGameInstance());
 	if (CurrentGameInstance)
@@ -30,6 +47,7 @@ void AInteractableActor_Trigger::TriggerRelatedObject()
 			}
 		}
 	}
+
 }
 
 void AInteractableActor_Trigger::GetInteractedWith_Implementation(AEternalGrace_ProtoCharacter* InteractingPlayer)
@@ -47,6 +65,7 @@ void AInteractableActor_Trigger::GetInteractedWith_Implementation(AEternalGrace_
 			bCanbeActivated = false;
 			TriggerRelatedObject();
 			InteractingPlayer->GetInventory()->KeyItemInventoryMap.Remove(RequiredKeyObjectID);
+			ISaveable::Execute_SaveData(InteractingPlayer);
 		}
 		else
 		{

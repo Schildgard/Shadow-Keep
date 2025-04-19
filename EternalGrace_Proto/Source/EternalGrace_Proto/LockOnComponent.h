@@ -38,7 +38,7 @@ public:
 	TArray<AActor*> ScanForTargets();
 
 	UFUNCTION()
-	AActor* FindTarget();
+	ACharacterBase* FindTarget();
  
 
 private:

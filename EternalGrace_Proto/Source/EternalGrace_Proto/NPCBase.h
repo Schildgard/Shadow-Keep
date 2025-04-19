@@ -59,10 +59,6 @@ protected:
 
 	UPROPERTY()
 	UAnimInstance* AnimationInstance;
-
-	UPROPERTY()
-	bool bIsAlive;
-
 	UFUNCTION()
 	virtual void NoticePlayer(APawn* SpottedPawn);
 	UFUNCTION()

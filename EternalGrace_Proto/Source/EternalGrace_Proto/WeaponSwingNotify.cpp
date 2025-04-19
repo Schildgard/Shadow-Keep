@@ -88,7 +88,7 @@ void UWeaponSwingNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 		FRotator CapsuleRotation = Hitbox->GetComponentRotation();
 		IgnoreList.Add(AttackingActor);
 		TArray<FHitResult> Hitted;
-		UTraceUtils::CapsuleTraceMultiForObjects(World, CapsulePosition, CapsulePosition, HitCapsuleRadius, HitCapsuleHalfHeight, CapsuleRotation, HittableObjectTypes, false, IgnoreList, EDrawDebugTrace::ForDuration, Hitted, true);
+		UTraceUtils::CapsuleTraceMultiForObjects(World, CapsulePosition, CapsulePosition, HitCapsuleRadius, HitCapsuleHalfHeight, CapsuleRotation, HittableObjectTypes, false, IgnoreList, EDrawDebugTrace::None, Hitted, true);
 
 		//On Hit, Add to Ignore List, Spawn Niagara and Weapon Hit Sound Effect
 		for (const FHitResult& Hit : Hitted)

@@ -121,12 +121,17 @@ void ANPCBase::Attack_Implementation()
 {
 	Super::Attack_Implementation();
 	BlackboardComponent->SetValueAsBool("bCanAttack", false);
+	if(CurrentActionState == EActionState::Staggered)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Enemy Attack failed because of Stagger %s"), *GetFName().ToString())
+		return;
+	}
 
 	if (NormalAttackArray.Num() >= 1)
 	{
 		int AttackIndex = UKismetMathLibrary::RandomIntegerInRange(0, NormalAttackArray.Num() - 1);
 		UE_LOG(LogTemp, Error, TEXT("Attack Index is %i"), AttackIndex)
-			AnimationInstance->Montage_Play(NormalAttackArray[AttackIndex]);
+			AnimationInstance->Montage_Play(NormalAttackArray[AttackIndex], true);
 
 		//	FOnMontageEnded AttackEndDelegate;
 		//	AttackEndDelegate.BindUObject(this, &ANPCBase::ResetAttackState);

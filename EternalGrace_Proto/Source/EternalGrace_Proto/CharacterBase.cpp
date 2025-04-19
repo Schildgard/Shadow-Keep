@@ -108,7 +108,7 @@ void ACharacterBase::Attack_Implementation()
 void ACharacterBase::GetDamage_Implementation(AActor* Attacker, float DamageValue, float PoiseDamage, EAttackDirection Direction, FVector HitLocation, FRotator HitRotation)
 {
 	//Check if here if Damage goes through Block or something
-	if (CurrentActionState == EActionState::Guarding && Direction == EAttackDirection::Front)
+	if (CurrentActionState == EActionState::Guarding && Direction != EAttackDirection::Back)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s Blocks Attack"), *GetFName().ToString())
 
